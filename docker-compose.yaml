@@ -1,0 +1,9 @@
+services:
+  seq:
+     image: datalust/seq
+     container_name: seq
+     environment:
+      ACCEPT_EULA: "Y"
+      SEQ_PASSWORD: "{SEQ_PASSWORD}"
+     ports:
+      - "${SEQ_PORT}"

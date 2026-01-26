@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<AssemblyName>BuildHub.DataEngine</AssemblyName>
+	<RootNamespace>BuildHub.DataEngine</RootNamespace>
+	<BaseOutputPath>..\bin\DataEngine</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\API\appsettings.Development.json" Link="appsettings.Development.json" />
+    <Content Include="..\API\appsettings.json" Link="appsettings.json" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>BuildHub.UnitTests</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+
+</Project>
