@@ -4,21 +4,21 @@
             <p-accordion-panel [value]="'0'" class="pb-1">
                 <p-accordion-header >
                     <div class="flex items-center space-x-2">
-                        <app-icon [icon]="item.icon" />
+                        <bh-icon [icon]="item.icon" />
                         <h3 >{{item.label}}</h3>
                     </div>
                     <ng-template #toggleicon let-active="active">
                         @if (active) {
-                            <app-icon [icon]="ChevronUpIcon" />
+                            <bh-icon [icon]="ChevronUpIcon" />
                         } @else {
-                            <app-icon [icon]="ChevronDownIcon" />
+                            <bh-icon [icon]="ChevronDownIcon" />
                         }
                     </ng-template>
                 </p-accordion-header>
                 <p-accordion-content [classList]="'space-y-1'">
                     @for (subItem of item.items; track subItem.id) {
                         <p-button variant="text" [routerLink]="subItem.page">
-                            <app-icon [icon]="subItem.icon" [size]="3" />
+                            <bh-icon [icon]="subItem.icon" [size]="3" />
                             <span class="`flex-1 text-left text-sm truncate`">
                                 {{subItem.label}}
                             </span>
@@ -38,7 +38,7 @@
                                 }
                                 @if (true) {
                                     <p-button variant="text">
-                                        <app-icon [icon]="PinIcon" [size]="3" />
+                                        <bh-icon [icon]="PinIcon" [size]="3" />
                                     </p-button>
                                 }
                             </div>

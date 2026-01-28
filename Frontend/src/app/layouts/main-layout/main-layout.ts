@@ -7,7 +7,7 @@ import { MenuItem } from 'primeng/api';
 import { NewsTicker } from '../../shared/components/tickers/news-ticker/news-ticker';
 
 @Component({
-  selector: 'app-main-layout',
+  selector: 'bh-main-layout',
   imports: [Menubar, RouterOutlet, Sidebar, BreadcrumbModule, NewsTicker],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css',

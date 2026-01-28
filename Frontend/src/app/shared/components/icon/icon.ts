@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 
 @Component({
-  selector: 'app-icon',
+  selector: 'bh-icon',
   imports: [LucideAngularModule],
   templateUrl: './icon.html',
   styleUrl: './icon.css',

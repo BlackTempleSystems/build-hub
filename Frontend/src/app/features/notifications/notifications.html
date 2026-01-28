@@ -1,10 +1,10 @@
 <div class="space-y-6">
-    <app-page-header title="Notifications" description="Stay updated with your build system activities">
+    <bh-page-header title="Notifications" description="Stay updated with your build system activities">
         <div actions class="flex items-center space-x-2 ">
             <p-tag class="text-xs!">4 unread</p-tag>
             <p-tag class="text-xs!">5 urgent</p-tag>
         </div>
-    </app-page-header>
+    </bh-page-header>
 
     <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
 
@@ -23,13 +23,13 @@
             <div class="flex gap-2 w-full sm:w-auto">
                 <p-iconfield iconPosition="left">
                     <p-inputicon>
-                        <app-icon [icon]="SearchIcon" />
+                        <bh-icon [icon]="SearchIcon" />
                     </p-inputicon>
                     <input type="text" pInputText placeholder="Search" class="relative flex-1 sm:w-64"/>
                 </p-iconfield>
                 <p-iconfield iconPosition="left">
                     <p-inputicon>
-                        <app-icon [icon]="FunnelIcon" />
+                        <bh-icon [icon]="FunnelIcon" />
                     </p-inputicon>
                     <p-select [options]="filterValues" optionLabel="name" placeholder="Select a City"
                         class="pl-6 w-39" />

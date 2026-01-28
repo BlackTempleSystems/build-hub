@@ -24,7 +24,7 @@ import { RouterLink } from '@angular/router';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 
 @Component({
-  selector: 'app-sidebar',
+  selector: 'bh-sidebar',
   imports: [AccordionModule, ScrollPanelModule, Icon, Button, TagModule, RouterLink],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',

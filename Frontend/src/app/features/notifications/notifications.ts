@@ -11,7 +11,7 @@ import { Icon } from '../../shared/components/icon/icon';
 
 
 @Component({
-  selector: 'app-notifications',
+  selector: 'bh-notifications',
   imports: [
     PageHeader,
     TagModule,

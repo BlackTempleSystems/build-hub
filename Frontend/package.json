@@ -7,7 +7,6 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:BuildHubFrontend": "node dist/BuildHubFrontend/server/server.mjs",
     "lint": "ng lint"
   },
   "prettier": {

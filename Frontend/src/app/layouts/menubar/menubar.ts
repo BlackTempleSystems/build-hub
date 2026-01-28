@@ -7,7 +7,7 @@ import { NotificationBell } from '../../shared/components/notification-bell/noti
 import { OverlayBadge } from 'primeng/overlaybadge';
 
 @Component({
-  selector: 'app-menubar',
+  selector: 'bh-menubar',
   imports: [
     MenubarModule,
     BadgeModule,

@@ -3,7 +3,7 @@ import { PageHeader } from "../../layouts/page-header/page-header";
 import { TabsModule } from 'primeng/tabs';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'bh-dashboard',
   imports: [PageHeader, TabsModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',

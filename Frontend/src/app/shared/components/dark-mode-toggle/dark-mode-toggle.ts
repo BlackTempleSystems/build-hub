@@ -4,7 +4,7 @@ import { Icon } from '../icon/icon';
 import { Sun, Moon } from 'lucide-angular';
 
 @Component({
-  selector: 'app-dark-mode-toggle',
+  selector: 'bh-dark-mode-toggle',
   imports: [Icon, ButtonModule],
   templateUrl: './dark-mode-toggle.html',
   styleUrl: './dark-mode-toggle.css',

@@ -8,7 +8,7 @@ import { Bell } from 'lucide-angular';
 import { MenuItem } from 'primeng/api';
 
 @Component({
-  selector: 'app-notification-bell',
+  selector: 'bh-notification-bell',
   imports: [MenuModule, ButtonModule, BadgeModule, OverlayBadgeModule, Icon],
   templateUrl: './notification-bell.html',
   styleUrl: './notification-bell.css',
