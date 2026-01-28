@@ -74,7 +74,7 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular-builders/jest:run",
           "options": {
             "tsConfig": "tsconfig.spec.json",
             "assets": [
@@ -95,6 +95,17 @@
               "src/**/*.ts",
               "src/**/*.html"
             ]
+          }
+        },
+        "e2e": {
+          "builder": "playwright-ng-schematics:playwright",
+          "options": {
+            "devServerTarget": "Frontend:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "Frontend:serve:production"
+            }
           }
         }
       }
