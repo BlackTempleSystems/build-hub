@@ -1,11 +1,11 @@
 // @ts-check
-const eslint = require("@eslint/js");
-const tseslint = require("typescript-eslint");
-const angular = require("angular-eslint");
+const eslint = require('@eslint/js');
+const tseslint = require('typescript-eslint');
+const angular = require('angular-eslint');
 
 module.exports = tseslint.config(
   {
-    files: ["**/*.ts"],
+    files: ['**/*.ts'],
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.recommended,
@@ -14,30 +14,45 @@ module.exports = tseslint.config(
     ],
     processor: angular.processInlineTemplates,
     rules: {
-      "@angular-eslint/directive-selector": [
-        "error",
+      // TypeScript rules
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/explicit-function-return-type': ['warn'],
+      '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'explicit' }],
+      '@typescript-eslint/naming-convention': [
+        'error',
+        { selector: 'variable', format: ['camelCase', 'UPPER_CASE'] },
+        { selector: 'function', format: ['camelCase'] },
+        { selector: 'typeLike', format: ['PascalCase'] },
+      ],
+
+      // General rules
+      eqeqeq: ['error', 'always'],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      curly: ['error', 'all'],
+      'max-len': ['warn', { code: 120 }],
+
+      // Angular-specific rules
+      '@angular-eslint/directive-selector': [
+        'error',
         {
-          type: "attribute",
-          prefix: "bh",
-          style: "camelCase",
+          type: 'attribute',
+          prefix: 'app',
+          style: 'camelCase',
         },
       ],
-      "@angular-eslint/component-selector": [
-        "error",
+      '@angular-eslint/component-selector': [
+        'error',
         {
-          type: "element",
-          prefix: "bh",
-          style: "kebab-case",
+          type: 'element',
+          prefix: 'app',
+          style: 'kebab-case',
         },
       ],
     },
   },
   {
-    files: ["**/*.html"],
-    extends: [
-      ...angular.configs.templateRecommended,
-      ...angular.configs.templateAccessibility,
-    ],
+    files: ['**/*.html'],
+    extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
     rules: {},
   }
 );

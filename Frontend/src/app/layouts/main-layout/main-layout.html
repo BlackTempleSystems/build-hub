@@ -1,0 +1,13 @@
+<bh-news-ticker />
+<bh-menubar></bh-menubar>
+<div class="flex">
+    <bh-sidebar></bh-sidebar>
+    <main class="flex-1 relative">
+        <div class="border-b border-zinc-500">
+            <p-breadcrumb [model]="items" [home]="home" />
+        </div>
+        <div class="p-6 relative">
+            <router-outlet></router-outlet>
+        </div>
+    </main>
+</div>
