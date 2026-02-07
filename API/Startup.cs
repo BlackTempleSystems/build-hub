@@ -31,7 +31,6 @@ if (app.Environment.IsDevelopment())
 		options.HideClientButton = true;
 	});
 }
-app.MapGet("/", () => Results.Redirect("api-docs")).ExcludeFromDescription();
 
 app.UseHttpsRedirection();
 
