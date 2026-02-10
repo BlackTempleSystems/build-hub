@@ -1,0 +1,17 @@
+.login-container{
+    background-color: #212529;
+    border-radius: 25px;
+}
+
+.signup-text {
+  text-align: center;
+  color: #aaa;
+  margin-top: 10px;
+}
+.signup-text a {
+  color: #2ecc71;
+  text-decoration: none;
+}
+.signup-text a:hover {
+  text-decoration: underline;
+}

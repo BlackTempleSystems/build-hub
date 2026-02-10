@@ -1,2 +1,6 @@
-@import 'tailwindcss';
-@plugin "tailwindcss-primeui";
+@import "tailwindcss";
+@import "tailwindcss-primeui";
+
+* {
+    margin: 0;
+}

@@ -1,0 +1,36 @@
+<div class="min-h-screen w-full flex items-center justify-center">
+  <form
+    class="flex flex-col w-80 gap-4 p-5 login-container h-100 shadow-2xl"
+    (ngSubmit)="onLogin()"
+  >
+    <h1 class="text-center text-2xl font-semibold pb-8">Login</h1>
+    <div class="credentials-control-group flex flex-col gap-6">
+      <p-floatlabel>
+        <input type="text" name="username" class="w-full" [(ngModel)]="this.userName" pInputText />
+        <label for="username_label">Username</label>
+      </p-floatlabel>
+      <p-floatlabel>
+        <p-password [toggleMask]="true" name="password" [(ngModel)]="this.password" [fluid]="true">
+        </p-password>
+        <label for="password_label">Password</label>
+      </p-floatlabel>
+    </div>
+    <div class="flex items-center gap-x-2">
+      <p-checkbox [binary]="true"></p-checkbox>
+      <span class="text-white select-none">Remember me</span>
+    </div>
+    <div class="flex flex-col gap-4 mt-2">
+      <button pButton type="submit">Login</button>
+      <p class="text-center text-sm text-gray-400">
+        Don't have an account?
+        <a
+          href="/register"
+          class="text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
+        >
+          Register
+        </a>
+      </p>
+    </div>
+  </form>
+</div>
+<p-toast />

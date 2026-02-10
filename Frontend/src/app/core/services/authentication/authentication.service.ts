@@ -3,14 +3,15 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService {
+export class AuthenticationService {
+
   private token: string | null = 'dummy-token';
 
-  getToken(): string | null {
+  public getToken(): string | null {
     return this.token;
   }
 
-  clear() {
+  private clear(): void {
     this.token = null;
   }
 }

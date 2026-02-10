@@ -1,2 +1,2 @@
 export * from './ticker/ticker.service'
-export * from './auth/auth.service'
+export * from './authentication/authentication.service'

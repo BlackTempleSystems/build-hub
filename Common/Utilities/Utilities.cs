@@ -51,13 +51,6 @@ namespace BuildHub.Common.Utilities
 			=> dateTime.ToString(dateFormat);
 
 		/// <summary>
-		/// Surrounds the given value with single quotes
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns>The value surrounded by single quotes</returns>
-		public static string Stringify(object value) => $"'{value}'";
-
-		/// <summary>
 		/// Retrieves the name of the specified type.
 		/// </summary>
 		/// <param name="object">The <see cref="Type"/> whose name is to be retrieved. Cannot be <see langword="null"/>.</param>
