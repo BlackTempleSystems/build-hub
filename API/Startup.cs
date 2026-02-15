@@ -1,3 +1,4 @@
+using BuildHub.API.Auth;
 using BuildHub.Common.Application;
 using BuildHub.Common.Logger;
 using Scalar.AspNetCore;
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddBuildHubAuth(builder.Configuration);
 
 //Initialization
 
@@ -26,7 +28,7 @@ if (app.Environment.IsDevelopment())
 	app.MapScalarApiReference("/api-docs", options =>
 
 	{
-		options.Title = "BuildHub API";
+		options.Title = "Build Hub API";
 		options.Theme = ScalarTheme.Saturn;
 		options.HideClientButton = true;
 	});
