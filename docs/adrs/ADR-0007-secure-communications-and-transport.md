@@ -150,7 +150,7 @@ flowchart LR
   end
 
   subgraph PrivateNetwork["Private / VPN overlay (treat as hostile)"]
-    HUB[WS Hub\n(can be split from API)]
+    HUB["WS Hub<br/>(can be split from API)"]
     ENHUB[Envoy sidecar\nWSS + mTLS]
     SPServer[SPIRE Server]
     Obs[Seq + OTel Collector + Prometheus + Grafana\ninternal-only]
