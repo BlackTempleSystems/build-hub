@@ -106,7 +106,7 @@ flowchart LR
 
   API --> SCH[Scheduler / Dispatcher]
   SCH --> DB
-  SCH --> GW[Agent Gateway (WS hub)]
+  SCH --> GW["Agent Gateway (WS hub)"]
 
   GW <--> AG[Agents]
 
