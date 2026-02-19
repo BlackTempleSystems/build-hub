@@ -12,7 +12,7 @@ ADRs capture key decisions: **what we chose**, **why**, and **what we considered
 - [ADR-0004 — Observability baseline (OTel Collector + Prometheus + Grafana)](./ADR-0004-observability-stack.md)
 - [ADR-0005 — SQL Server in Docker for development](./ADR-0005-sqlserver-docker-dev.md)
 - [ADR-0006 — Trace backend choice (Jaeger vs Tempo)](./ADR-0006-trace-backend-jaeger-tempo.md)
-- [ADR-0007: Secure communications (UI ↔ API ↔ Services) and transport hardening](./ADR-0007-secure-communications-and-transport)
+- [ADR-0007 — Secure communications (UI ↔ API ↔ Services) and transport hardening](./ADR-0007-secure-communications-and-transport)
 
 ## Template
 - [ADR template](./ADR-template.md)
