@@ -6,13 +6,27 @@
     <h1 class="text-center text-2xl font-semibold pb-8">Login</h1>
     <div class="credentials-control-group flex flex-col gap-6">
       <p-floatlabel>
-        <input type="text" name="username" class="w-full" [(ngModel)]="this.userName" pInputText />
-        <label for="username_label">Username</label>
+        <input
+          type="text"
+          name="login-username"
+          id="login-username"
+          class="w-full"
+          autocomplete="on"
+          [(ngModel)]="userName"
+          pInputText
+        />
+        <label for="login-username">Username</label>
       </p-floatlabel>
       <p-floatlabel>
-        <p-password [toggleMask]="true" name="password" [(ngModel)]="this.password" [fluid]="true">
+        <p-password
+          [toggleMask]="true"
+          name="login-password"
+          id="login-password"
+          [(ngModel)]="password"
+          [fluid]="true"
+        >
         </p-password>
-        <label for="password_label">Password</label>
+        <label for="login-password">Password</label>
       </p-floatlabel>
     </div>
     <div class="flex items-center gap-x-2">

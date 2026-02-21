@@ -51,6 +51,16 @@ module.exports = tseslint.config(
     },
   },
   {
+    files: ['**/*.ts'],
+    extends: [
+      ...angular.configs.tsRecommended,
+      ...angular.configs.tsAll
+    ],
+    rules: {
+      '@angular-eslint/prefer-inject': 'off',
+    },
+  },
+  {
     files: ['**/*.html'],
     extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
     rules: {},
