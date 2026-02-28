@@ -4,14 +4,13 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class AuthenticationService {
-
   private token: string | null = 'dummy-token';
 
   public getToken(): string | null {
     return this.token;
   }
 
-  private clear(): void {
+  public clear(): void {
     this.token = null;
   }
 }

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
@@ -12,7 +12,7 @@ import { ToastService } from '@app/core';
   selector: 'bh-login-page',
   imports: [
     ButtonModule,
-    FormsModule,
+    ReactiveFormsModule,
     PasswordModule,
     InputTextModule,
     CheckboxModule,
@@ -23,19 +23,15 @@ import { ToastService } from '@app/core';
   styleUrl: './login.page.css',
 })
 export class LoginPage {
-  public userName: string;
-  public password: string;
+  public userName: FormControl<string | null>;
+  public password: FormControl<string | null>;
 
   public constructor(private toastService: ToastService) {
-    this.userName = '';
-    this.password = '';
+    this.userName = new FormControl<string>('');
+    this.password = new FormControl<string>('');
   }
 
   private validate(): boolean {
-    if (this.userName.length <= 0) {
-      this.toastService.showErrorToast('Username is empty');
-      return false;
-    }
     return true;
   }
 

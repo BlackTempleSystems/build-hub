@@ -12,7 +12,7 @@
           id="login-username"
           class="w-full"
           autocomplete="on"
-          [(ngModel)]="userName"
+          [formControl]="userName"
           pInputText
         />
         <label for="login-username">Username</label>
@@ -22,7 +22,7 @@
           [toggleMask]="true"
           name="login-password"
           id="login-password"
-          [(ngModel)]="password"
+          [formControl]="password"
           [fluid]="true"
         >
         </p-password>
