@@ -23,7 +23,7 @@ It favors explicit behavior over implicit “magic”.
 
 ---
 
-## 🏗 Architecture
+## Architecture
 
 ### 1. Configuration
 
