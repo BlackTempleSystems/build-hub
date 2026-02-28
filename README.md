@@ -21,6 +21,7 @@ At its core, BuildHub models builds as an **Execution Plan** made of ordered **E
 - [Feature catalog (considered)](docs/feature-catalog.md)
 - [Pipeline (Execution Plans & Steps)](docs/pipeline.md)
 - [CommandBuilder](docs/command-builder.md)
+- [DataEngine](docs/data-engine.md)
 - [Observability](docs/observability.md)
 - [Authentication roadmap](docs/authentication.md)
 - [Development setup](docs/development.md)
