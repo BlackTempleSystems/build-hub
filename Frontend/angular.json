@@ -5,7 +5,16 @@
   "projects": {
     "Frontend": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+        "type": "component",
+         "flat": false
+        },
+        "@schematics/angular:service": {
+        "type": "service",
+        "flat": false
+      }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "bh",
@@ -24,7 +33,7 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+               "src/styles.css"
             ],
             "scripts": []
           },

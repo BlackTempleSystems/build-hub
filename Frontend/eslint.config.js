@@ -36,7 +36,7 @@ module.exports = tseslint.config(
         'error',
         {
           type: 'attribute',
-          prefix: 'app',
+          prefix: 'bh',
           style: 'camelCase',
         },
       ],
@@ -44,10 +44,20 @@ module.exports = tseslint.config(
         'error',
         {
           type: 'element',
-          prefix: 'app',
+          prefix: 'bh',
           style: 'kebab-case',
         },
       ],
+    },
+  },
+  {
+    files: ['**/*.ts'],
+    extends: [
+      ...angular.configs.tsRecommended,
+      ...angular.configs.tsAll
+    ],
+    rules: {
+      '@angular-eslint/prefer-inject': 'off',
     },
   },
   {

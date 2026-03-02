@@ -46,13 +46,13 @@
 		private string ProcessValue(object? value)
 		{
 			if (value is string)
-				return Utilities.Stringify(value);
+				return StringUtilities.Stringify(value);
 
 			if (value is DateTime)
-				return Utilities.Stringify(Utilities.FormatDateTime((DateTime)(value)));
+				return StringUtilities.Stringify(Utilities.FormatDateTime((DateTime)(value)));
 
 			if (value is Guid)
-				return Utilities.Stringify(value);
+				return StringUtilities.Stringify(value);
 
 			return value?.ToString() ?? string.Empty;
 		}
