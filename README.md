@@ -13,6 +13,7 @@ At its core, BuildHub models builds as an **Execution Plan** made of ordered **E
 > Status: early-stage foundation. Some command builders are implemented, others are stubs.
 
 ## Docs
+For more information see the docs.
 
 - [Docs index](docs/README.md)
 - [Architecture](docs/architecture.md)
@@ -28,14 +29,14 @@ At its core, BuildHub models builds as an **Execution Plan** made of ordered **E
 
 ## Repository layout
 
-- [`Frontend/`](Frontend/README.md) — Angular 21.1.1 app (PrimeNG 21.0.4, NgRx 21.0.1)
-- [`API/`](API/README.md) — ASP.NET Core (net10.0) API (OpenAPI + Scalar UI)
-- `Common/` — shared utilities (configuration, logging via Serilog)
-- [`DataEngine/`](DataEngine/README.md) — data-access library (connection pooling, query builder, transactions)
-- [`CommandBuilder/`](CommandBuilder/README.md) — generates execution steps (Git, TFS, MSBuild, IncrediBuild, VisualStudio, …)
+- `Frontend/` — Angular 21.1.1 app (PrimeNG 21.0.4)
+- `API/` — ASP.NET Core (net10.0) API (OpenAPI + Scalar UI)
+- `Common/` — Shared utilities (Configuration, Logging)
+- `DataEngine/` — Custom ORM(Object-realtional-mapping) library (Connection Pooling, Query Builder, transactions)
+- `CommandBuilder/` — Generates execution steps (Git, TFS, MSBuild, IncrediBuild, VisualStudio, …)
 - `Databases/` — SQL projects (Core, Users, IntegrationTests)
-- `Infrastructure/` — infra glue (currently minimal)
-- `UnitTests/` — unit tests across modules
+- `Infrastructure/` — Contains domain models (currently minimal)
+- `UnitTests/` — Unit tests across modules
 
 ## Quick start (dev)
 
