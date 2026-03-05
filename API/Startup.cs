@@ -1,16 +1,21 @@
+using BuildHub.API.Services.HealthCheck;
 using BuildHub.Common.Application;
 using BuildHub.Common.Logger;
 using Scalar.AspNetCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks()
+	.AddCheck<DatabaseHealthCheck>("DatabaseHealthCheck")
+	.AddResourceUtilizationHealthCheck();
 
 try
 {
 	Logger.Initialize();
-	Logger.LogInformation("Application Starting Up");
 }
 catch (Exception exception)
 {
@@ -29,12 +34,13 @@ if (app.Environment.IsDevelopment())
 		options.HideClientButton = true;
 	});
 }
+
 app.MapGet("/", () => Results.Redirect("api-docs")).ExcludeFromDescription();
+app.MapHealthChecks("/health");
 
+app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
