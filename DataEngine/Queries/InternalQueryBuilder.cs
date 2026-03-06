@@ -97,7 +97,7 @@
 				{
 					string completedCondition = string.Empty;
 					string columnName = statement.InternalWhereCondition.Item1;
-					string compareOperator = Utilities.GetEnumDescription<CompareTypes>(statement.InternalWhereCondition.Item2);
+					string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(statement.InternalWhereCondition.Item2);
 					object? value = statement?.InternalWhereCondition.Item3;
 
 					if (!this.ValidateQueryParameters(value))
@@ -218,7 +218,7 @@
 				else
 					queryStringBuilder.Append($"SELECT * FROM {this._tableName} ");
 
-				queryStringBuilder.Append($"WITH({Utilities.GetEnumDescription<LockTypes>(this._queryBuilderState.LockType)})");
+				queryStringBuilder.Append($"WITH({EnumUtilities.GetEnumDescription<LockTypes>(this._queryBuilderState.LockType)})");
 				this.GenerateWhereStatements(queryStringBuilder);
 
 				_query = queryStringBuilder.ToString().Trim();

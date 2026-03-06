@@ -1,6 +1,5 @@
 using BuildHub.API.Services.HealthCheck;
-using BuildHub.Common.Application;
-using BuildHub.Common.Logger;
+using BuildHub.API.Startup;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -9,18 +8,11 @@ builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddHostedService<LoggerStartupService>();
+builder.Services.AddHostedService<DatabaseStartupService>();
 builder.Services.AddHealthChecks()
 	.AddCheck<DatabaseHealthCheck>("DatabaseHealthCheck")
 	.AddResourceUtilizationHealthCheck();
-
-try
-{
-	Logger.Initialize();
-}
-catch (Exception exception)
-{
-	Application.ExitWithError(exception, "Failed to initialize logger configuration.");
-}
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

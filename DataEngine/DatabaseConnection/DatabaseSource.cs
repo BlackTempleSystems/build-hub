@@ -14,6 +14,6 @@ namespace BuildHub.DataEngine.DatabaseConnection
 		Users = 1,
 
 		[Description("BuildHubIntegrationTests")]
-		IntegrationTests
+		IntegrationTests = 2
 	}
 }

@@ -50,8 +50,8 @@
                 .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                //.Enrich.WithMachineName();
-                //.Enrich.WithThreadId();
+                .Enrich.WithMachineName()
+                .Enrich.WithThreadId()
                 .Enrich.WithProperty("AppName", "BuildHub");
 
             if (loggerConfiguration.LogToConsoleEnabled)

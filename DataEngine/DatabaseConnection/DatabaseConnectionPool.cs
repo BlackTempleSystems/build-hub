@@ -10,12 +10,12 @@ namespace BuildHub.DataEngine.DatabaseConnection
 	#endregion
 
 	using DatabaseConfigurationsMap = Dictionary<DatabaseSource, Configuration.DatabaseConfiguration>;
-    using BuildHub.DataEngine.Statistics;
+    using BuildHub.DataEngine.Extensions;
 
     /// <summary>
     /// Database connection pool singleton, initializing and managing a number of database connections.
     /// </summary>
-	public sealed class DatabaseConnectionPool : IDisposable
+    public sealed class DatabaseConnectionPool : IDisposable
 	{
 		private static readonly Lazy<DatabaseConnectionPool> _databaseConnectionPoolInstance = new Lazy<DatabaseConnectionPool>(() => new DatabaseConnectionPool());
 
@@ -73,7 +73,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 			lock (_mutex)
 			{
 				if (!_availableDatabaseConnectionsMap.TryGetValue(databaseSource, out var databaseConnections))
-					throw new MissingDatabaseConfigurationException(databaseSource);
+					throw new MissingRequiredDatabaseConfigurationException(databaseSource);
 
 				return databaseConnections.Count;
 			}
@@ -92,7 +92,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 			{
 				var databaseConfiguration = _databaseConfigurationsMap[databaseSource];
 				if (databaseConfiguration is null)
-					throw new MissingDatabaseConfigurationException(databaseSource);
+					throw new MissingRequiredDatabaseConfigurationException(databaseSource);
 
 				return databaseConfiguration.MaxPoolConnections - this._availableDatabaseConnectionsMap[databaseSource].Count;
 			}
@@ -117,7 +117,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 				while (retryCount < databaseConfiguration.RetrieveConnectionRetryCount)
 				{
 					if (!_availableDatabaseConnectionsMap.TryGetValue(databaseSource, out var availableDatabaseConnections))
-						throw new MissingDatabaseConfigurationException(databaseSource);
+						throw new MissingRequiredDatabaseConfigurationException(databaseSource);
 
 					if (availableDatabaseConnections.Count > 0)
 					{
@@ -157,13 +157,13 @@ namespace BuildHub.DataEngine.DatabaseConnection
 			{
 				var databaseSource = databaseConnection.DatabaseSource;
 				if (!this._availableDatabaseConnectionsMap.TryGetValue(databaseSource, out var availableDatabaseConnections))
-					throw new MissingDatabaseConfigurationException(databaseSource);
+					throw new MissingRequiredDatabaseConfigurationException(databaseSource);
 
 				if (databaseConnection.IsConnectionOpen())
 				{
 					var databaseConfiguration = this._databaseConfigurationsMap[databaseSource];
 					if (databaseConfiguration is null)
-						throw new MissingDatabaseConfigurationException(databaseSource);
+						throw new MissingRequiredDatabaseConfigurationException(databaseSource);
 
 					if (availableDatabaseConnections.Count < databaseConfiguration.MaxPoolConnections)
 					{
@@ -184,9 +184,19 @@ namespace BuildHub.DataEngine.DatabaseConnection
 			}
 		}
 
+		/// <summary>
+		/// Retrieves the connection string associated with the specified database source.
+		/// </summary>
+		/// <remarks>This method uses the configuration manager to obtain the connection string based on the
+		/// description of the provided database source. Ensure that the connection string is defined in the configuration for
+		/// the application.</remarks>
+		/// <param name="databaseSource">The database source for which to retrieve the connection string. This parameter must be a valid value of the
+		/// DatabaseSource enumeration.</param>
+		/// <returns>A string representing the connection string for the specified database source.</returns>
+		/// <exception cref="EmptyConnectionStringException">Thrown if the connection string for the specified database source is null or empty.</exception>
 		private string GetConnectionString(DatabaseSource databaseSource)
 		{
-			string connectionStringKey = Utilities.GetEnumDescription<DatabaseSource>(databaseSource);
+			string connectionStringKey = EnumUtilities.GetEnumDescription<DatabaseSource>(databaseSource);
 			string connectionString = this._configurationManager.GetConnectionString(connectionStringKey);
 
 			if (string.IsNullOrEmpty(connectionString))
@@ -216,7 +226,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 			catch (SqlException exception)
 			{
 				databaseConnection.CloseConnection();
-				Logger.LogError(exception, $"An error occured while trying to open connection for {databaseSource}");
+				Logger.LogError(exception, $"An error occurred while trying to open connection for {databaseSource}");
 				throw;
 			}
 
@@ -233,7 +243,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 		/// <summary>
 		/// Initializes the connections for a specific database configuration
 		/// </summary>
-		/// <param name="databaseConfiguration">Datbase configuration model</param>
+		/// <param name="databaseConfiguration">Database configuration model</param>
 		/// <returns></returns>
 		/// <exception cref="Exception"></exception>
 		/// <exception cref="InvalidOperationException"></exception>
@@ -242,22 +252,36 @@ namespace BuildHub.DataEngine.DatabaseConnection
 			ValidateDatabaseConfiguration(databaseConfiguration);
 
 			var availableDatabaseConnections = new Queue<DatabaseConnection>();
+            DatabaseSource databaseSource = databaseConfiguration.DatabaseSource;
 
-			for (var index = 0; index < databaseConfiguration.MinPoolConnections; index++)
+            for (var index = 0; index < databaseConfiguration.MinPoolConnections; index++)
 			{
-				DatabaseSource databaseSource = databaseConfiguration.DatabaseSource;
-
-				DatabaseConnection databaseConnection = InitializeConnection(databaseConfiguration.DatabaseSource);
+				var databaseConnection = InitializeConnection(databaseConfiguration.DatabaseSource);
                 databaseConnection.IsConnectionPooled = true;
 
                 availableDatabaseConnections.Enqueue(databaseConnection);
-
-				Logger.LogInformation($"Connection for database {databaseSource} was successfully initialized.");
 			}
 
+			Logger.LogInformation($"Database connection established successfully - [{databaseSource}]");
 			this._availableDatabaseConnectionsMap.Add(databaseConfiguration.DatabaseSource, availableDatabaseConnections);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		private void ValidateRequiredDatabaseConfigurations()
+		{
+            var databaseSources = EnumUtilities.GetEnumValues<DatabaseSource>().Where(databaseSource => databaseSource.IsRequired());
+
+            foreach (var databaseSource in databaseSources)
+            {
+                if (!_databaseConfigurationsMap.ContainsKey(databaseSource))
+				{
+                    throw new MissingRequiredDatabaseConfigurationException(databaseSource);
+                }
+            }
+        }
 
 		/// <summary>
 		/// Validates the database configuration
@@ -279,16 +303,13 @@ namespace BuildHub.DataEngine.DatabaseConnection
 		/// </summary>
 		private void Initialize()
 		{
-			_databaseConfigurationsMap = _configurationManager.GetDatabaseConfigurations();
+            _databaseConfigurationsMap = _configurationManager.GetDatabaseConfigurations();
+			ValidateRequiredDatabaseConfigurations();
 
-			var databaseSources = Utilities.GetEnumValues<DatabaseSource>();
-			if (databaseSources.Count() != _databaseConfigurationsMap.Count())
-				throw new MissingDatabaseConfigurationException();
-
-			foreach (DatabaseConfiguration databaseConfiguration in _databaseConfigurationsMap.Values)
+            foreach (DatabaseConfiguration databaseConfiguration in _databaseConfigurationsMap.Values)
 				InitializeConnections(databaseConfiguration);
 
-			Logger.LogInformation("Database connection pool initialized.");
+			Logger.LogInformation("Database connection pool was initialized successfully.");
 		}
 
 		/// <summary>
