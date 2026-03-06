@@ -1,15 +1,19 @@
 using BuildHub.API.Services.HealthCheck;
 using BuildHub.API.Startup;
+using BuildHub.Infrastructure.Services.Database.Startup;
+using BuildHub.Infrastructure.Services.Startup.Logger;
 using Scalar.AspNetCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
 
+builder.Services.AddSingleton<IDatabaseStartupService, DatabaseStartupService>();
+builder.Services.AddSingleton<ILoggerStartupService, LoggerStartupService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddHostedService<LoggerStartupService>();
-builder.Services.AddHostedService<DatabaseStartupService>();
+builder.Services.AddHostedService<LoggerHostedBootstrapService>();
+builder.Services.AddHostedService<DatabaseHostedBootstrapService>();
 builder.Services.AddHealthChecks()
 	.AddCheck<DatabaseHealthCheck>("DatabaseHealthCheck")
 	.AddResourceUtilizationHealthCheck();

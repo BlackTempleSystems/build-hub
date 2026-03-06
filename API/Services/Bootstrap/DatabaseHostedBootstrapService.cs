@@ -1,5 +1,5 @@
 ﻿using BuildHub.Common.Logger;
-using BuildHub.DataEngine.DatabaseConnection;
+using BuildHub.Infrastructure.Services.Database.Startup;
 
 namespace BuildHub.API.Startup
 {
@@ -11,14 +11,16 @@ namespace BuildHub.API.Startup
     /// application's startup and graceful shutdown process. It is typically registered with the dependency injection
     /// container to ensure that database connections are properly initialized when the application starts and disposed
     /// of when the application stops.</remarks>
-    public sealed class DatabaseStartupService : IHostedService
+    public sealed class DatabaseHostedBootstrapService : IHostedService
     {
         private readonly IHostApplicationLifetime _applicationLifetime;
-        private DatabaseConnectionPool? _databaseConnectionPool = null;
+        private readonly IDatabaseStartupService _databaseStartupService;
 
-        public DatabaseStartupService(IHostApplicationLifetime applicationLifetime)
+        public DatabaseHostedBootstrapService(IHostApplicationLifetime applicationLifetime, 
+            IDatabaseStartupService databaseStartupService)
         {
             this._applicationLifetime = applicationLifetime;
+            this._databaseStartupService = databaseStartupService;
         }
 
         /// <summary>
@@ -32,14 +34,10 @@ namespace BuildHub.API.Startup
         {
             return Task.Run(() =>
             {
-                try
+                if(!_databaseStartupService.SetupDatabaseConnections())
                 {
-                    this._databaseConnectionPool = DatabaseConnectionPool.GetInstance();
-                }
-                catch (Exception exception)
-                {
-                    _applicationLifetime.StopApplication();
-                    Logger.LogFatal(exception, "Unable to connect to the database. Ensure the server is running and the connection string is valid..");
+                    Logger.LogFatal("Failed to initialize the database layer.");
+                    this._applicationLifetime.StopApplication();
                 }
             });
         }
@@ -55,13 +53,10 @@ namespace BuildHub.API.Startup
         {
             return Task.Run(() =>
             {
-                try
+                if (!_databaseStartupService.CloseDatabaseConnections())
                 {
-                    this._databaseConnectionPool?.Dispose();
-                }
-                catch(Exception exception)
-                {
-                    Logger.LogFatal(exception, "Failed to release the database resources.");
+                    Logger.LogFatal("Failed to cleanup database resources.");
+                    this._applicationLifetime.StopApplication();
                 }
             });
         }

@@ -9,4 +9,13 @@
 	<BaseOutputPath>..\bin\Infrastructure</BaseOutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="DomainModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\DataEngine\DataEngine.csproj" />
+  </ItemGroup>
+
 </Project>

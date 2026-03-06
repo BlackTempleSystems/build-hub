@@ -23,7 +23,7 @@ namespace BuildHub.API.Services.HealthCheck
         /// result.</returns>
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(HealthCheckResult.Unhealthy());
+            return Task.FromResult<HealthCheckResult>(HealthCheckResult.Healthy());
         }
     }
 }

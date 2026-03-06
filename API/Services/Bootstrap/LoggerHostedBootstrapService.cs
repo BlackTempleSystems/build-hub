@@ -1,4 +1,4 @@
-﻿using BuildHub.Common.Logger;
+﻿using BuildHub.Infrastructure.Services.Startup.Logger;
 
 namespace BuildHub.API.Startup
 {
@@ -8,13 +8,16 @@ namespace BuildHub.API.Startup
     /// <remarks>Inherits from BaseStartupService and is intended to manage the lifecycle of logging services.
     /// Override the StartAsync and StopAsync methods to implement custom logic for initializing and terminating logging
     /// resources as part of the application's startup and shutdown processes.</remarks>
-    public class LoggerStartupService : IHostedService
+    public class LoggerHostedBootstrapService : IHostedService
     {
         private readonly IHostApplicationLifetime _applicationLifetime;
+        private readonly ILoggerStartupService _loggerStartupService;
 
-        public LoggerStartupService(IHostApplicationLifetime applicationLifeTime)
+        public LoggerHostedBootstrapService(IHostApplicationLifetime applicationLifeTime,
+            ILoggerStartupService loggerStartupService)
         {
             this._applicationLifetime = applicationLifeTime;
+            this._loggerStartupService = loggerStartupService;
         }
 
         /// <summary>
@@ -27,19 +30,10 @@ namespace BuildHub.API.Startup
         /// <returns>A task that represents the asynchronous initialization operation.</returns>
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            return Task.Run(() => 
+            return Task.Run(() =>
             {
-                try
-                {
-                    Logger.Initialize();
-
-                }
-                catch (Exception exception)
-                {
-                    this._applicationLifetime.StopApplication();
-                }
-            }
-            );
+                this._loggerStartupService.InitializeLogger();
+            });
         }
 
         /// <summary>

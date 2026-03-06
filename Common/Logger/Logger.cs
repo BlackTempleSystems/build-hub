@@ -1,7 +1,7 @@
 ﻿namespace BuildHub.Common.Logger
 {
     #region
-    using BuildHub.Common.Configuration;
+    using Configuration;
     using BuildHub.Common.Configuration.Base;
     using Serilog;
     using Serilog.Events;
@@ -37,7 +37,7 @@
 
             var loggerConfiguration = _configurationManager.GetConfigurationModel<LoggerConfiguration>("LoggerConfiguration");
             if (loggerConfiguration is null)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("LoggerConfiguration section is missing from configuration");
 
             var serilogConfiguration = new SerilogConfiguration()
                 .MinimumLevel.Is(loggerConfiguration.MinimumLogEventLevel)
