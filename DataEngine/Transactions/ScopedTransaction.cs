@@ -18,7 +18,7 @@
 		private readonly SqlTransaction _internalTransaction;
 
 		/// <summary>
-		/// Database source specifying the datbase
+		/// Database source specifying the database
 		/// </summary>
 		private readonly DatabaseSource _databaseSource;
 
