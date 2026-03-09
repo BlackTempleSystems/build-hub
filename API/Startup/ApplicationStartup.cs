@@ -1,7 +1,7 @@
 using BuildHub.API.Services.HealthCheck;
 using BuildHub.API.Startup;
-using BuildHub.Infrastructure.Services.Database.Startup;
-using BuildHub.Infrastructure.Services.Startup.Logger;
+using BuildHub.Common.Logger;
+using BuildHub.Domain.Services.Database;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -9,16 +9,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
 
 builder.Services.AddSingleton<IDatabaseStartupService, DatabaseStartupService>();
-builder.Services.AddSingleton<ILoggerStartupService, LoggerStartupService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddHostedService<LoggerHostedBootstrapService>();
 builder.Services.AddHostedService<DatabaseHostedBootstrapService>();
 builder.Services.AddHealthChecks()
 	.AddCheck<DatabaseHealthCheck>("DatabaseHealthCheck")
 	.AddResourceUtilizationHealthCheck();
 
 var app = builder.Build();
+
+Logger.Initialize();
+app.UseSerilogRequestLogging();
+
 if (app.Environment.IsDevelopment())
 {
 	app.MapOpenApi();
@@ -30,13 +32,21 @@ if (app.Environment.IsDevelopment())
 		options.HideClientButton = true;
 	});
 }
-
 app.MapGet("/", () => Results.Redirect("api-docs")).ExcludeFromDescription();
 app.MapHealthChecks("/health");
-
-app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+try
+{
+	app.Run();
+}
+catch(OperationCanceledException)
+{
+    Logger.LogInformation("BuildHub server is shutting down gracefully. All services stopped.");
+}
+finally
+{
+	Logger.Shutdown();
+}

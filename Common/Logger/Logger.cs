@@ -23,8 +23,6 @@
 
         private Logger() => this.InitializeLogger();
 
-        ~Logger() => Log.CloseAndFlush();
-
         /// <summary>
         /// Initializes the application logger with default configuration settings.
         /// </summary>
@@ -55,7 +53,8 @@
                 .Enrich.WithProperty("AppName", "BuildHub");
 
             if (loggerConfiguration.LogToConsoleEnabled)
-                serilogConfiguration = serilogConfiguration.WriteTo.Console();
+                serilogConfiguration = serilogConfiguration.WriteTo.Console(
+                    outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}");
 
             if (!string.IsNullOrEmpty(loggerConfiguration.LogFileDirectory))
                 serilogConfiguration = serilogConfiguration.WriteTo.File(loggerConfiguration.LogFileDirectory, rollingInterval: loggerConfiguration.RollingInterval);
@@ -75,6 +74,17 @@
         {
             if (_loggerInstance == null)
                 _loggerInstance = new Logger();
+        }
+
+        /// <summary>
+        /// Shuts down the application, releasing all resources and performing necessary cleanup operations.
+        /// </summary>
+        /// <remarks>This method should be called when the application is ready to terminate. It ensures
+        /// that all pending operations are completed and resources are properly disposed of before the application
+        /// exits.</remarks>
+        public static void Shutdown()
+        {
+            Log.CloseAndFlush();
         }
 
         /// <summary>

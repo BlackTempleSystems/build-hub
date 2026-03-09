@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\Unit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{62CE4BA6-0AD7-4CDA-925E-B4E7F746462B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{8C143D79-3D98-4CD4-98A9-14E7F997ABB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Infrastructure\Domain.csproj", "{8C143D79-3D98-4CD4-98A9-14E7F997ABB5}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Users", "Databases\Users\Users.sqlproj", "{9A7D801F-5D9D-4B2F-A72E-B086FC209332}"
 EndProject

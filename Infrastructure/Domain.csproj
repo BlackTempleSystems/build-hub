@@ -4,13 +4,13 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<AssemblyName>BuildHub.Infrastructure</AssemblyName>
-	<RootNamespace>BuildHub.Infrastructure</RootNamespace>
-	<BaseOutputPath>..\bin\Infrastructure</BaseOutputPath>
+	<AssemblyName>BuildHub.Domain</AssemblyName>
+	<RootNamespace>BuildHub.Domain</RootNamespace>
+	<BaseOutputPath>..\bin\Domain</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DomainModels\" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
   <ItemGroup>

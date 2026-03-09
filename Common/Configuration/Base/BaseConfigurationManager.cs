@@ -48,9 +48,9 @@ namespace BuildHub.Common.Configuration.Base
 
 				_configuration = builder.Build();
 			}
-			catch (Exception exception)
+			catch
 			{
-				//TODO add some kind of handle here.
+				throw;
 			}
 		}
 

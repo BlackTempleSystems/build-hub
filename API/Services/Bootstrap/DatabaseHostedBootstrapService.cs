@@ -1,5 +1,5 @@
 ﻿using BuildHub.Common.Logger;
-using BuildHub.Infrastructure.Services.Database.Startup;
+using BuildHub.Domain.Services.Database;
 
 namespace BuildHub.API.Startup
 {
@@ -34,7 +34,7 @@ namespace BuildHub.API.Startup
         {
             return Task.Run(() =>
             {
-                if(!_databaseStartupService.SetupDatabaseConnections())
+                if(!_databaseStartupService.Initialize())
                 {
                     Logger.LogFatal("Failed to initialize the database layer.");
                     this._applicationLifetime.StopApplication();
@@ -53,7 +53,7 @@ namespace BuildHub.API.Startup
         {
             return Task.Run(() =>
             {
-                if (!_databaseStartupService.CloseDatabaseConnections())
+                if (!_databaseStartupService.Shutdown())
                 {
                     Logger.LogFatal("Failed to cleanup database resources.");
                     this._applicationLifetime.StopApplication();
