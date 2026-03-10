@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using BuildHub.Domain.Services.Database;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace BuildHub.API.Services.HealthCheck
 {
@@ -10,8 +11,11 @@ namespace BuildHub.API.Services.HealthCheck
     /// checks or similar systems.</remarks>
     public sealed class DatabaseHealthCheck  : IHealthCheck
     {
-        public DatabaseHealthCheck()
+        private readonly IDatabaseMaintananceService _databaseMaintananceService;
+
+        public DatabaseHealthCheck(IDatabaseMaintananceService databaseMaintananceService)
         {
+            this._databaseMaintananceService = databaseMaintananceService;
         }
 
         /// <summary>
@@ -23,7 +27,12 @@ namespace BuildHub.API.Services.HealthCheck
         /// result.</returns>
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<HealthCheckResult>(HealthCheckResult.Healthy());
+            HealthCheckResult healthCheckResult = HealthCheckResult.Healthy();
+
+            if(!this._databaseMaintananceService.IsDatabaseRachable())
+                healthCheckResult = HealthCheckResult.Unhealthy();
+
+            return Task.FromResult<HealthCheckResult>(healthCheckResult);
         }
     }
 }

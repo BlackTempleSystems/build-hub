@@ -143,10 +143,22 @@
         /// If <paramref name="exception"/> is null, only the message and property values are logged.</remarks>
         /// <param name="exception">The exception to log. Can be null if no exception is associated with the error.</param>
         /// <param name="message">The error message to log. This should describe the error or context.</param>
-        /// <param name="propertyValues">Optional property values to format into the message. These are used for structured logging or message formatting.</param>
         public static void LogWarning(Exception? exception, string message)
         {
             Log.Warning(exception, message);
+        }
+
+        /// <summary>
+        /// Logs a warning message and associated exception details to the application's error logging system.
+        /// </summary>
+        /// <remarks>This method is typically used to record unexpected errors or exceptions for diagnostic purposes.
+        /// If <paramref name="exception"/> is null, only the message and property values are logged.</remarks>
+        /// <param name="exception">The exception to log. Can be null if no exception is associated with the error.</param>
+        /// <param name="message">The error message to log. This should describe the error or context.</param>
+        /// <param name="propertyValues">Optional property values to format into the message. These are used for structured logging or message formatting.</param>
+        public static void LogWarning(Exception? exception, string message, params object[] propertyValues)
+        {
+            Log.Warning(exception, message, propertyValues);
         }
 
         /// <summary>

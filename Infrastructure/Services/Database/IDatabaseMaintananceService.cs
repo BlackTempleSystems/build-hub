@@ -1,6 +1,4 @@
-﻿using BuildHub.DataEngine.Statistics;
-
-namespace BuildHub.Domain.Services.Database
+﻿namespace BuildHub.Domain.Services.Database
 {
     /// <summary>
     /// Provides methods for performing maintenance tasks on a database, such as backups and optimizations.
@@ -8,22 +6,12 @@ namespace BuildHub.Domain.Services.Database
     /// <remarks>This service is designed to facilitate routine database maintenance operations, ensuring
     /// optimal performance and reliability. It may include features for scheduling tasks and monitoring maintenance
     /// activities.</remarks>
-    public sealed class DatabaseMaintenanceService : IDatabaseMaintananceService
+    public interface IDatabaseMaintananceService
     {
-        /// <summary>
-        /// Database maintenance manager instance
-        /// </summary>
-        private readonly DatabaseMaintenanceManager _databaseMaintenanceManager;
-
-        public DatabaseMaintenanceService()
-        {
-            this._databaseMaintenanceManager = new DatabaseMaintenanceManager();
-        }
-
         /// <summary>
         /// Checks if the required database are reachable
         /// </summary>
         /// <returns>returns whether the required databases are reachable.</returns>
-        public bool IsDatabaseRachable() => this._databaseMaintenanceManager.IsDatabaseIsReachable();
+        public bool IsDatabaseRachable();
     }
 }

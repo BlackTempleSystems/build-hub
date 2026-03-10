@@ -5,12 +5,13 @@ namespace BuildHub.DataEngine.DatabaseConnection
 	#region
 	using Exceptions.DatabaseConnection;
 	using DataEngine.Configuration;
+	using Extensions;
 	using Common.Utilities;
+	using Messages;
 	using Common.Logger;
 	#endregion
 
 	using DatabaseConfigurationsMap = Dictionary<DatabaseSource, Configuration.DatabaseConfiguration>;
-	using BuildHub.DataEngine.Extensions;
 
 	/// <summary>
 	/// Database connection pool singleton, initializing and managing a number of database connections.
@@ -45,8 +46,8 @@ namespace BuildHub.DataEngine.DatabaseConnection
 		private DatabaseConnectionPool()
 		{
 			this._configurationManager = DatabaseConfigurationManager.GetInstance();
-			this._availableDatabaseConnectionsMap = new Dictionary<DatabaseSource, Queue<DatabaseConnection>>();
-			this._databaseConfigurationsMap = new Dictionary<DatabaseSource, DatabaseConfiguration>();
+			this._availableDatabaseConnectionsMap = new();
+			this._databaseConfigurationsMap = new ();
 			this._isDisposed = false;
 
 			Initialize();
@@ -131,7 +132,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 
 				if (databaseConnection is null)
 				{
-					Logger.LogWarning($"Connection pool exhausted for {databaseSource}.");
+					Logger.LogWarning(DataEngineMessages.CONNECTION_POOL_EXHAUSTED, databaseSource);
 					throw new ConnectionPoolExhaustedException(databaseSource);
 				}
 
@@ -227,8 +228,8 @@ namespace BuildHub.DataEngine.DatabaseConnection
 			{
 				databaseConnection.CloseConnection();
 
-				Logger.LogError(exception, $"Database connection failed | Source: {databaseSource} " +
-					$"| Server: {databaseConnection.InternalConnection.DataSource} | Database: {databaseConnection.InternalConnection.Database}");
+				Logger.LogError(exception, DataEngineMessages.DATABASE_CONNECTION_FAILED, databaseSource,
+					databaseConnection.InternalConnection.DataSource, databaseConnection.InternalConnection.Database);
 
 				throw new DatabaseConenctionException();
 			}
@@ -273,10 +274,10 @@ namespace BuildHub.DataEngine.DatabaseConnection
 				if (databaseSource.IsRequired())
 					throw;
 				else
-					Logger.LogWarning(exception, $"Failed to establish a conenction to [NOT REQUIRED] database [{databaseSource}]");
+					Logger.LogWarning(exception, DataEngineMessages.FAILED_TO_ESTABLISH_CONNECTION_TO_NO_REQUIRED_DATABASE, databaseSource);
 			}
 
-			Logger.LogInformation($"Database connection established successfully | Source: {databaseSource}");
+			Logger.LogInformation(DataEngineMessages.DATABASE_CONNECTION_ESTABLISHED_SUCCESSFULLY, databaseSource);
 			this._availableDatabaseConnectionsMap.Add(databaseConfiguration.DatabaseSource, availableDatabaseConnections);
 		}
 
@@ -304,12 +305,18 @@ namespace BuildHub.DataEngine.DatabaseConnection
 		/// <exception cref="InvalidDatabaseConfigurationException"></exception>
 		private void ValidateDatabaseConfiguration(DatabaseConfiguration databaseConfiguration)
 		{
-			if (databaseConfiguration.MaxPoolConnections < 1)
-				throw new InvalidDatabaseConfigurationException("MaxPoolConnections must be at least 1");
+			var databaseSource = databaseConfiguration.DatabaseSource;
+
+            if (databaseConfiguration.MaxPoolConnections < 1)
+				throw new InvalidDatabaseConfigurationException("MaxPoolConnections must be at least 1", databaseSource);
 
 			if (databaseConfiguration.MinPoolConnections > databaseConfiguration.MaxPoolConnections)
 				throw new InvalidDatabaseConfigurationException($"Invalid database configuration provided " +
-					$"for  database: {databaseConfiguration.DatabaseSource} the minimum pool connections are greater than the maximum pool connections.");
+					$"for  database: {databaseConfiguration.DatabaseSource} the minimum pool connections are greater than the maximum pool connections.", databaseSource);
+
+			if(databaseConfiguration.RetrieveConnectionRetryCount <= 0)
+				throw new InvalidDatabaseConfigurationException($"Invalid database configuration provided " +
+					$"for  database: {databaseConfiguration.DatabaseSource} the minimum connection retry count is 1.", databaseSource);
 		}
 
 		/// <summary>
@@ -323,7 +330,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 			foreach (DatabaseConfiguration databaseConfiguration in _databaseConfigurationsMap.Values)
 				InitializeConnections(databaseConfiguration);
 
-			Logger.LogInformation("Database connection pool was initialized successfully.");
+			Logger.LogInformation(DataEngineMessages.CONNECTION_POOL_INITIALIZED_SUCCESSFULLY);
 		}
 
 		/// <summary>

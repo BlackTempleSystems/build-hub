@@ -2,12 +2,15 @@ using BuildHub.API.Services.HealthCheck;
 using BuildHub.API.Startup;
 using BuildHub.Common.Logger;
 using BuildHub.Domain.Services.Database;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
 
+builder.Services.AddSingleton<IDatabaseMaintananceService, DatabaseMaintenanceService>();
 builder.Services.AddSingleton<IDatabaseStartupService, DatabaseStartupService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
@@ -19,7 +22,7 @@ builder.Services.AddHealthChecks()
 var app = builder.Build();
 
 Logger.Initialize();
-app.UseSerilogRequestLogging();
+//app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
 {
@@ -33,7 +36,11 @@ if (app.Environment.IsDevelopment())
 	});
 }
 app.MapGet("/", () => Results.Redirect("api-docs")).ExcludeFromDescription();
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+	ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
@@ -44,7 +51,7 @@ try
 }
 catch(OperationCanceledException)
 {
-    Logger.LogInformation("BuildHub server is shutting down gracefully. All services stopped.");
+	Logger.LogInformation("BuildHub server is shutting down gracefully. All services stopped.");
 }
 finally
 {

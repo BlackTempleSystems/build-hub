@@ -1,5 +1,7 @@
 ﻿using BuildHub.Common.Logger;
 using BuildHub.DataEngine.DatabaseConnection;
+using BuildHub.DataEngine.Exceptions.DatabaseConnection;
+using System;
 
 namespace BuildHub.Domain.Services.Database
 {
@@ -28,6 +30,12 @@ namespace BuildHub.Domain.Services.Database
             try
             {
                 this._databaseConnectionPool = DatabaseConnectionPool.GetInstance();
+            }
+            catch(InvalidDatabaseConfigurationException invalidDatabaseConfigurationException)
+            {
+                Logger.LogFatal(invalidDatabaseConfigurationException, "Invalid database configuration | Source {DatabaseSource}. Ensure all database configurations are valid.",
+                    invalidDatabaseConfigurationException.DatabaseSource);
+                return false;
             }
             catch (Exception exception)
             {
