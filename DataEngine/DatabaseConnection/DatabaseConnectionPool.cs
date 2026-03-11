@@ -118,7 +118,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 				while (retryCount < databaseConfiguration.RetrieveConnectionRetryCount)
 				{
 					if (!_availableDatabaseConnectionsMap.TryGetValue(databaseSource, out var availableDatabaseConnections))
-						throw new MissingRequiredDatabaseConfigurationException(databaseSource);
+						throw new DatabaseConnectionNotEstablishedException(databaseSource);
 
 					if (availableDatabaseConnections.Count > 0)
 					{
@@ -272,9 +272,14 @@ namespace BuildHub.DataEngine.DatabaseConnection
 			catch(DatabaseConenctionException exception)
 			{
 				if (databaseSource.IsRequired())
+				{
 					throw;
+				}
 				else
+				{
 					Logger.LogWarning(exception, DataEngineMessages.FAILED_TO_ESTABLISH_CONNECTION_TO_NO_REQUIRED_DATABASE, databaseSource);
+					return;
+				}
 			}
 
 			Logger.LogInformation(DataEngineMessages.DATABASE_CONNECTION_ESTABLISHED_SUCCESSFULLY, databaseSource);
@@ -307,7 +312,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 		{
 			var databaseSource = databaseConfiguration.DatabaseSource;
 
-            if (databaseConfiguration.MaxPoolConnections < 1)
+			if (databaseConfiguration.MaxPoolConnections < 1)
 				throw new InvalidDatabaseConfigurationException("MaxPoolConnections must be at least 1", databaseSource);
 
 			if (databaseConfiguration.MinPoolConnections > databaseConfiguration.MaxPoolConnections)

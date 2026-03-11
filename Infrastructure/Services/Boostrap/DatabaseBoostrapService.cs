@@ -1,5 +1,7 @@
 ﻿using BuildHub.Common.Logger;
-using BuildHub.Domain.Services.Database;
+using BuildHub.DataEngine.DatabaseConnection;
+using BuildHub.DataEngine.Exceptions.DatabaseConnection;
+using Microsoft.Extensions.Hosting;
 
 namespace BuildHub.API.Startup
 {
@@ -11,16 +13,21 @@ namespace BuildHub.API.Startup
     /// application's startup and graceful shutdown process. It is typically registered with the dependency injection
     /// container to ensure that database connections are properly initialized when the application starts and disposed
     /// of when the application stops.</remarks>
-    public sealed class DatabaseHostedBootstrapService : IHostedService
+    public sealed class DatabaseBootstrapService : IHostedService
     {
+        /// <summary>
+        /// Access to the application lifetime events
+        /// </summary>
         private readonly IHostApplicationLifetime _applicationLifetime;
-        private readonly IDatabaseStartupService _databaseStartupService;
 
-        public DatabaseHostedBootstrapService(IHostApplicationLifetime applicationLifetime, 
-            IDatabaseStartupService databaseStartupService)
+        /// <summary>
+        /// Instance to the database connection pool
+        /// </summary>
+        private DatabaseConnectionPool? _databaseConnectionPool;
+
+        public DatabaseBootstrapService(IHostApplicationLifetime applicationLifetime)
         {
             this._applicationLifetime = applicationLifetime;
-            this._databaseStartupService = databaseStartupService;
         }
 
         /// <summary>
@@ -34,11 +41,24 @@ namespace BuildHub.API.Startup
         {
             return Task.Run(() =>
             {
-                if(!_databaseStartupService.Initialize())
+
+                try
                 {
-                    Logger.LogFatal("Failed to initialize the database layer.");
+                    this._databaseConnectionPool = DatabaseConnectionPool.GetInstance();
+                }
+                catch (InvalidDatabaseConfigurationException invalidDatabaseConfigurationException)
+                {
+                    Logger.LogFatal(invalidDatabaseConfigurationException, "Invalid database configuration | Source {DatabaseSource}. Ensure all database configurations are valid.",
+                        invalidDatabaseConfigurationException.DatabaseSource);
+
                     this._applicationLifetime.StopApplication();
                 }
+                catch (Exception exception)
+                {
+                    Logger.LogFatal(exception, "Unable to connect to the database. Ensure the server is running and the connection string is valid..");
+                    this._applicationLifetime.StopApplication();
+                }
+
             });
         }
 
@@ -53,10 +73,13 @@ namespace BuildHub.API.Startup
         {
             return Task.Run(() =>
             {
-                if (!_databaseStartupService.Shutdown())
+                try
                 {
-                    Logger.LogFatal("Failed to cleanup database resources.");
-                    this._applicationLifetime.StopApplication();
+                    this._databaseConnectionPool?.Dispose();
+                }
+                catch(Exception exception)
+                {
+                    Logger.LogError(exception, "An error occurred while trying to clean all database resources.");
                 }
             });
         }

@@ -9,7 +9,7 @@ namespace BuildHub.DataEngine.Extensions
     /// </summary>
     /// <remarks>This class contains static methods that extend the functionality of the DataSource
     /// enumeration, allowing for additional operations without modifying the original type.</remarks>
-    internal static class DatabaseSourceExtensions
+    public static class DatabaseSourceExtensions
     {
         /// <summary>
         /// Determines whether the specified database source is marked as required.

@@ -1,9 +1,7 @@
-﻿using BuildHub.DataEngine.DatabaseConnection;
-
-namespace BuildHub.DataEngine.Exceptions.DatabaseConnection
+﻿namespace BuildHub.DataEngine.Exceptions.DatabaseConnection
 {
    /// <summary>
-   /// 
+   /// General exception for database connections.
    /// </summary>
     internal sealed class DatabaseConenctionException : Exception
     {
