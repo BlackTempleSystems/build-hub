@@ -1,10 +1,21 @@
-﻿namespace BuildHub.DataEngine.Exceptions.DatabaseConnection
+﻿using BuildHub.DataEngine.DatabaseConnection;
+
+namespace BuildHub.DataEngine.Exceptions.DatabaseConnection
 {
-    internal class InvalidDatabaseConfigurationException : Exception
+    /// <summary>
+    /// 
+    /// </summary>
+    public class InvalidDatabaseConfigurationException : Exception
     {
-        public InvalidDatabaseConfigurationException(string message)
+        /// <summary>
+        /// 
+        /// </summary>
+        public DatabaseSource DatabaseSource { get; private set; }
+
+        public InvalidDatabaseConfigurationException(string message, DatabaseSource databaseSource)
             : base(message)
         {
+            this.DatabaseSource = databaseSource;
         }
     }
 }

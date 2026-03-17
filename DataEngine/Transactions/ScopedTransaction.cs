@@ -17,6 +17,9 @@
 		/// <summary> Internal transaction object from Micrsoft.SqlData </summary>
 		private readonly SqlTransaction _internalTransaction;
 
+		/// <summary>
+		/// Database source specifying the database
+		/// </summary>
 		private readonly DatabaseSource _databaseSource;
 
 		private bool _isTransactionFinished;

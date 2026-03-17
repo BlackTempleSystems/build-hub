@@ -7,7 +7,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 	/// <summary>
 	/// A class aiming to test the database connection before use
 	/// </summary>
-	public sealed class DatabaseConnectionValidator
+	internal sealed class DatabaseConnectionValidator
 	{
 		/// <summary>
 		/// Test query constant

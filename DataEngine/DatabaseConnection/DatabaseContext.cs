@@ -23,7 +23,7 @@
 		}
 
 		/// <summary>
-		/// Gets the current connection context for this async flow
+		/// Gets the current connection context for this asynchronous flow
 		/// </summary>
 		public static DatabaseContext GetCurrentContext => _currentThreadLocalDatabaseConnection.Value;
 
