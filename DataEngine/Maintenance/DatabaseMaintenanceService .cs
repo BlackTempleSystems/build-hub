@@ -4,7 +4,8 @@
     using DatabaseConnection;
 
     /// <summary>
-    /// 
+    /// A database service providing functionality for maintaining the database.
+    /// For example growing, or reducing the pool, closing idle connections and more...
     /// </summary>
     public sealed class DatabaseMaintenanceService
     {
