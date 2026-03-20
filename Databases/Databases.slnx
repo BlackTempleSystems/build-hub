@@ -1,0 +1,14 @@
+<Solution>
+  <Project Path="Core/Core.sqlproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="IntegrationTests/IntegrationTests.sqlproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="Users/Users.sqlproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>
