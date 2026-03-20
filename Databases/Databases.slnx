@@ -1,13 +1,13 @@
 <Solution>
-  <Project Path="Core/Core.sqlproj">
+  <Project Path="Core/Core.sqlproj" Id="99057605-9754-4eca-8b60-cc8848e0b575">
     <Build />
     <Deploy />
   </Project>
-  <Project Path="IntegrationTests/IntegrationTests.sqlproj">
+  <Project Path="IntegrationTests/IntegrationTests.sqlproj" Id="858f5046-1c08-4a97-ba31-03240d59d73e">
     <Build />
     <Deploy />
   </Project>
-  <Project Path="Users/Users.sqlproj">
+  <Project Path="Users/Users.sqlproj" Id="9a7d801f-5d9d-4b2f-a72e-b086fc209332">
     <Build />
     <Deploy />
   </Project>
