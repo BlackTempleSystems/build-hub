@@ -1,16 +1,15 @@
-﻿using BuildHub.API.Auth;
+using BuildHub.API.Auth;
 using BuildHub.API.Auth.Models;
 using BuildHub.API.Auth.Services;
 using BuildHub.API.Auth.Store;
 using BuildHub.API.Auth.Users;
+using BuildHub.API.Controllers.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BuildHub.API.Controllers;
 
-[Route("api/[controller]")]
-[ApiController]
-public class AuthController : ControllerBase
+public class AuthController : BaseApiController
 {
 	private readonly IUserValidator _users;
 	private readonly TokenService _tokens;

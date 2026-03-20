@@ -1,3 +1,4 @@
+using BuildHub.API.Auth;
 using BuildHub.API.Services.HealthCheck;
 using BuildHub.API.Startup;
 using BuildHub.Common.Logger;
@@ -11,6 +12,7 @@ builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddBuildHubAuth(builder.Configuration);
 builder.Services.AddHostedService<DatabaseBootstrapService>();
 builder.Services.AddHealthChecks()
 	.AddCheck<DatabaseHealthCheck>("DatabaseHealthCheck")
@@ -45,7 +47,7 @@ try
 {
 	app.Run();
 }
-catch(OperationCanceledException)
+catch (OperationCanceledException)
 {
 	Logger.LogInformation("BuildHub server is shutting down gracefully. All services stopped.");
 }

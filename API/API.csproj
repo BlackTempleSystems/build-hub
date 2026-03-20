@@ -12,6 +12,7 @@
 
   <ItemGroup>
 	<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
 	<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
 	<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.ResourceUtilization" Version="10.3.0" />
 	<PackageReference Include="Scalar.AspNetCore" Version="2.11.0" />
