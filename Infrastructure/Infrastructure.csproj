@@ -4,9 +4,22 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<AssemblyName>BuildHub.Infrastructure</AssemblyName>
 	<RootNamespace>BuildHub.Infrastructure</RootNamespace>
-	<BaseOutputPath>..\bin\Infrastructure</BaseOutputPath>
+	<AssemblyName>BuildHub.Infrastructure</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\Background\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.3.9" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\DataEngine\DataEngine.csproj" />
+  </ItemGroup>
 
 </Project>

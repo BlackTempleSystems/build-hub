@@ -63,7 +63,7 @@ namespace BuildHub.DataEngine.Configuration
 		{
 			IReadOnlyList<DatabaseConfiguration>? databaseConfigurations = GetConfigurationModels<DatabaseConfiguration>(_DATABASE_CONFIGURATIONS_KEY);
 			if (databaseConfigurations is null)
-				throw new MissingDatabaseConfigurationException();
+				throw new MissingRequiredDatabaseConfigurationException();
 
 			if (databaseConfigurations.Count() != databaseConfigurations.DistinctBy(config => config.DatabaseSource).Count())
 				throw new DuplicateDatabaseConfigurationException();

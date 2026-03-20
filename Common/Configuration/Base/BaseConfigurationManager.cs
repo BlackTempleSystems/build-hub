@@ -2,8 +2,6 @@ using Microsoft.Extensions.Configuration;
 
 namespace BuildHub.Common.Configuration.Base
 {
-	using Application;
-
 	/// <summary>
 	/// Base class for the configuration managers.
 	/// </summary>
@@ -50,9 +48,9 @@ namespace BuildHub.Common.Configuration.Base
 
 				_configuration = builder.Build();
 			}
-			catch (Exception exception)
+			catch
 			{
-				Application.ExitWithError(exception, "Failed to initialize configuration manager.");
+				throw;
 			}
 		}
 

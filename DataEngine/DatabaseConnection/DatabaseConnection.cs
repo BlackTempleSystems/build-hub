@@ -48,10 +48,10 @@ namespace BuildHub.DataEngine.DatabaseConnection
 		/// </summary>
 		public void CloseConnection() => this.InternalConnection.Close();
 
-		/// <summary>
-		/// Implements the Dispose pattern to release the database connection back to the pool.
-		/// </summary>
-		public void Dispose()
+        /// <summary>
+        /// Implements the Dispose pattern to release the database connection back to the pool.
+        /// </summary>
+        public void Dispose()
 		{
 			this.Dispose(true);
 			GC.SuppressFinalize(this);

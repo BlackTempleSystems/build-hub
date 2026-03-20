@@ -1,9 +1,22 @@
 services:
-  seq:
-     image: datalust/seq
-     container_name: seq
-     environment:
+ sqlserver:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: build-hub-sql-server
+    environment:
       ACCEPT_EULA: "Y"
-      SEQ_PASSWORD: "{SEQ_PASSWORD}"
-     ports:
-      - "${SEQ_PORT}"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+    ports:
+      - "${MSSQL_PORT}"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+ seq:
+    image: datalust/seq:latest
+    container_name: seq
+    environment:
+     ACCEPT_EULA: "Y"
+     SEQ_PASSWORD: "${SEQ_PASSWORD}"
+    ports:
+     - "${SEQ_PORT}:80"
+
+volumes:
+  sqlserverdata:

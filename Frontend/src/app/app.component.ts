@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { HasPermission } from "./core/directives/has-permission";
+import { LoginPage } from './features/authentication/login/login.page';
 
 @Component({
   selector: 'bh-root',
-  imports: [HasPermission],
+  imports: [LoginPage],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  title = 'BuildHub Frontend';
+  public title = 'BuildHub Frontend';
 }

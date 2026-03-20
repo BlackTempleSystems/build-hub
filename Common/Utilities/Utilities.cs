@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -15,29 +14,6 @@ namespace BuildHub.Common.Utilities
 		private const string _DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss.fff";
 
 		/// <summary>
-		/// Retrieves a description attribute from an enumeration
-		/// </summary>
-		/// <typeparam name="TEnumType">Type parameter for enumerations</typeparam>
-		/// <param name="enumeration">Value of the enum</param>
-		/// <returns>string</returns>
-		public static string GetEnumDescription<TEnumType>(Enum enumeration)
-			where TEnumType : Enum
-		{
-			DescriptionAttribute? descriptionAttribute = enumeration.GetType()?.GetField(enumeration.ToString())
-				?.GetCustomAttributes(typeof(DescriptionAttribute), false)
-				.SingleOrDefault() as DescriptionAttribute;
-
-			return descriptionAttribute?.Description ?? string.Empty;
-		}
-
-		/// <summary>
-		/// Retrieves all values of the specified enumeration type.
-		/// </summary>
-		/// <typeparam name="TEnumType">The enumeration type whose values are to be retrieved. This type must be an enumeration.</typeparam>
-		/// <returns>An <see cref="IEnumerable{T}"/> containing all values of the specified enumeration type.</returns>
-		public static IEnumerable<TEnumType> GetEnumValues<TEnumType>() => Enum.GetValues(typeof(TEnumType)).Cast<TEnumType>();
-
-		/// <summary>
 		/// Retrieves the system date time
 		/// </summary>
 		public static DateTime GetCurrentDateTime => DateTime.Now;
@@ -49,13 +25,6 @@ namespace BuildHub.Common.Utilities
 		/// <returns>A string representation of the <paramref name="dateTime"/> value in the predefined format.</returns>
 		public static string FormatDateTime(DateTime dateTime, string dateFormat = _DATE_TIME_FORMAT)
 			=> dateTime.ToString(dateFormat);
-
-		/// <summary>
-		/// Surrounds the given value with single quotes
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns>The value surrounded by single quotes</returns>
-		public static string Stringify(object value) => $"'{value}'";
 
 		/// <summary>
 		/// Retrieves the name of the specified type.
