@@ -40,6 +40,7 @@ app.MapHealthChecks("/health", new HealthCheckOptions
 });
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
