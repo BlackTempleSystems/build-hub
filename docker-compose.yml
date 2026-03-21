@@ -1,0 +1,145 @@
+services:
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:${MSSQL_IMAGE_TAG}
+    container_name: sql-server
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+    ports:
+      - "${MSSQL_PORT}:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - buildhub-net
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/1433' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 45s
+    restart: unless-stopped
+
+  seq:
+    image: datalust/seq:${SEQ_IMAGE_TAG}
+    container_name: seq
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_ADMINPASSWORD: "${SEQ_PASSWORD}"
+    ports:
+      - "${SEQ_PORT}:80"
+    volumes:
+      - seq-data:/data
+    networks:
+      - buildhub-net
+    restart: unless-stopped
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:${OTEL_COLLECTOR_VERSION}
+    container_name: otel-collector
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./ops/otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "${OTEL_GRPC_PORT}:4317"
+      - "${OTEL_HTTP_PORT}:4318"
+      - "${OTEL_METRICS_PORT}:8889"
+    depends_on:
+      - seq
+    networks:
+      - buildhub-net
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VERSION}
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    volumes:
+      - ./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+    depends_on:
+      - otel-collector
+    networks:
+      - buildhub-net
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_VERSION}
+    container_name: grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: "${GRAFANA_ADMIN_USER}"
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD}"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "${GRAFANA_PORT}:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - buildhub-net
+    restart: unless-stopped
+
+  api:
+    profiles: ["api", "frontend"]
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+      args:
+        BUILD_CONFIGURATION: "${BUILD_CONFIGURATION}"
+    image: api:local
+    container_name: api
+    environment:
+      ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT}"
+      ASPNETCORE_URLS: "http://+:8080"
+
+      LoggerConfiguration__SeqServerUrl: "http://seq:80"
+
+      ConnectionStrings__BuildHubCore: "Server=sql-server,1433;Database=${BUILDHUB_CORE_DB};User ID=sa;Password=${MSSQL_SA_PASSWORD};Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False;Command Timeout=30"
+      ConnectionStrings__BuildHubUsers: "Server=sql-server,1433;Database=${BUILDHUB_USERS_DB};User ID=sa;Password=${MSSQL_SA_PASSWORD};Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False;Command Timeout=30"
+      ConnectionStrings__BuildHubIntegrationTests: "Server=sql-server,1433;Database=${BUILDHUB_TEST_DB};User ID=sa;Password=${MSSQL_SA_PASSWORD};Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False;Command Timeout=30"
+
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "api"
+    ports:
+      - "${API_PORT}:8080"
+    depends_on:
+      sql-server:
+        condition: service_healthy
+      seq:
+        condition: service_started
+      otel-collector:
+        condition: service_started
+    networks:
+      - buildhub-net
+    restart: unless-stopped
+
+  frontend:
+    profiles: ["frontend"]
+    build:
+      context: .
+      dockerfile: Frontend/Dockerfile
+    image: frontend:local
+    container_name: frontend
+    ports:
+      - "${FRONTEND_PORT}:80"
+    depends_on:
+      - api
+    networks:
+      - buildhub-net
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:
+  seq-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  buildhub-net:
+    driver: bridge
