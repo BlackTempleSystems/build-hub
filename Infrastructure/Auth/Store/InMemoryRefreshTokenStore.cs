@@ -1,6 +1,9 @@
-﻿using System.Collections.Concurrent;
 
-namespace BuildHub.API.Auth.Store;
+using BuildHub.Domain.Store;
+using BuildHub.Infrastructure.Auth.Security;
+using System.Collections.Concurrent;
+
+namespace BuildHub.Infrastructure.Auth.Store;
 
 public sealed class InMemoryRefreshTokenStore : IRefreshTokenStore
 {

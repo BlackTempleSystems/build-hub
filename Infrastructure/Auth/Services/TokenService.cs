@@ -1,10 +1,13 @@
-﻿using BuildHub.API.Auth.Models;
+using BuildHub.Domain.Users;
+using BuildHub.Infrastructure.Auth.Configuration;
+using BuildHub.Infrastructure.Auth.Security;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace BuildHub.API.Auth.Services;
+namespace BuildHub.Infrastructure.Auth.Services;
 
 public sealed class TokenService
 {

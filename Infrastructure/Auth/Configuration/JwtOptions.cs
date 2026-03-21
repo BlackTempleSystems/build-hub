@@ -1,4 +1,4 @@
-﻿namespace BuildHub.API.Auth;
+namespace BuildHub.Infrastructure.Auth.Configuration;
 
 public sealed class JwtOptions
 {

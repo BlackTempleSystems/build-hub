@@ -1,4 +1,4 @@
-﻿namespace BuildHub.API.Auth.Store;
+namespace BuildHub.Domain.Store;
 
 public interface IRefreshTokenStore
 {

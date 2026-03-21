@@ -1,9 +1,10 @@
 using BuildHub.API.Auth;
 using BuildHub.API.Auth.Models;
-using BuildHub.API.Auth.Services;
-using BuildHub.API.Auth.Store;
-using BuildHub.API.Auth.Users;
 using BuildHub.API.Controllers.Base;
+using BuildHub.Domain.Store;
+using BuildHub.Domain.Users;
+using BuildHub.Infrastructure.Auth.Security;
+using BuildHub.Infrastructure.Auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,7 +1,7 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
 
-namespace BuildHub.API.Auth;
+namespace BuildHub.Infrastructure.Auth.Security;
 
 public static class Crypto
 {

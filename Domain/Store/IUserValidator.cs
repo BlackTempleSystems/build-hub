@@ -1,6 +1,6 @@
-﻿using BuildHub.API.Auth.Models;
+using BuildHub.Domain.Users;
 
-namespace BuildHub.API.Auth.Users;
+namespace BuildHub.Domain.Store;
 
 public interface IUserValidator
 {

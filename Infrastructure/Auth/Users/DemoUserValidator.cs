@@ -1,6 +1,7 @@
-﻿using BuildHub.API.Auth.Models;
+using BuildHub.Domain.Store;
+using BuildHub.Domain.Users;
 
-namespace BuildHub.API.Auth.Users;
+namespace BuildHub.Infrastructure.Auth.Users;
 
 public sealed class DemoUserValidator : IUserValidator
 {
