@@ -21,9 +21,7 @@ services:
 
   db-init:
     profiles: ["db"]
-    build:
-      context: .
-      dockerfile: ops/db/Dockerfile
+    image: ?
     container_name: db-init
     depends_on:
       sql-server:
@@ -35,20 +33,13 @@ services:
       BUILDHUB_CORE_DB: "${BUILDHUB_CORE_DB}"
       BUILDHUB_USERS_DB: "${BUILDHUB_USERS_DB}"
       BUILDHUB_TEST_DB: "${BUILDHUB_TEST_DB}"
-    volumes:
-      - ./:/src
     networks:
       - buildhub-net
     restart: "no"
 
   api:
     profiles: ["api", "frontend"]
-    build:
-      context: .
-      dockerfile: API/Dockerfile
-      args:
-        BUILD_CONFIGURATION: "${BUILD_CONFIGURATION}"
-    image: buildhub-api:local
+    image: ?
     container_name: api
     environment:
       ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT}"
@@ -74,10 +65,7 @@ services:
 
   frontend:
     profiles: ["frontend"]
-    build:
-      context: .
-      dockerfile: Frontend/Dockerfile
-    image: buildhub-frontend:local
+    image: ?
     container_name: frontend
     ports:
       - "${FRONTEND_PORT}:80"

@@ -31,13 +31,14 @@ if (app.Environment.IsDevelopment())
 		options.HideClientButton = true;
 	});
 }
-app.MapGet("/", () => Results.Redirect("api-docs")).ExcludeFromDescription();
+
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
 	ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
@@ -45,7 +46,7 @@ try
 {
 	app.Run();
 }
-catch(OperationCanceledException)
+catch (OperationCanceledException)
 {
 	Logger.LogInformation("BuildHub server is shutting down gracefully. All services stopped.");
 }
