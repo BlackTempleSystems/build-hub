@@ -1,0 +1,16 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Default" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Project Path="Core/Core.sqlproj" Type="42ea0dbd-9cf1-443e-919e-be9c484e4577" Id="92ab7fa0-97b8-4663-9a05-b78199edaae6">
+    <BuildType Solution="Default|*" Project="Release" />
+  </Project>
+  <Project Path="IntegrationTests/IntegrationTests.sqlproj" Type="42ea0dbd-9cf1-443e-919e-be9c484e4577" Id="9f7728b1-d7d1-4837-8765-39dccbed9c51">
+    <BuildType Solution="Default|*" Project="Release" />
+  </Project>
+  <Project Path="Users/Users.sqlproj" Type="42ea0dbd-9cf1-443e-919e-be9c484e4577" Id="23d356ac-d151-4793-8b21-c32406ac327a">
+    <BuildType Solution="Default|*" Project="Release" />
+  </Project>
+</Solution>
