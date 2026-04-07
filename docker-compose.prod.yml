@@ -1,0 +1,84 @@
+services:
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:${MSSQL_IMAGE_TAG}
+    container_name: sql-server
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+    ports:
+      - "${MSSQL_PORT}:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - buildhub-net
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/1433' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 45s
+    restart: unless-stopped
+
+  db-init:
+    profiles: ["db"]
+    image: ?
+    container_name: db-init
+    depends_on:
+      sql-server:
+        condition: service_healthy
+    environment:
+      MSSQL_HOST: sql-server
+      MSSQL_PORT: 1433
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+      BUILDHUB_CORE_DB: "${BUILDHUB_CORE_DB}"
+      BUILDHUB_USERS_DB: "${BUILDHUB_USERS_DB}"
+      BUILDHUB_TEST_DB: "${BUILDHUB_TEST_DB}"
+    networks:
+      - buildhub-net
+    restart: "no"
+
+  api:
+    profiles: ["api", "frontend"]
+    image: ?
+    container_name: api
+    environment:
+      ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT}"
+      ASPNETCORE_URLS: "http://+:8080"
+
+      LoggerConfiguration__SeqServerUrl: "http://seq:80"
+
+      ConnectionStrings__BuildHubCore: "Server=sql-server,1433;Database=${BUILDHUB_CORE_DB};User ID=sa;Password=${MSSQL_SA_PASSWORD};Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False;Command Timeout=30"
+      ConnectionStrings__BuildHubUsers: "Server=sql-server,1433;Database=${BUILDHUB_USERS_DB};User ID=sa;Password=${MSSQL_SA_PASSWORD};Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False;Command Timeout=30"
+      ConnectionStrings__BuildHubIntegrationTests: "Server=sql-server,1433;Database=${BUILDHUB_TEST_DB};User ID=sa;Password=${MSSQL_SA_PASSWORD};Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False;Command Timeout=30"
+      
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "api"
+    ports:
+      - "${API_PORT}:8080"
+    depends_on:
+      sql-server:
+        condition: service_healthy
+    networks:
+      - buildhub-net
+    restart: unless-stopped
+
+  frontend:
+    profiles: ["frontend"]
+    image: ?
+    container_name: frontend
+    ports:
+      - "${FRONTEND_PORT}:80"
+    depends_on:
+      api:
+        condition: service_started
+    networks:
+      - buildhub-net
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:
+
+networks:
+  buildhub-net:
+    driver: bridge

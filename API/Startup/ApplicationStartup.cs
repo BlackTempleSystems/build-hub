@@ -33,7 +33,7 @@ if (app.Environment.IsDevelopment())
 		options.HideClientButton = true;
 	});
 }
-app.MapGet("/", () => Results.Redirect("api-docs")).ExcludeFromDescription();
+
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
 	ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
