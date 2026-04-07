@@ -3,7 +3,7 @@ using System.Text;
 
 namespace BuildHub.Infrastructure.Auth.Security;
 
-public static class Crypto
+public static class CryptoUtility
 {
 	public static string GenerateSecureToken(int numBytes = 32)
 	{

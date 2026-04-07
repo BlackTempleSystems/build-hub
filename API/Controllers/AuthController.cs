@@ -34,7 +34,7 @@ public class AuthController : BaseApiController
 		var (refreshToken, refreshExpiresAt) = _tokens.CreateRefreshToken();
 
 		var refreshRecord = new RefreshTokenRecord(
-		  TokenHash: Crypto.Sha256Base64Url(refreshToken),
+		  TokenHash: CryptoUtility.Sha256Base64Url(refreshToken),
 		  UserId: user.UserId,
 		  ExpiresAt: refreshExpiresAt,
 		  CreatedAt: DateTimeOffset.UtcNow,
@@ -76,7 +76,7 @@ public class AuthController : BaseApiController
 
 		// Issue a NEW refresh token (rotation)
 		var (newRefreshToken, newRefreshExpiresAt) = _tokens.CreateRefreshToken();
-		var newHash = Crypto.Sha256Base64Url(newRefreshToken);
+		var newHash = CryptoUtility.Sha256Base64Url(newRefreshToken);
 
 		// Store new refresh token
 		var newRecord = new RefreshTokenRecord(

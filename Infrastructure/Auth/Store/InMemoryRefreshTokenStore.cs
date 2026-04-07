@@ -17,7 +17,7 @@ public sealed class InMemoryRefreshTokenStore : IRefreshTokenStore
 
 	public Task<RefreshTokenRecord?> TryConsumeForRotationAsync(string presentedRefreshToken, CancellationToken ct)
 	{
-		var hash = Crypto.Sha256Base64Url(presentedRefreshToken);
+		var hash = CryptoUtility.Sha256Base64Url(presentedRefreshToken);
 
 		if (!_byHash.TryGetValue(hash, out var existing))
 			return Task.FromResult<RefreshTokenRecord?>(null);
@@ -38,7 +38,7 @@ public sealed class InMemoryRefreshTokenStore : IRefreshTokenStore
 
 	public Task RevokeAsync(string presentedRefreshToken, CancellationToken ct)
 	{
-		var hash = Crypto.Sha256Base64Url(presentedRefreshToken);
+		var hash = CryptoUtility.Sha256Base64Url(presentedRefreshToken);
 
 		if (_byHash.TryGetValue(hash, out var existing) && existing.RevokedAt is null)
 		{

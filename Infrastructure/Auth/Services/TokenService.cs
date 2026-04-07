@@ -55,7 +55,7 @@ public sealed class TokenService
 
 	public (string RefreshToken, DateTimeOffset ExpiresAt) CreateRefreshToken()
 	{
-		var refreshToken = Crypto.GenerateSecureToken(48);
+		var refreshToken = CryptoUtility.GenerateSecureToken(48);
 		var expiresAt = DateTimeOffset.UtcNow.AddDays(_opts.RefreshTokenDays);
 		return (refreshToken, expiresAt);
 	}
