@@ -24,15 +24,6 @@ namespace UnitTests.DataEngineTests.Tables
         [ClassCleanup]
 		public static void Cleanup()
 		{
-			using var scopedTransaction = new ScopedTransaction(DatabaseSource.IntegrationTests);
-
-			var integrationTestsTable = new IntegrationTestsTable();
-			var allIntegrationTests = integrationTestsTable.GetAll();
-
-			foreach (var test in allIntegrationTests)
-				integrationTestsTable.Delete(test);
-
-			scopedTransaction.Commit();
 		}
 
 		[TestMethod]

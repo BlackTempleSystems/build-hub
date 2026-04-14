@@ -74,23 +74,42 @@ namespace BuildHub.DataEngine.DatabaseConnection
 
         ~DatabaseConnectionPoolImplementation() => Dispose(false);
 
+        /// <summary>
+        /// Logs the current metrics snapshot on a certain interval
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
         private void OnMetricsSnapshot(Object? source, System.Timers.ElapsedEventArgs e)
         {
-            if (_metrics.CalculateUtilization() <= 0.0)
+            if (_metrics.CalculateUtilizationPercentage() <= 0.0)
                 return;
 
-            if(_metrics.CalculateUtilization() >= _databaseConfiguration!.PoolGrowthThreshold)
+            if(_metrics.CalculateUtilizationPercentage() >= _databaseConfiguration!.PoolGrowthThresholdPercentage)
             {
                 Logger.LogWarning(DataEngineMessages.DATABASE_STATISTICS_REPORT, _metrics.TotalConnectionsCount, _metrics.IdleConnectionsCount, _metrics.ActiveConnectionsCount,
-                _metrics.CalculateUtilization(), _databaseConfiguration!.DatabaseSource);
+                _metrics.CalculateUtilizationPercentage(), _databaseConfiguration!.DatabaseSource);
             }
             else
             {
                 Logger.LogInformation(DataEngineMessages.DATABASE_STATISTICS_REPORT, _metrics.TotalConnectionsCount, _metrics.IdleConnectionsCount, _metrics.ActiveConnectionsCount,
-                _metrics.CalculateUtilization(), _databaseConfiguration!.DatabaseSource);
+                _metrics.CalculateUtilizationPercentage(), _databaseConfiguration!.DatabaseSource);
             }  
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        private void OnCloseIdleConnections(Object? source, System.Timers.ElapsedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <exception cref="ConnectionPoolExhaustedException"></exception>
         private void GrowConnectionPool()
         {
             int maxConnectionsCount = _databaseConfiguration!.MaxPoolConnections;
@@ -101,8 +120,8 @@ namespace BuildHub.DataEngine.DatabaseConnection
             if (totalOpenedConnectionsCount >= maxConnectionsCount)
                 return;
 
-            double utilization = ((double)activeConnectionsCount / totalOpenedConnectionsCount) * 100;
-            if (utilization < _databaseConfiguration.PoolGrowthThreshold)
+            double utilizationPercentage = ((double)activeConnectionsCount / totalOpenedConnectionsCount) * 100;
+            if (utilizationPercentage < _databaseConfiguration.PoolGrowthThresholdPercentage)
                 return;
 
             int connectionsToOpen = Math.Min(_databaseConfiguration!.PoolGrowthStep, maxConnectionsCount - totalOpenedConnectionsCount);

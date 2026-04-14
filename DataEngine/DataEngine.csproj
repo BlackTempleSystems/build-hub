@@ -10,6 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Statistics\**" />
+    <EmbeddedResource Remove="Statistics\**" />
+    <None Remove="Statistics\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="..\API\appsettings.Development.json" Link="appsettings.Development.json" />
     <Content Include="..\API\appsettings.json" Link="appsettings.json" />
   </ItemGroup>
@@ -26,10 +32,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Statistics\" />
   </ItemGroup>
 
 </Project>

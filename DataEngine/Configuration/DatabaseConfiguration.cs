@@ -34,11 +34,16 @@ namespace BuildHub.DataEngine.Configuration
 		/// <summary>
 		/// The threshold in percentage which indicates whether we need to scale the pool up.
 		/// </summary>
-        public double PoolGrowthThreshold { get; set; }
+		public double PoolGrowthThresholdPercentage { get; set; }
 
 		/// <summary>
 		/// How many connections will be opened at once if the pool is about to be scaled up.
 		/// </summary>
-        public int PoolGrowthStep { get; set; }
-    }
+		public int PoolGrowthStep { get; set; }
+
+		/// <summary>
+		/// Timeout in milliseconds on witch the idle connections will be closed
+		/// </summary>
+		public int CloseIdleConnectionsTimeout { get; set; }
+	}
 }

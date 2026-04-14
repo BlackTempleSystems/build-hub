@@ -107,7 +107,7 @@
         /// 
         /// </summary>
         /// <returns></returns>
-        public double CalculateUtilization()
+        public double CalculateUtilizationPercentage()
         {
             return (_activeConnectionsCount / _totalConnectionsCount) * 100;
         }
