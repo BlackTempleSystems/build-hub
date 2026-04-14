@@ -18,6 +18,7 @@ namespace BuildHub.Common.Logger
 		public string? LogFileDirectory { get; set; }
 		public RollingInterval RollingInterval { get; set; }
 		public string? SeqServerUrl { get; set; }
-		public bool LogToConsoleEnabled { get; set; }
+		public string? SerilogAPIKey { get; set;}
+        public bool LogToConsoleEnabled { get; set; }
 	}
 }

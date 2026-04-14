@@ -1,3 +1,5 @@
+#region
+using BuildHub.API.Messages;
 using BuildHub.API.Services.HealthCheck;
 using BuildHub.API.Startup;
 using BuildHub.Common.Logger;
@@ -5,6 +7,8 @@ using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 using Serilog;
+using System.Reflection;
+#endregion
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
@@ -19,6 +23,26 @@ builder.Services.AddHealthChecks()
 var app = builder.Build();
 
 Logger.Initialize();
+Logger.LogInformation(ApplicationMessages.APPLICATION_STARTING);
+Logger.LogInformation(ApplicationMessages.APPLICATION_HEADER);
+Logger.LogInformation(ApplicationMessages.APPLICATION_ENVIRONMENT, app.Environment.EnvironmentName);
+Logger.LogInformation(ApplicationMessages.APPLICATION_VERSION, Assembly.GetExecutingAssembly().GetName().Version);
+Logger.LogInformation(ApplicationMessages.APPLICATION_SEPARATOR);
+
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    Logger.LogInformation(ApplicationMessages.APPLICATION_SEPARATOR);
+    Logger.LogInformation(ApplicationMessages.APPLICATION_STARTED);
+    Logger.LogInformation(ApplicationMessages.APPLICATION_LISTENING, string.Join(", ", app.Urls));
+    Logger.LogInformation(ApplicationMessages.APPLICATION_SEPARATOR);
+});
+
+app.Lifetime.ApplicationStopping.Register(() =>
+{
+    Logger.LogInformation(ApplicationMessages.APPLICATION_SEPARATOR);
+    Logger.LogInformation(ApplicationMessages.APPLICATION_SHUTDOWN);
+    Logger.LogInformation(ApplicationMessages.APPLICATION_SEPARATOR);
+});
 
 if (app.Environment.IsDevelopment())
 {
