@@ -23,25 +23,17 @@ builder.Services.AddHealthChecks()
 var app = builder.Build();
 
 Logger.Initialize();
-Logger.LogInformation(ApplicationMessages.APPLICATION_STARTING);
-Logger.LogInformation(ApplicationMessages.APPLICATION_HEADER);
-Logger.LogInformation(ApplicationMessages.APPLICATION_ENVIRONMENT, app.Environment.EnvironmentName);
-Logger.LogInformation(ApplicationMessages.APPLICATION_VERSION, Assembly.GetExecutingAssembly().GetName().Version);
-Logger.LogInformation(ApplicationMessages.APPLICATION_SEPARATOR);
+Logger.LogInformation("BuildHub API v{Version} starting... [{Environment}]", Assembly.GetExecutingAssembly().GetName().Version, 
+	app.Environment.EnvironmentName);
 
 app.Lifetime.ApplicationStarted.Register(() =>
 {
-    Logger.LogInformation(ApplicationMessages.APPLICATION_SEPARATOR);
-    Logger.LogInformation(ApplicationMessages.APPLICATION_STARTED);
-    Logger.LogInformation(ApplicationMessages.APPLICATION_LISTENING, string.Join(", ", app.Urls));
-    Logger.LogInformation(ApplicationMessages.APPLICATION_SEPARATOR);
+    Logger.LogInformation("Listening on {URLS}" , string.Join(", ", app.Urls));
 });
 
 app.Lifetime.ApplicationStopping.Register(() =>
 {
-    Logger.LogInformation(ApplicationMessages.APPLICATION_SEPARATOR);
-    Logger.LogInformation(ApplicationMessages.APPLICATION_SHUTDOWN);
-    Logger.LogInformation(ApplicationMessages.APPLICATION_SEPARATOR);
+	Logger.LogInformation(ApplicationMessages.BUILD_HUB_SHUTING_DOWN);
 });
 
 if (app.Environment.IsDevelopment())
@@ -71,7 +63,7 @@ try
 }
 catch(OperationCanceledException)
 {
-	Logger.LogInformation("BuildHub server is shutting down gracefully. All services stopped.");
+	Logger.LogInformation(ApplicationMessages.BUILD_HUB_SHUTING_DOWN);
 }
 finally
 {

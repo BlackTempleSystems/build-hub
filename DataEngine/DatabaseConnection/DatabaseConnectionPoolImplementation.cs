@@ -51,12 +51,17 @@ namespace BuildHub.DataEngine.DatabaseConnection
         private Timer _metricsLogTimer;
 
         /// <summary>
+        /// Timer on which we close idle connections if needed.
+        /// </summary>
+        private Timer _closeIdleConnectionsTimer;
+
+        /// <summary>
         /// Boolean indicating whether the object is disposed.
         /// </summary>
         private volatile bool _isDisposed;
 
         /// <summary>
-        /// 
+        /// Information about the current status of the pool.
         /// </summary>
         public DatabaseConnectionPoolMetrics Metrics { get { return _metrics; } }
 
@@ -64,12 +69,10 @@ namespace BuildHub.DataEngine.DatabaseConnection
         {
             this._databaseConnectionsQueue = new();
             this._metrics = new();
+            this._metricsLogTimer = new Timer();
+            this._closeIdleConnectionsTimer = new Timer();
             this._isDisposed = false;
 
-            this._metricsLogTimer = new Timer();
-            this._metricsLogTimer.Interval = _METRICS_SNAPSHOT_INTERVAL;
-            this._metricsLogTimer.AutoReset = true;
-            this._metricsLogTimer.Elapsed += this.OnMetricsSnapshot;
         }
 
         ~DatabaseConnectionPoolImplementation() => Dispose(false);
@@ -81,10 +84,12 @@ namespace BuildHub.DataEngine.DatabaseConnection
         /// <param name="e"></param>
         private void OnMetricsSnapshot(Object? source, System.Timers.ElapsedEventArgs e)
         {
-            if (_metrics.CalculateUtilizationPercentage() <= 0.0)
+            var utilization = _metrics.CalculateUtilizationPercentage();
+
+            if (utilization <= 0.0)
                 return;
 
-            if(_metrics.CalculateUtilizationPercentage() >= _databaseConfiguration!.PoolGrowthThresholdPercentage)
+            if(utilization >= _databaseConfiguration!.PoolGrowthThresholdPercentage)
             {
                 Logger.LogWarning(DataEngineMessages.DATABASE_STATISTICS_REPORT, _metrics.TotalConnectionsCount, _metrics.IdleConnectionsCount, _metrics.ActiveConnectionsCount,
                 _metrics.CalculateUtilizationPercentage(), _databaseConfiguration!.DatabaseSource);
@@ -97,17 +102,30 @@ namespace BuildHub.DataEngine.DatabaseConnection
         }
 
         /// <summary>
-        /// 
+        /// Closes idle connections on a certain timer interval depending on the utilization and minimum connections.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
         private void OnCloseIdleConnections(Object? source, System.Timers.ElapsedEventArgs e)
         {
+            if (_databaseConnectionsQueue.Count <= _databaseConfiguration!.MinPoolConnections)
+                return;
 
+            var utilization = _metrics.CalculateUtilizationPercentage();
+            if (utilization < _databaseConfiguration!.PoolGrowthThresholdPercentage)
+                return;
+
+            int idleConnectionsToCloseCount = _databaseConnectionsQueue.Count - _databaseConfiguration!.MinPoolConnections;
+
+            for (int index = 0; index < idleConnectionsToCloseCount; index++)
+            {
+                var databaseConnection = _databaseConnectionsQueue.Dequeue();
+                databaseConnection.CloseConnection();
+            }
         }
 
         /// <summary>
-        /// 
+        /// Grows the connection pool according to the current utilization threshold and opened connections.
         /// </summary>
         /// <exception cref="ConnectionPoolExhaustedException"></exception>
         private void GrowConnectionPool()
@@ -156,7 +174,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
                 int retryCount = 0;
                 DatabaseConnection? databaseConnection = null;
 
-                while (retryCount < _databaseConfiguration!.RetrieveConnectionRetryCount)
+                while (retryCount < _databaseConfiguration!.AcquireConnectionRetryCount)
                 {
                     if (_databaseConnectionsQueue.Count > 0)
                     {
@@ -168,7 +186,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 
                     _metrics.OnWaitStart();
 
-                    if (!Monitor.Wait(_mutex, _databaseConfiguration.RetrieveConnectionTimeout))
+                    if (!Monitor.Wait(_mutex, _databaseConfiguration.AcquireConnectionTimeout))
                         GrowConnectionPool();
 
                     _metrics.OnWaitEnd();
@@ -328,8 +346,6 @@ namespace BuildHub.DataEngine.DatabaseConnection
                     return;
                 }
             }
-
-            Logger.LogInformation(DataEngineMessages.DATABASE_CONNECTION_ESTABLISHED_SUCCESSFULLY, databaseSource);
         }
 
         /// <summary>
@@ -344,7 +360,15 @@ namespace BuildHub.DataEngine.DatabaseConnection
 
             InitializeConnections();
 
+            this._metricsLogTimer.Interval = _METRICS_SNAPSHOT_INTERVAL;
+            this._metricsLogTimer.AutoReset = true;
+            this._metricsLogTimer.Elapsed += this.OnMetricsSnapshot;
             this._metricsLogTimer.Enabled = true;
+
+            this._closeIdleConnectionsTimer.Interval = _databaseConfiguration!.CloseIdleConnectionsTimeout;
+            this._closeIdleConnectionsTimer.AutoReset = true;
+            this._closeIdleConnectionsTimer.Elapsed += this.OnCloseIdleConnections;
+            this._closeIdleConnectionsTimer.Enabled = true;
         }
 
         /// <summary>

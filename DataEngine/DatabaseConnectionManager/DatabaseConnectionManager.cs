@@ -15,6 +15,7 @@ namespace BuildHub.DataEngine.DatabaseConnectionManager
     using DatabaseConfigurationsMap = Dictionary<DatabaseConnection.DatabaseSource, Configuration.DatabaseConfiguration>;
     using System.Diagnostics;
     using BuildHub.Common.Logger;
+    using System.Linq;
     #endregion
 
     /// <summary>
@@ -82,15 +83,32 @@ namespace BuildHub.DataEngine.DatabaseConnectionManager
             var databaseSource = databaseConfiguration.DatabaseSource;
 
             if (databaseConfiguration.MaxPoolConnections < 1)
-                throw new InvalidDatabaseConfigurationException("MaxPoolConnections must be at least 1", databaseSource);
+                throw new InvalidDatabaseConfigurationException($"Invalid database configuration provided " +
+                   $"for  database: {databaseConfiguration.DatabaseSource}. Property \"MaxPoolConnections\" is less than 1 .", databaseSource);
 
             if (databaseConfiguration.MinPoolConnections > databaseConfiguration.MaxPoolConnections)
                 throw new InvalidDatabaseConfigurationException($"Invalid database configuration provided " +
-                    $"for  database: {databaseConfiguration.DatabaseSource} the minimum pool connections are greater than the maximum pool connections.", databaseSource);
+                  $"for  database: {databaseConfiguration.DatabaseSource}. Property \"MaxPoolConnections\" is greater than \"MinPoolConnections\" .", databaseSource);
 
-            if (databaseConfiguration.RetrieveConnectionRetryCount <= 0)
+            if (databaseConfiguration.AcquireConnectionRetryCount <= 0)
                 throw new InvalidDatabaseConfigurationException($"Invalid database configuration provided " +
-                    $"for  database: {databaseConfiguration.DatabaseSource} the minimum connection retry count is 1.", databaseSource);
+                  $"for  database: {databaseConfiguration.DatabaseSource}. Property \"AcquireConnectionRetryCount\" is less than or equal to 0 .", databaseSource);
+
+            if (databaseConfiguration.AcquireConnectionTimeout <= 0)
+                throw new InvalidDatabaseConfigurationException($"Invalid database configuration provided " +
+                  $"for  database: {databaseConfiguration.DatabaseSource}. Property \"AcquireConnectionTimeout\" is less than or equal to 0 .", databaseSource);
+
+            if (databaseConfiguration.PoolGrowthThresholdPercentage <= 0)
+                throw new InvalidDatabaseConfigurationException($"Invalid database configuration provided " +
+                  $"for  database: {databaseConfiguration.DatabaseSource}. Property \"PoolGrowthThresholdPercentage\" is less than or equal to 0 .", databaseSource);
+
+            if (databaseConfiguration.PoolGrowthStep <= 0)
+                throw new InvalidDatabaseConfigurationException($"Invalid database configuration provided " +
+                  $"for  database: {databaseConfiguration.DatabaseSource}. Property \"PoolGrowthStep\" is less than or equal to 0 .", databaseSource);
+
+            if (databaseConfiguration.CloseIdleConnectionsTimeout <= 0)
+                throw new InvalidDatabaseConfigurationException($"Invalid database configuration provided " +
+                  $"for  database: {databaseConfiguration.DatabaseSource}. Property \"CloseIdleConnectionsTimeout\" is less than or equal to 0 .", databaseSource);
         }
 
         /// <summary>
@@ -128,6 +146,7 @@ namespace BuildHub.DataEngine.DatabaseConnectionManager
                 }
             }
 
+            Logger.LogInformation("Database connection pools initialized: {DatabaseSources}", _connectionPoolsMap.Keys);
         }
 
         /// <summary>
@@ -140,16 +159,10 @@ namespace BuildHub.DataEngine.DatabaseConnectionManager
         private IDatabaseConnectionPool GetConnectionPool(DatabaseSource databaseSource)
         {
             if (!this._connectionPoolsMap.TryGetValue(databaseSource, out IDatabaseConnectionPool? connectionPool))
-            {
-                //Logger.LogError();
                 throw new KeyNotFoundException();
-            }
 
             if (connectionPool is null)
-            {
-                //Logger.LogError();
                 throw new NullReferenceException();
-            }
 
             return connectionPool;
         }

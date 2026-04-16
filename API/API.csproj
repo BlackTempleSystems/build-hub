@@ -1,29 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-	<TargetFramework>net10.0</TargetFramework>
-	<Nullable>enable</Nullable>
-	<ImplicitUsings>enable</ImplicitUsings>
-	<AssemblyName>BuildHub.API</AssemblyName>
-	<RootNamespace>BuildHub.API</RootNamespace>
-	<BaseOutputPath>..\bin\API</BaseOutputPath>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<AssemblyName>BuildHub.API</AssemblyName>
+		<RootNamespace>BuildHub.API</RootNamespace>
+		<BaseOutputPath>..\bin\API</BaseOutputPath>
+		<PackageId>ClassLibDotNetStandard</PackageId>
+		<Version>0.0.0.1</Version>
+		<Authors>Adam Ayash, Veselin Nikolov</Authors>
+		<Company>BlackTempleSystems</Company>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.ResourceUtilization" Version="10.3.0" />
+		<PackageReference Include="Scalar.AspNetCore" Version="2.11.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-	<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
-	<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
-	<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.ResourceUtilization" Version="10.3.0" />
-	<PackageReference Include="Scalar.AspNetCore" Version="2.11.0" />
-	<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Common\Common.csproj" />
+		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-	<ProjectReference Include="..\Common\Common.csproj" />
-	<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-	<Folder Include="Models\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Models\" />
+	</ItemGroup>
 
 </Project>

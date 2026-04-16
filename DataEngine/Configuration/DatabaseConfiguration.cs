@@ -25,11 +25,11 @@ namespace BuildHub.DataEngine.Configuration
 		/// <summary>
 		/// Gets or sets the number of times to retry retrieving a connection after a failure.
 		/// </summary>
-		public int RetrieveConnectionRetryCount { get; set; }
+		public int AcquireConnectionRetryCount { get; set; }
 		/// <summary>
 		/// Gets or sets the timeout, in seconds, to wait when establishing a connection before the attempt is aborted.
 		/// </summary>
-		public int RetrieveConnectionTimeout { get; set; }
+		public int AcquireConnectionTimeout { get; set; }
 
 		/// <summary>
 		/// The threshold in percentage which indicates whether we need to scale the pool up.
