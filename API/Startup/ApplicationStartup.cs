@@ -1,5 +1,6 @@
 #region
 using BuildHub.API.Messages;
+using BuildHub.API.Auth;
 using BuildHub.API.Services.HealthCheck;
 using BuildHub.API.Startup;
 using BuildHub.Common.Logger;
@@ -15,6 +16,7 @@ builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddBuildHubAuth(builder.Configuration);
 builder.Services.AddHostedService<DatabaseBootstrapService>();
 builder.Services.AddHealthChecks()
 	.AddCheck<DatabaseHealthCheck>("DatabaseHealthCheck")
@@ -47,13 +49,14 @@ if (app.Environment.IsDevelopment())
 		options.HideClientButton = true;
 	});
 }
-app.MapGet("/", () => Results.Redirect("api-docs")).ExcludeFromDescription();
+
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
 	ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
@@ -61,7 +64,7 @@ try
 {
 	app.Run();
 }
-catch(OperationCanceledException)
+catch (OperationCanceledException)
 {
 	Logger.LogInformation(ApplicationMessages.BUILD_HUB_SHUTING_DOWN);
 }
