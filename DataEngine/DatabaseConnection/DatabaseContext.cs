@@ -1,23 +1,22 @@
 ﻿namespace BuildHub.DataEngine.DatabaseConnection
 {
-	using Transactions;
+    #region Dependencies
+    using Transactions;
+    using DatabaseConnectionManager;
+	#endregion
 
 	/// <summary>
 	/// Manages thread-local database connections for the current async/thread context
 	/// </summary>
 	public sealed class DatabaseContext
 	{
-		private static readonly ThreadLocal<DatabaseContext> _currentThreadLocalDatabaseConnection
-			= new ThreadLocal<DatabaseContext>(() => new DatabaseContext());
-
-		private readonly DatabaseConnectionPool _databaseConnectionPool = DatabaseConnectionPool.GetInstance();
+		private static readonly ThreadLocal<DatabaseContext> _currentThreadLocalDatabaseConnection = new (() => new DatabaseContext());
 		private readonly Dictionary<DatabaseSource, DatabaseConnection> _contextDatabaseConnections;
 
 		public ITransactionContext? TransactionContext { get; set; }
 
 		private DatabaseContext()
 		{
-			this._databaseConnectionPool = DatabaseConnectionPool.GetInstance();
 			this._contextDatabaseConnections = new Dictionary<DatabaseSource, DatabaseConnection>();
 			this.TransactionContext = null;
 		}
@@ -50,7 +49,7 @@
 				existingConnection.CloseConnection();
 			}
 
-			var newConnection = this._databaseConnectionPool.GetDatabaseConnection(databaseSource);
+			var newConnection = DatabaseConnectionManager.GetInstance().GetDatabaseConnection(databaseSource);
 			this._contextDatabaseConnections[databaseSource] = newConnection;
 
 			return newConnection;

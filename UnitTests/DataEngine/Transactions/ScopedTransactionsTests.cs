@@ -1,5 +1,6 @@
 ﻿using BuildHub.Common.Logger;
 using BuildHub.DataEngine.DatabaseConnection;
+using BuildHub.DataEngine.DatabaseConnectionManager;
 using BuildHub.DataEngine.Queries;
 using BuildHub.DataEngine.Transactions;
 using UnitTests.DataEngine.Common;
@@ -17,6 +18,7 @@ namespace UnitTests.DataEngine.Transactions
         public static void ClassInit(TestContext context)
         {
             Logger.Initialize();
+            DatabaseConnectionManager.GetInstance().Initialize();
         }
 
         [ClassCleanup]

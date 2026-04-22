@@ -54,11 +54,11 @@
                 .MinimumLevel.Is(loggerConfiguration.MinimumLogEventLevel)
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.AspNetCore.Server.Kestrel", LogEventLevel.Information)
-                .MinimumLevel.Override("Microsoft.AspNetCore.Server.Kestrel.Core", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.AspNetCore.Server.Kestrel", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.AspNetCore.Server.Kestrel.Core", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Server.Kestrel.Http2", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Server.Kestrel.Transport", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
@@ -72,7 +72,10 @@
                 serilogConfiguration = serilogConfiguration.WriteTo.File(loggerConfiguration.LogFileDirectory, rollingInterval: loggerConfiguration.RollingInterval);
 
             if (!string.IsNullOrEmpty(loggerConfiguration.SeqServerUrl))
-                serilogConfiguration = serilogConfiguration.WriteTo.Seq(loggerConfiguration.SeqServerUrl);
+            {
+                string? serilogAPIKey = loggerConfiguration.SerilogAPIKey;
+                serilogConfiguration = serilogConfiguration.WriteTo.Seq(loggerConfiguration.SeqServerUrl, apiKey: serilogAPIKey);
+            }
 
             Log.Logger = serilogConfiguration.CreateLogger();
         }

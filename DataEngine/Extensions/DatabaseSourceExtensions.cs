@@ -1,6 +1,8 @@
-﻿using BuildHub.DataEngine.DatabaseConnection;
+﻿#region
+using BuildHub.DataEngine.DatabaseConnection;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+#endregion
 
 namespace BuildHub.DataEngine.Extensions
 {

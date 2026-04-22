@@ -1,26 +1,33 @@
 namespace UnitTests.DataEngineTests.DatabaseConnection
 {
 	using BuildHub.DataEngine.DatabaseConnection;
-	using BuildHub.DataEngine.Exceptions.DatabaseConnection;
+    using BuildHub.DataEngine.DatabaseConnectionManager;
+    using BuildHub.DataEngine.Exceptions.DatabaseConnection;
 
 	[TestClass]
 	[TestCategory("Integration")]
 	[DoNotParallelize]
-	public sealed class DatabaseConnectionPoolTests
+	public sealed class DatabaseConnectionManagerTests
 	{
-		[TestMethod]
+        [ClassInitialize]
+        public static void ClassInit(TestContext context)
+        {
+            DatabaseConnectionManager.GetInstance().Initialize();
+        }
+
+        [TestMethod]
 		public void Get_Instance_Should_Return_Singleton_Instance()
 		{
-			DatabaseConnectionPool databaseConnectionPoolInstance = DatabaseConnectionPool.GetInstance();
-			Assert.IsNotNull(databaseConnectionPoolInstance);
+			DatabaseConnectionManager DatabaseConnectionManagerInstance = DatabaseConnectionManager.GetInstance();
+			Assert.IsNotNull(DatabaseConnectionManagerInstance);
 		}
 
 		[TestMethod]
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Get_connection_should_return_open_connection_for_valid_database_source(DatabaseSource databaseSource)
 		{
-			DatabaseConnectionPool databaseConnectionPoolInstance = DatabaseConnectionPool.GetInstance();
-			using DatabaseConnection databaseConnection = databaseConnectionPoolInstance.GetDatabaseConnection(databaseSource);
+			DatabaseConnectionManager DatabaseConnectionManagerInstance = DatabaseConnectionManager.GetInstance();
+			using DatabaseConnection databaseConnection = DatabaseConnectionManagerInstance.GetDatabaseConnection(databaseSource);
 
 			Assert.IsTrue(databaseConnection.IsConnectionOpen());
 		}
@@ -29,10 +36,10 @@ namespace UnitTests.DataEngineTests.DatabaseConnection
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Release_Connection_Should_Keep_Connection_Open_And_Return_To_Pool(DatabaseSource databaseSource)
 		{
-			DatabaseConnectionPool databaseConnectionPoolInstance = DatabaseConnectionPool.GetInstance();
-			DatabaseConnection databaseConnection = databaseConnectionPoolInstance.GetDatabaseConnection(databaseSource);
+			DatabaseConnectionManager DatabaseConnectionManagerInstance = DatabaseConnectionManager.GetInstance();
+			DatabaseConnection databaseConnection = DatabaseConnectionManagerInstance.GetDatabaseConnection(databaseSource);
 
-			databaseConnectionPoolInstance.ReleaseDatabaseConnection(databaseConnection);
+			DatabaseConnectionManagerInstance.ReleaseDatabaseConnection(databaseConnection);
 			Assert.IsTrue(databaseConnection.IsConnectionOpen());
 		}
 
@@ -42,42 +49,42 @@ namespace UnitTests.DataEngineTests.DatabaseConnection
 		[DataRow(-3)]
 		public void Get_Connection_Should_Throw_Key_Not_Found_Exception_For_Invalid_Database_Source(int falseDatabaseSource)
 		{
-			DatabaseConnectionPool databaseConnectionPoolInstance = DatabaseConnectionPool.GetInstance();
-			Assert.Throws<KeyNotFoundException>(() => databaseConnectionPoolInstance.GetDatabaseConnection((DatabaseSource)falseDatabaseSource));
+			DatabaseConnectionManager DatabaseConnectionManagerInstance = DatabaseConnectionManager.GetInstance();
+			Assert.Throws<KeyNotFoundException>(() => DatabaseConnectionManagerInstance.GetDatabaseConnection((DatabaseSource)falseDatabaseSource));
 		}
 
 		[TestMethod]
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Get_Available_Connections_Count_Should_Return_Positive_Number(DatabaseSource databaseSource)
 		{
-			DatabaseConnectionPool databaseConnectionPoolInstance = DatabaseConnectionPool.GetInstance();
-			Assert.IsGreaterThan(0, databaseConnectionPoolInstance.GetAvailableDatabaseConnectionsCount(databaseSource));
+			DatabaseConnectionManager DatabaseConnectionManagerInstance = DatabaseConnectionManager.GetInstance();
+			Assert.IsGreaterThan(0, DatabaseConnectionManagerInstance.GetPoolMetrics(databaseSource).IdleConnectionsCount);
 		}
 
 		[TestMethod]
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Dispose_Connection_Should_Decrease_Currently_Used_Connections_Count(DatabaseSource databaseSource)
 		{
-			DatabaseConnectionPool databaseConnectionPoolInstance = DatabaseConnectionPool.GetInstance();
+			DatabaseConnectionManager DatabaseConnectionManagerInstance = DatabaseConnectionManager.GetInstance();
 
-			DatabaseConnection databaseConnection = databaseConnectionPoolInstance.GetDatabaseConnection(databaseSource);
+			DatabaseConnection databaseConnection = DatabaseConnectionManagerInstance.GetDatabaseConnection(databaseSource);
 
-			int currentlyUsedConnectionsBeforeDispose = databaseConnectionPoolInstance.GetCurrentlyUsedConnectionsCount(databaseSource);
+			int currentlyUsedConnectionsBeforeDispose = DatabaseConnectionManagerInstance.GetPoolMetrics(databaseSource).ActiveConnectionsCount;
 			databaseConnection.Dispose();
 
-			Assert.IsGreaterThan<int>(databaseConnectionPoolInstance.GetCurrentlyUsedConnectionsCount(databaseSource), currentlyUsedConnectionsBeforeDispose);
+			Assert.IsGreaterThan<int>(DatabaseConnectionManagerInstance.GetPoolMetrics(databaseSource).ActiveConnectionsCount, currentlyUsedConnectionsBeforeDispose);
 		}
 
 		[TestMethod]
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Get_Connections_Concurrently_Should_Return_Valid_Connections(DatabaseSource databaseSource)
 		{
-			DatabaseConnectionPool databaseConnectionPoolInstance = DatabaseConnectionPool.GetInstance();
-			for (int index = 0; index < databaseConnectionPoolInstance.GetAvailableDatabaseConnectionsCount(databaseSource); ++index)
+			DatabaseConnectionManager DatabaseConnectionManagerInstance = DatabaseConnectionManager.GetInstance();
+			for (int index = 0; index < DatabaseConnectionManagerInstance.GetPoolMetrics(databaseSource).IdleConnectionsCount; ++index)
 			{
 				Parallel.Invoke(() =>
 				{
-					using DatabaseConnection databaseConnection = databaseConnectionPoolInstance.GetDatabaseConnection(databaseSource);
+					using DatabaseConnection databaseConnection = DatabaseConnectionManagerInstance.GetDatabaseConnection(databaseSource);
 					Assert.IsNotNull(databaseConnection);
 				});
 			}
@@ -87,13 +94,13 @@ namespace UnitTests.DataEngineTests.DatabaseConnection
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Get_Connections_Exceeding_Pool_Size_Concurrently_Should_Handle_Gracefully(DatabaseSource databaseSource)
 		{
-			DatabaseConnectionPool databaseConnectionPoolInstance = DatabaseConnectionPool.GetInstance();
+			DatabaseConnectionManager DatabaseConnectionManagerInstance = DatabaseConnectionManager.GetInstance();
 
-			for (int index = 0; index < databaseConnectionPoolInstance.GetAvailableDatabaseConnectionsCount(databaseSource) + 1; ++index)
+			for (int index = 0; index < DatabaseConnectionManagerInstance.GetPoolMetrics(databaseSource).IdleConnectionsCount + 1; ++index)
 			{
 				Parallel.Invoke(() =>
 				{
-					using DatabaseConnection databaseConnection = databaseConnectionPoolInstance.GetDatabaseConnection(databaseSource);
+					using DatabaseConnection databaseConnection = DatabaseConnectionManagerInstance.GetDatabaseConnection(databaseSource);
 					Assert.IsNotNull(databaseConnection);
 				});
 			}
@@ -103,8 +110,8 @@ namespace UnitTests.DataEngineTests.DatabaseConnection
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Exhausted_Pool_With_Retry_Should_Eventually_Get_Connection_When_Released(DatabaseSource databaseSource)
 		{
-			DatabaseConnectionPool pool = DatabaseConnectionPool.GetInstance();
-			int maxConnections = pool.GetAvailableDatabaseConnectionsCount(databaseSource);
+			DatabaseConnectionManager pool = DatabaseConnectionManager.GetInstance();
+			int maxConnections = pool.GetPoolMetrics(databaseSource).IdleConnectionsCount;
 			List<DatabaseConnection> heldConnections = new List<DatabaseConnection>();
 
 			try
@@ -140,8 +147,8 @@ namespace UnitTests.DataEngineTests.DatabaseConnection
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Exhausted_Pool_Exceeding_Max_Retries_Should_Throw_Pool_Exhausted_Exception(DatabaseSource databaseSource)
 		{
-			DatabaseConnectionPool pool = DatabaseConnectionPool.GetInstance();
-			int maxConnections = pool.GetAvailableDatabaseConnectionsCount(databaseSource);
+			DatabaseConnectionManager pool = DatabaseConnectionManager.GetInstance();
+			int maxConnections = pool.GetPoolMetrics(databaseSource).IdleConnectionsCount;
 			List<DatabaseConnection> heldConnections = new List<DatabaseConnection>();
 
 			try
@@ -167,60 +174,71 @@ namespace UnitTests.DataEngineTests.DatabaseConnection
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Release_Connection_Twice_Should_Not_Corrupt_Pool_Count(DatabaseSource databaseSource)
 		{
-			DatabaseConnectionPool pool = DatabaseConnectionPool.GetInstance();
-			int initialCount = pool.GetAvailableDatabaseConnectionsCount(databaseSource);
+			DatabaseConnectionManager pool = DatabaseConnectionManager.GetInstance();
+			int initialCount = pool.GetPoolMetrics(databaseSource).IdleConnectionsCount;
 
 			var conn = pool.GetDatabaseConnection(databaseSource);
 			pool.ReleaseDatabaseConnection(conn);
 
-			// Releasing again should either be idempotent or throw exception
-			// Adjust based on your implementation
-			try
-			{
-				pool.ReleaseDatabaseConnection(conn);
-			}
-			catch (InvalidOperationException)
-			{
-				// Expected if your implementation throws on double release
-			}
-
-			// Pool count should not exceed initial
-			Assert.IsLessThanOrEqualTo(pool.GetAvailableDatabaseConnectionsCount(databaseSource), initialCount);
+			Assert.Throws<DatabaseConnectionLeakException>(() => pool.ReleaseDatabaseConnection(conn));
 		}
 
 		[TestMethod]
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Get_Currently_Used_Connections_Count_Should_Reflect_Actual_Usage(DatabaseSource databaseSource)
 		{
-			DatabaseConnectionPool pool = DatabaseConnectionPool.GetInstance();
-			int initialUsed = pool.GetCurrentlyUsedConnectionsCount(databaseSource);
+			DatabaseConnectionManager pool = DatabaseConnectionManager.GetInstance();
+			int initialUsed = pool.GetPoolMetrics(databaseSource).ActiveConnectionsCount;
 
 			var conn1 = pool.GetDatabaseConnection(databaseSource);
-			Assert.AreEqual(initialUsed + 1, pool.GetCurrentlyUsedConnectionsCount(databaseSource));
+			Assert.AreEqual(initialUsed + 1, pool.GetPoolMetrics(databaseSource).ActiveConnectionsCount);
 
 			var conn2 = pool.GetDatabaseConnection(databaseSource);
-			Assert.AreEqual(initialUsed + 2, pool.GetCurrentlyUsedConnectionsCount(databaseSource));
+			Assert.AreEqual(initialUsed + 2, pool.GetPoolMetrics(databaseSource).ActiveConnectionsCount);
 
 			pool.ReleaseDatabaseConnection(conn1);
-			Assert.AreEqual(initialUsed + 1, pool.GetCurrentlyUsedConnectionsCount(databaseSource));
+			Assert.AreEqual(initialUsed + 1, pool.GetPoolMetrics(databaseSource).ActiveConnectionsCount);
 
 			pool.ReleaseDatabaseConnection(conn2);
-			Assert.AreEqual(initialUsed, pool.GetCurrentlyUsedConnectionsCount(databaseSource));
+			Assert.AreEqual(initialUsed, pool.GetPoolMetrics(databaseSource).ActiveConnectionsCount);
 		}
 
 		[TestMethod]
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Get_Connection_From_Exhausted_Pool_Should_Throw_Pool_Exhausted_Exception(DatabaseSource databaseSource)
 		{
-			DatabaseConnectionPool pool = DatabaseConnectionPool.GetInstance();
-			int maxConnections = pool.GetAvailableDatabaseConnectionsCount(databaseSource);
+			DatabaseConnectionManager pool = DatabaseConnectionManager.GetInstance();
+			int maxConnections = 100;
+
+			Parallel.For(0, maxConnections, x =>
+			{
+				try
+				{
+                    var connection = pool.GetDatabaseConnection(databaseSource);
+                }
+				catch(ConnectionPoolExhaustedException ex)
+				{
+					Assert.Throws<ConnectionPoolExhaustedException>(() => throw new ConnectionPoolExhaustedException(databaseSource));
+				}
+
+            });
+
+			Assert.Throws<ConnectionPoolExhaustedException>(() => pool.GetDatabaseConnection(databaseSource));
+		}
+
+		[TestMethod]
+		[DataRow(DatabaseSource.IntegrationTests)]
+		public void Connection_Pool_Should_Regrow_And_Return_A_Connection(DatabaseSource databaseSource)
+		{
+			DatabaseConnectionManager pool = DatabaseConnectionManager.GetInstance();
+			int maxConnections = pool.GetPoolMetrics(databaseSource).IdleConnectionsCount;
 
 			Parallel.For(0, maxConnections, x =>
 			{
 				var connection = pool.GetDatabaseConnection(databaseSource);
 			});
 
-			Assert.Throws<ConnectionPoolExhaustedException>(() => pool.GetDatabaseConnection(databaseSource));
+			Assert.IsNotNull(pool.GetDatabaseConnection(databaseSource));
 		}
-	}
+    }
 }

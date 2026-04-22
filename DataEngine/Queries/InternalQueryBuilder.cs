@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Queries
+namespace BuildHub.DataEngine.Queries
 {
 	#region
 	using BuildHub.Common.Logger;
@@ -6,7 +6,8 @@
 	using BuildHub.DataEngine.Exceptions.Queries;
 	using BuildHub.DataEngine.Queries.Base;
 	using Entities;
-	using System.Data;
+    using Microsoft.IdentityModel.Tokens;
+    using System.Data;
 	using System.Text;
 	#endregion
 
@@ -43,6 +44,11 @@
 			this.Reset();
 		}
 
+		/// <summary>
+		/// Processes the given value and adds "" if needed.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
 		private string ProcessValue(object? value)
 		{
 			if (value is string)
@@ -78,6 +84,15 @@
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Validates the different query components (Just the table name for now)
+		/// </summary>
+		private void ValidateQueryComponents()
+		{
+			if (_tableName.IsNullOrEmpty())
+				throw new ArgumentException();
 		}
 
 		/// <summary>
@@ -209,7 +224,9 @@
 		{
 			if (!this._isQueryBuilt)
 			{
-				this._query = string.Empty;
+				ValidateQueryComponents();
+
+                this._query = string.Empty;
 				int topStatementCount = this._queryBuilderState.TopStatementCount;
 
 				StringBuilder queryStringBuilder = new StringBuilder();
@@ -242,7 +259,9 @@
 		{
 			if (!this._isQueryBuilt)
 			{
-				this._query = string.Empty;
+                ValidateQueryComponents();
+
+                this._query = string.Empty;
 
 				StringBuilder queryStringBuilder = new StringBuilder();
 				queryStringBuilder.Append($"INSERT INTO {this._tableName} ");
@@ -290,7 +309,9 @@
 		{
 			if (!this._isQueryBuilt)
 			{
-				this._query = string.Empty;
+                ValidateQueryComponents();
+
+                this._query = string.Empty;
 
 				StringBuilder queryStringBuilder = new StringBuilder();
 				queryStringBuilder.Append($"UPDATE {this._tableName} ");
@@ -351,7 +372,9 @@
 		{
 			if (!this._isQueryBuilt)
 			{
-				this._query = string.Empty;
+                ValidateQueryComponents();
+
+                this._query = string.Empty;
 
 				StringBuilder queryStringBuilder = new StringBuilder();
 				queryStringBuilder.Append($"DELETE FROM {this._tableName}");

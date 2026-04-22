@@ -1,11 +1,12 @@
 ﻿namespace BuildHub.DataEngine.Tables.Base
 {
-	#region
+	#region Dependencies
 	using BuildHub.Common.Logger;
 	using BuildHub.Common.Utilities;
 	using BuildHub.DataEngine.Exceptions.Entities;
 	using DatabaseConnection;
-	using Entities;
+	using DatabaseConnectionManager;
+    using Entities;
 	using Microsoft.Data.SqlClient;
 	using Queries;
 	using System;
@@ -24,11 +25,6 @@
 	public abstract class BaseTable<TEntity> where TEntity : IEntity
 	{
 		/// <summary>
-		/// Instance to the connection pool.
-		/// </summary>
-		private readonly DatabaseConnectionPool _databaseConnectionPoolInstance;
-
-		/// <summary>
 		/// Database source.
 		/// </summary>
 		private readonly DatabaseSource _databaseSource;
@@ -46,7 +42,6 @@
 
 		protected BaseTable(DatabaseSource databaseSource = DatabaseSource.Core)
 		{
-			this._databaseConnectionPoolInstance = DatabaseConnectionPool.GetInstance();
 			this._databaseSource = databaseSource;
 			this._isConnectionLocal = false;
 			this._databaseConnection = null;
@@ -82,7 +77,7 @@
 			}
 			else
 			{
-				this._databaseConnection = this._databaseConnectionPoolInstance.GetDatabaseConnection(this._databaseSource);
+				this._databaseConnection = DatabaseConnectionManager.GetInstance().GetDatabaseConnection(this._databaseSource);
 				this._isConnectionLocal = true;
 			}
 		}

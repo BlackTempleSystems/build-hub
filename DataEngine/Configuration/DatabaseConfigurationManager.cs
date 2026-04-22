@@ -25,7 +25,7 @@ namespace BuildHub.DataEngine.Configuration
 		private static DatabaseConfigurationManager? _databaseConfigurationManagerInstance = null;
 		private DatabaseConfigurationsMap _databaseConfigurationsMap;
 
-		private DatabaseConfigurationManager()
+		private DatabaseConfigurationManager() 
 		{
 			this._databaseConfigurationsMap = new DatabaseConfigurationsMap();
 
