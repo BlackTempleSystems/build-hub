@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Queries
+namespace BuildHub.DataEngine.Queries
 {
 	#region
 	using BuildHub.Common.Logger;
@@ -45,7 +45,7 @@
 		}
 
 		/// <summary>
-		/// 
+		/// Processes the given value and adds "" if needed.
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
