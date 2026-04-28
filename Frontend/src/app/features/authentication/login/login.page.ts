@@ -7,6 +7,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { Toast } from 'primeng/toast';
 import { ToastService } from '@app/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'bh-login-page',
@@ -18,6 +19,7 @@ import { ToastService } from '@app/core';
     CheckboxModule,
     FloatLabelModule,
     Toast,
+    RouterLink 
   ],
   templateUrl: './login.page.html',
   styleUrl: './login.page.css',

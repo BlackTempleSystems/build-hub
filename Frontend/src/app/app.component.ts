@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { LoginPage } from './features/authentication/login/login.page';
+import { RouterOutlet } from "@angular/router";
 
 @Component({
   selector: 'bh-root',
-  imports: [LoginPage],
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })

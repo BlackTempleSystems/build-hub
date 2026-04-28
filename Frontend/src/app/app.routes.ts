@@ -2,20 +2,23 @@ import { Routes } from '@angular/router';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { Dashboard } from './features/dashboard/dashboard';
 import { Notifications } from './features/notifications/notifications';
+import { LoginPage } from './features/authentication/login/login.page';
+import { RegisterPage } from './features/authentication/register/register.page';
 
 export const routes: Routes = [
   {
-    path: '',
-    component: MainLayout,
+    path: 'authentication',
     children: [
       {
-        path: 'dashboard',
-        component: Dashboard,
+        path: 'login',
+        component: LoginPage
       },
-      {
-        path: 'notifications',
-        component: Notifications,
+       {
+        path: 'register',
+        component: RegisterPage
       },
-    ],
+    ]
   },
+   { path: '', redirectTo: 'authentication/login', pathMatch: 'full' },
+  { path: '**', redirectTo: 'authentication/login' }
 ];
