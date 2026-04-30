@@ -1,7 +1,9 @@
-﻿using BuildHub.Common.Logger;
-using BuildHub.DataEngine.DatabaseConnection;
+﻿#region Dependencies
+using BuildHub.Common.Logger;
+using BuildHub.DataEngine.DatabaseConnectionManager;
 using BuildHub.DataEngine.Exceptions.DatabaseConnection;
 using Microsoft.Extensions.Hosting;
+#endregion
 
 namespace BuildHub.API.Startup
 {
@@ -20,11 +22,6 @@ namespace BuildHub.API.Startup
         /// </summary>
         private readonly IHostApplicationLifetime _applicationLifetime;
 
-        /// <summary>
-        /// Instance to the database connection pool
-        /// </summary>
-        private DatabaseConnectionPool? _databaseConnectionPool;
-
         public DatabaseBootstrapService(IHostApplicationLifetime applicationLifetime)
         {
             this._applicationLifetime = applicationLifetime;
@@ -41,10 +38,9 @@ namespace BuildHub.API.Startup
         {
             return Task.Run(() =>
             {
-
                 try
                 {
-                    this._databaseConnectionPool = DatabaseConnectionPool.GetInstance();
+                    DatabaseConnectionManager.GetInstance().Initialize();
                 }
                 catch (InvalidDatabaseConfigurationException invalidDatabaseConfigurationException)
                 {
@@ -75,7 +71,7 @@ namespace BuildHub.API.Startup
             {
                 try
                 {
-                    this._databaseConnectionPool?.Dispose();
+                    DatabaseConnectionManager.GetInstance().ShutDown();
                 }
                 catch(Exception exception)
                 {

@@ -3,9 +3,9 @@
    /// <summary>
    /// General exception for database connections.
    /// </summary>
-    internal sealed class DatabaseConenctionException : Exception
+    internal sealed class DatabaseConnectionException : Exception
     {
-        public DatabaseConenctionException()
+        public DatabaseConnectionException()
              : base()
         {
         }

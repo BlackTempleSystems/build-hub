@@ -1,16 +1,19 @@
 ﻿namespace UnitTests.DataEngineTests.DatabaseConnection
 {
     using BuildHub.Common.Logger;
+	using BuildHub.DataEngine.DatabaseConnectionManager;
     using BuildHub.DataEngine.DatabaseConnection;
 	using BuildHub.DataEngine.Transactions;
 
 	[TestClass]
+	[DoNotParallelize]
 	public class DatabaseConnectionValidatorTests
 	{
         [ClassInitialize]
         public static void ClassInit(TestContext context)
         {
             Logger.Initialize();
+            DatabaseConnectionManager.GetInstance().Initialize();
         }
 
         [TestMethod]
@@ -27,7 +30,7 @@
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Test_Connection_Should_Return_True_When_Connection_Is_Valid(DatabaseSource databaseSource)
 		{
-			var pool = DatabaseConnectionPool.GetInstance();
+			var pool = DatabaseConnectionManager.GetInstance();
 			using var databaseConnection = pool.GetDatabaseConnection(databaseSource);
 			var databaseConnectionValidator = new DatabaseConnectionValidator(databaseConnection);
 
@@ -50,8 +53,8 @@
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Test_Connection_With_Null_Transaction_Context_Should_Return_True_When_Valid(DatabaseSource databaseSource)
 		{
-			var pool = DatabaseConnectionPool.GetInstance();
-			using var databaseConnection = pool.GetDatabaseConnection(databaseSource);
+			var databaseConnectionManager = DatabaseConnectionManager.GetInstance();
+			using var databaseConnection = databaseConnectionManager.GetDatabaseConnection(databaseSource);
 
 			var databaseConnectionValidator = new DatabaseConnectionValidator(databaseConnection, null);
 
@@ -62,8 +65,8 @@
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Test_Connection_Should_Handle_Multiple_Consecutive_Validations(DatabaseSource databaseSource)
 		{
-			var pool = DatabaseConnectionPool.GetInstance();
-			using var databaseConnection = pool.GetDatabaseConnection(databaseSource);
+			var databaseConnectionManager = DatabaseConnectionManager.GetInstance();
+			using var databaseConnection = databaseConnectionManager.GetDatabaseConnection(databaseSource);
 			var databaseConnectionValidator = new DatabaseConnectionValidator(databaseConnection);
 
 			// Test multiple times to ensure validator is reusable
@@ -86,8 +89,8 @@
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Test_Connection_With_Disposed_Transaction_Should_Handle_Gracefully(DatabaseSource databaseSource)
 		{
-			var pool = DatabaseConnectionPool.GetInstance();
-			using var databaseConnection = pool.GetDatabaseConnection(databaseSource);
+			var databaseConnectionManager = DatabaseConnectionManager.GetInstance();
+			using var databaseConnection = databaseConnectionManager.GetDatabaseConnection(databaseSource);
 
 			var transactionContext = new ScopedTransaction();
 			transactionContext.Dispose();

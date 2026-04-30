@@ -2,7 +2,8 @@
 {
     using BuildHub.Common.Logger;
     using BuildHub.DataEngine.DatabaseConnection;
-	using BuildHub.DataEngine.Transactions;
+    using BuildHub.DataEngine.DatabaseConnectionManager;
+    using BuildHub.DataEngine.Transactions;
 	using Moq;
 
 	[TestClass]
@@ -14,6 +15,7 @@
         public static void ClassInit(TestContext context)
         {
             Logger.Initialize();
+            DatabaseConnectionManager.GetInstance().Initialize();
         }
 
         [TestMethod]
