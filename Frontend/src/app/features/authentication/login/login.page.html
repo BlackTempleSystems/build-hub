@@ -1,14 +1,15 @@
 <div class="min-h-screen w-full flex items-center justify-center">
-  <form class="flex flex-col w-80 gap-4 p-5 login-container h-100 shadow-2xl" (ngSubmit)="onLogin()">
+  <form [formGroup]="loginForm" class="flex flex-col w-80 gap-4 p-5 login-container h-100 shadow-2xl"
+    (ngSubmit)="onLogin()">
     <h1 class="text-center text-2xl font-semibold pb-8">Login</h1>
     <div class="credentials-control-group flex flex-col gap-6">
       <p-floatlabel>
         <input type="text" name="login-username" id="login-username" class="w-full" autocomplete="on"
-          [formControl]="userName" pInputText />
+          formControlName="userName" pInputText />
         <label for="login-username">Username</label>
       </p-floatlabel>
       <p-floatlabel>
-        <p-password [toggleMask]="true" name="login-password" id="login-password" [formControl]="password"
+        <p-password [toggleMask]="true" name="login-password" id="login-password" formControlName="userPassword"
           [fluid]="true">
         </p-password>
         <label for="login-password">Password</label>
@@ -30,4 +31,4 @@
     </div>
   </form>
 </div>
-<p-toast />
+<p-toast></p-toast>

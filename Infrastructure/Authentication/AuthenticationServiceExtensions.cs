@@ -9,14 +9,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace BuildHub.Infrastructure.Auth;
+namespace BuildHub.Infrastructure.Authentication;
 
-public static class AuthServiceCollectionExtensions
+/// <summary>
+/// Provides extension methods for registering authentication and authorization services for BuildHub applications.
+/// </summary>
+/// <remarks>This class contains extension methods for configuring JWT-based authentication and related services
+/// in an ASP.NET Core application's dependency injection container. These methods are intended to be called during
+/// application startup to ensure authentication and authorization are properly set up.</remarks>
+public static class AuthenticationServiceExtensions
 {
-	public static IServiceCollection AddBuildHubAuth(this IServiceCollection services, IConfiguration configuration)
+	public static IServiceCollection AddBuildHubAuthentication(this IServiceCollection services, IConfiguration configuration)
 	{
 		// Auth services
-		services.AddSingleton<IUserValidator, DemoUserValidator>();              // replace later
+		//services.AddSingleton<IUserValidator, DemoUserValidator>();              // replace later
 		services.AddSingleton<IRefreshTokenStore, InMemoryRefreshTokenStore>();  // swap to DB later
 		services.AddSingleton<TokenService>();
 

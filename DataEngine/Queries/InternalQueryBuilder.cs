@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Queries
+namespace BuildHub.DataEngine.Queries
 {
 	#region
 	using BuildHub.Common.Logger;

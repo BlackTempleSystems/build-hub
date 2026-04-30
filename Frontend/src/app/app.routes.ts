@@ -10,12 +10,12 @@ export const routes: Routes = [
         path: 'login',
         component: LoginPage
       },
-       {
+      {
         path: 'register',
         component: RegisterPage
       },
     ]
   },
-   { path: '', redirectTo: 'authentication/login', pathMatch: 'full' },
+  { path: '', redirectTo: 'authentication/login', pathMatch: 'full' },
   { path: '**', redirectTo: 'authentication/login' }
 ];

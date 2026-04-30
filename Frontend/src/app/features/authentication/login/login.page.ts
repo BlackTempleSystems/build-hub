@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { Toast } from 'primeng/toast';
-import { ToastService } from '@app/core';
 import { RouterLink } from '@angular/router';
+import { BasePage } from '@app/core/directives/base-page/base-page';
+import { Toast } from "primeng/toast";
+import { AuthenticationService } from '@app/core/services/authentication/authentication.service';
+import { LoginRequest } from '@app/core/services/authentication/models/login.request';
 
 @Component({
   selector: 'bh-login-page',
@@ -18,26 +20,59 @@ import { RouterLink } from '@angular/router';
     InputTextModule,
     CheckboxModule,
     FloatLabelModule,
-    Toast,
-    RouterLink 
+    RouterLink,
+    Toast
   ],
   templateUrl: './login.page.html',
   styleUrl: './login.page.css',
 })
-export class LoginPage {
-  public userName: FormControl<string | null>;
-  public password: FormControl<string | null>;
+export class LoginPage extends BasePage {
 
-  public constructor(private toastService: ToastService) {
-    this.userName = new FormControl<string>('');
-    this.password = new FormControl<string>('');
+  private _authenticationService = inject(AuthenticationService);
+
+  public loginForm: FormGroup;
+
+  public constructor(private fb: FormBuilder,) {
+    super();
+
+    this.loginForm = this.fb.group({
+      userName: ['', [Validators.required]],
+      userPassword: ['', [Validators.required]]
+    });
   }
 
-  private validate(): boolean {
+  protected validate(): boolean {
+
+    if (this.loginForm.invalid) {
+      this.showErrorToast('Please, enter your credentials.');
+      this.loginForm.markAllAsTouched();
+      return false;
+    }
+
     return true;
   }
 
+  override ngOnInit(): void {
+
+  }
+
   public onLogin(): void {
-    this.validate();
+    if (!this.validate())
+      return;
+
+    let loginRequest = new LoginRequest();
+    loginRequest.userName = this.loginForm.get('userName')?.value;
+    loginRequest.userPassword = this.loginForm.get('userPassword')?.value;
+
+    this._authenticationService.login(this.loginForm.value).subscribe({
+      next: (response) => {
+        console.log(response);
+      },
+      error: (error) => {
+        console.log(error);
+      }
+    });
+
+    this.loginForm.reset();
   }
 }

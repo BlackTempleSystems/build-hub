@@ -1,4 +1,4 @@
-﻿namespace BuildHub.Common.Logger
+namespace BuildHub.Common.Logger
 {
     #region
     using Configuration;
