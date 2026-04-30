@@ -1,7 +1,10 @@
 ﻿namespace BuildHub.DataEngine.Statistics
 {
+    #region
     using BuildHub.Common.Utilities;
     using DatabaseConnection;
+    using DatabaseConnectionManager;
+    #endregion
 
     /// <summary>
     /// A database service providing functionality for maintaining the database.
@@ -9,14 +12,8 @@
     /// </summary>
     public sealed class DatabaseMaintenanceService
     {
-        /// <summary>
-        /// Reference to the database connection pool
-        /// </summary>
-        private readonly DatabaseConnectionPool _databaseConnectionPool;
-
         public DatabaseMaintenanceService()
         {
-            this._databaseConnectionPool = DatabaseConnectionPool.GetInstance();
         }
 
         /// <summary>
@@ -28,7 +25,7 @@
             var databaseSources = EnumUtilities.GetEnumValues<DatabaseSource>();
             foreach (var databaseSource in databaseSources)
             {
-                using var databaseConnection = _databaseConnectionPool.GetDatabaseConnection(databaseSource);
+                using var databaseConnection = DatabaseConnectionManager.GetInstance().GetDatabaseConnection(databaseSource);
 
                 DatabaseConnectionValidator databaseConnectionValidator = new(databaseConnection);
                 if (!databaseConnectionValidator.TestDatabaseConnection())

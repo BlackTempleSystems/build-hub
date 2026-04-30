@@ -1,3 +1,6 @@
+#region
+using BuildHub.API.Messages;
+using BuildHub.API.Auth;
 using BuildHub.API.Services.HealthCheck;
 using BuildHub.API.Startup;
 using BuildHub.Common.Logger;
@@ -6,6 +9,8 @@ using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 using Serilog;
+using System.Reflection;
+#endregion
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
@@ -34,6 +39,18 @@ var app = builder.Build();
 app.UseCors(applicationFrontEndOriginPolicy);
 
 Logger.Initialize();
+Logger.LogInformation("BuildHub API v{Version} starting... [{Environment}]", Assembly.GetExecutingAssembly().GetName().Version, 
+	app.Environment.EnvironmentName);
+
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    Logger.LogInformation("Listening on {URLS}" , string.Join(", ", app.Urls));
+});
+
+app.Lifetime.ApplicationStopping.Register(() =>
+{
+	Logger.LogInformation(ApplicationMessages.BUILD_HUB_SHUTING_DOWN);
+});
 
 if (app.Environment.IsDevelopment())
 {
@@ -63,7 +80,7 @@ try
 }
 catch (OperationCanceledException)
 {
-	Logger.LogInformation("BuildHub server is shutting down gracefully. All services stopped.");
+	Logger.LogInformation(ApplicationMessages.BUILD_HUB_SHUTING_DOWN);
 }
 finally
 {

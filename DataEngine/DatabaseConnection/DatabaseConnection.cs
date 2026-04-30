@@ -3,6 +3,10 @@ using System.Data;
 
 namespace BuildHub.DataEngine.DatabaseConnection
 {
+	#region Dependencies
+	using DatabaseConnectionManager;
+	#endregion
+
 	/// <summary>
 	/// Represents a connection to a database. Virtual proxy to the actual SqlConnection. 
 	/// </summary>
@@ -64,7 +68,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 		protected virtual void Dispose(bool disposing)
 		{
 			if (disposing && !this.IsConnectionPooled)
-				DatabaseConnectionPool.GetInstance().ReleaseDatabaseConnection(this);
+				DatabaseConnectionManager.GetInstance().ReleaseDatabaseConnection(this);
 		}
 	}
 }
