@@ -7,7 +7,6 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '@app/core/directives/base-page/base-page';
-import { Toast } from "primeng/toast";
 import { AuthenticationService } from '@app/core/services/authentication/authentication.service';
 import { LoginRequest } from '@app/core/services/authentication/models/login.request';
 
@@ -21,7 +20,6 @@ import { LoginRequest } from '@app/core/services/authentication/models/login.req
     CheckboxModule,
     FloatLabelModule,
     RouterLink,
-    Toast
   ],
   templateUrl: './login.page.html',
   styleUrl: './login.page.css',
@@ -53,7 +51,7 @@ export class LoginPage extends BasePage {
   }
 
   override ngOnInit(): void {
-
+    this.showErrorToast('Please, enter your credentials.');
   }
 
   public onLogin(): void {
