@@ -5,11 +5,7 @@ import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { Toast } from 'primeng/toast';
-import { BasePage } from '@app/core/directives/base-page/base-page';
-import { AuthenticationService } from '@app/core';
-import { RegisterUserRequest } from '@app/core/services/authentication/models/register-user.request';
-import { RouterLink } from '@angular/router';
+import { ToastService } from '@app/core';
 @Component({
   selector: 'bh-register-page',
   imports: [
@@ -19,12 +15,14 @@ import { RouterLink } from '@angular/router';
     InputTextModule,
     CheckboxModule,
     FloatLabelModule,
-    RouterLink,
-    Toast,
   ],
   templateUrl: './register.page.html',
   styleUrl: './register.page.css',
 })
+export class RegisterPage {
+  public userName: FormControl<string | null>;
+  public password: FormControl<string | null>;
+  public confirmPassword: FormControl<string | null>;
 export class RegisterPage extends BasePage {
 
   private _authenticationService = inject(AuthenticationService);
