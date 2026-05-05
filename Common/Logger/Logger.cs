@@ -26,7 +26,7 @@ namespace BuildHub.Common.Logger
         /// <summary>
         /// An output template for the console without exceptions
         /// </summary>
-        private const string CONSOLE_OUTPUT_TEMPLATE = "{Timestamp:HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}";
+        private const string _ConsoleOutputTemplate = "{Timestamp:HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}";
 
         /// <summary>
         /// Configuration manager instance
@@ -66,7 +66,7 @@ namespace BuildHub.Common.Logger
                 .Enrich.WithProperty("AppName", "BuildHub");
 
             if (loggerConfiguration.LogToConsoleEnabled)
-                serilogConfiguration = serilogConfiguration.WriteTo.Console(outputTemplate: CONSOLE_OUTPUT_TEMPLATE);
+                serilogConfiguration = serilogConfiguration.WriteTo.Console(outputTemplate: _ConsoleOutputTemplate);
 
             if (!string.IsNullOrEmpty(loggerConfiguration.LogFileDirectory))
                 serilogConfiguration = serilogConfiguration.WriteTo.File(loggerConfiguration.LogFileDirectory, rollingInterval: loggerConfiguration.RollingInterval);

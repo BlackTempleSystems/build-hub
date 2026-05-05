@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Entities
+namespace BuildHub.DataEngine.Entities
 {
 	/// <summary>
 	/// Specifies metadata for a property that maps to a database column.

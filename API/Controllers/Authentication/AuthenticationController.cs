@@ -1,7 +1,6 @@
-using BuildHub.API.Authentication.Models;
 using BuildHub.API.Controllers.Base;
-using BuildHub.Domain.Store;
-using BuildHub.Infrastructure.Auth.Services;
+using BuildHub.Application.Services.Authentication;
+using BuildHub.Application.Services.Authentication.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,19 +16,41 @@ namespace BuildHub.API.Controllers.Authentication;
 /// authentication scenarios where clients manage access and refresh tokens.</remarks>
 public class AuthenticationController : BaseApiController
 {
-	private readonly TokenService _tokenService;
-	private readonly IRefreshTokenStore _refresh;
+	/// <summary>
+	/// Authentication service.
+	/// </summary>
+	private readonly IAuthenticationService _authenticationService;
 
-	public AuthenticationController(TokenService tokenService, IRefreshTokenStore refresh)
+	public AuthenticationController(IAuthenticationService authenticationService)
 	{
-		_tokenService = tokenService;
-		_refresh = refresh;
+		this._authenticationService = authenticationService;
 	}
 
+	/// <summary>
+	/// Authenticates a user based on the provided login credentials and returns a response indicating the result of the
+	/// authentication attempt.
+	/// </summary>
+	/// <param name="loginRequest">The login credentials and related information required to authenticate the user. Cannot be null.</param>
+	/// <param name="cancellationToken">A token that can be used to cancel the login operation.</param>
+	/// <returns>An IActionResult containing the authentication result. Returns a success response with authentication details if
+	/// the credentials are valid.</returns>
 	[HttpPost("login")]
 	[AllowAnonymous]
 	public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest, CancellationToken cancellationToken)
 	{
 		return ApiOk(new LoginResponse());
+	}
+
+	/// <summary>
+	/// Registers a new user with the provided registration details.
+	/// </summary>
+	/// <param name="registerUserRequest">The registration information for the new user. Cannot be null.</param>
+	/// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+	/// <returns>An IActionResult indicating the result of the registration operation.</returns>
+	[HttpPost("register")]
+	[AllowAnonymous]
+	public async Task<IActionResult> Register([FromBody] RegisterUserRequest registerUserRequest, CancellationToken cancellationToken)
+	{
+		return FromResult(await _authenticationService.RegisterUser(registerUserRequest));
 	}
 }

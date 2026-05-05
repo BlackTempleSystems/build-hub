@@ -10,7 +10,7 @@ namespace BuildHub.Common.Configuration.Base
 		/// <summary>
 		/// Constant configuration file name
 		/// </summary>
-		protected const string _CONFIGURATION_FILE_NAME = "appsettings.json";
+		protected const string _ConfigurationFileName = "appsettings.json";
 
 		/// <summary>
 		/// Whether the configuration should reload on change
@@ -43,7 +43,7 @@ namespace BuildHub.Common.Configuration.Base
 				var builder = new ConfigurationBuilder()
 				.AddEnvironmentVariables()
 				.SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-				.AddJsonFile(_CONFIGURATION_FILE_NAME, optional: this._isOptional,
+				.AddJsonFile(_ConfigurationFileName, optional: this._isOptional,
 				reloadOnChange: this._reloadOnChange);
 
 				_configuration = builder.Build();

@@ -1,29 +1,25 @@
 #region
 using BuildHub.API.Messages;
-using BuildHub.API.Auth;
-using BuildHub.API.Services.HealthCheck;
-using BuildHub.API.Startup;
 using BuildHub.Common.Logger;
-using BuildHub.Infrastructure.Authentication;
-using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Reflection;
+using BuildHub.Application.Services.Bootstrap;
+using BuildHub.Application.Services.Authentication.Extensions;
+using BuildHub.API.Middleware;
 #endregion
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
+builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddBuildHubAuthentication(builder.Configuration);
+builder.Services.AddBuildHubAuthentication();
 builder.Services.AddHostedService<DatabaseBootstrapService>();
-builder.Services.AddHealthChecks()
-	.AddCheck<DatabaseHealthCheck>("DatabaseHealthCheck")
-	.AddResourceUtilizationHealthCheck();
 
 var applicationFrontEndOriginPolicy = "ApplicationFrontendOriginPolicy";
-var frontendApplicationUrl = builder.Configuration["FrontendApplicationSettings:BaseUrl"]!;
+var frontendApplicationUrl = builder.Configuration["FrontendApplicationSettings:BaseUrl"] 
+	?? throw new InvalidOperationException("FrontendApplicationSettings:BaseUrl is not configured.");
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy(applicationFrontEndOriginPolicy,
@@ -49,7 +45,7 @@ app.Lifetime.ApplicationStarted.Register(() =>
 
 app.Lifetime.ApplicationStopping.Register(() =>
 {
-	Logger.LogInformation(ApplicationMessages.BUILD_HUB_SHUTING_DOWN);
+	Logger.LogInformation(ApplicationMessages.BuildHubShuttingDown);
 });
 
 if (app.Environment.IsDevelopment())
@@ -64,11 +60,7 @@ if (app.Environment.IsDevelopment())
 	});
 }
 
-app.MapHealthChecks("/health", new HealthCheckOptions
-{
-	ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
-
+app.UseMiddleware<GlobalExceptionHandler>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -78,9 +70,9 @@ try
 {
 	app.Run();
 }
-catch (OperationCanceledException)
+catch (Exception)
 {
-	Logger.LogInformation(ApplicationMessages.BUILD_HUB_SHUTING_DOWN);
+	Logger.LogInformation(ApplicationMessages.BuildHubShuttingDown);
 }
 finally
 {

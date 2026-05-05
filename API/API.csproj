@@ -26,19 +26,16 @@
 		<PackageReference Include="Scalar.AspNetCore" Version="2.13.13" />
 		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Common\Common.csproj" />
-		<ProjectReference Include="..\Domain\Domain.csproj" />
-		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-	</ItemGroup>
-
 	<ItemGroup>
 		<Folder Include="Models\" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ContainerPort Include="8081" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Application\Application.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿#region
+#region
 using BuildHub.Common.Configuration.Base;
 using BuildHub.DataEngine.DatabaseConnection;
 using BuildHub.DataEngine.Exceptions.DatabaseConnection;
@@ -17,7 +17,7 @@ namespace BuildHub.DataEngine.Configuration
 	/// database configurations are loaded and validated during initialization.</remarks>
 	internal class DatabaseConfigurationManager : BaseConfigurationManager
 	{
-		private const string _DATABASE_CONFIGURATIONS_KEY = "DatabaseConfigurations";
+		private const string _DatabaseConfigurationsKey = "DatabaseConfigurations";
 
 		/// <summary>
 		/// Database configuration manager singleton instance
@@ -61,7 +61,7 @@ namespace BuildHub.DataEngine.Configuration
 
 		private void LoadDatabaseConfigurations()
 		{
-			IReadOnlyList<DatabaseConfiguration>? databaseConfigurations = GetConfigurationModels<DatabaseConfiguration>(_DATABASE_CONFIGURATIONS_KEY);
+			IReadOnlyList<DatabaseConfiguration>? databaseConfigurations = GetConfigurationModels<DatabaseConfiguration>(_DatabaseConfigurationsKey);
 			if (databaseConfigurations is null)
 				throw new MissingRequiredDatabaseConfigurationException();
 

@@ -12,5 +12,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\ConcurrencyTests.sql" />
+    <Build Include="dbo\Tables\IntegrationTests.sql" />
   </ItemGroup>
 </Project>

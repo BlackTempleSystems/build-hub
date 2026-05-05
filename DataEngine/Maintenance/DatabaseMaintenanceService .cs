@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Statistics
+namespace BuildHub.DataEngine.Statistics
 {
     #region
     using BuildHub.Common.Utilities;

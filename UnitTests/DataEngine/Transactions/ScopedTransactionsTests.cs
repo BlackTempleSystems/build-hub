@@ -1,4 +1,4 @@
-﻿using BuildHub.Common.Logger;
+using BuildHub.Common.Logger;
 using BuildHub.DataEngine.DatabaseConnection;
 using BuildHub.DataEngine.DatabaseConnectionManager;
 using BuildHub.DataEngine.Queries;
@@ -44,7 +44,7 @@ namespace UnitTests.DataEngine.Transactions
 			var integrationTest = new IntegrationTestEntity();
 			integrationTest.Name = TestContext.TestName;
 
-			Assert.IsTrue(IntegrationTestsTable.Insert(integrationTest));
+			Assert.IsNotNull(IntegrationTestsTable.Insert(integrationTest));
 			Assert.IsTrue(transaction.Commit());
 		}
 
@@ -57,11 +57,11 @@ namespace UnitTests.DataEngine.Transactions
 			var integrationTest = new IntegrationTestEntity();
 			integrationTest.Name = TestContext.TestName; 
 
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
-			Assert.IsNotNull(integrationTestTable.GetByGuid(integrationTest.Guid));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.GetById(integrationTest.Id));
 
 			Assert.IsTrue(transaction.Rollback());
-			Assert.IsNull(integrationTestTable.GetByGuid(integrationTest.Guid));
+			Assert.IsNull(integrationTestTable.GetById(integrationTest.Id));
 		}
 
 		[TestMethod]
@@ -74,10 +74,10 @@ namespace UnitTests.DataEngine.Transactions
 				integrationTest.Name = TestContext.TestName;
 
 				using var scopedTransaction = new ScopedTransaction(DatabaseSource.IntegrationTests);
-				Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+				Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 			}
 
-			Assert.IsNull(integrationTestTable.GetByGuid(integrationTest.Guid));
+			Assert.IsNull(integrationTestTable.GetById(integrationTest.Id));
 		}
 
 		[TestMethod]
@@ -89,8 +89,8 @@ namespace UnitTests.DataEngine.Transactions
 			var integrationTest = new IntegrationTestEntity();
 			integrationTest.Name = TestContext.TestName;
 
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
-			Assert.IsNotNull(integrationTestTable.GetByGuid(integrationTest.Guid));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.GetById(integrationTest.Id));
 
 			Assert.IsTrue(transaction.Rollback());
 			Assert.IsFalse(transaction.Rollback());
@@ -105,8 +105,8 @@ namespace UnitTests.DataEngine.Transactions
 			var integrationTest = new IntegrationTestEntity();
 			integrationTest.Name = TestContext.TestName;
 
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
-			Assert.IsNotNull(integrationTestTable.GetByGuid(integrationTest.Guid));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.GetById(integrationTest.Id));
 
 			Assert.IsTrue(transaction.Commit());
 			Assert.IsFalse(transaction.Commit());
@@ -121,13 +121,13 @@ namespace UnitTests.DataEngine.Transactions
 			var integrationTest = new IntegrationTestEntity();
 			integrationTest.Name = TestContext.TestName;
 
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
 			var concurrencyTable = new ConcurrencyTestsTable();
 			var concurrencyTest = new ConcurrencyTesteEntity();
 			concurrencyTest.Name = TestContext.TestName;
 
-			Assert.IsTrue(concurrencyTable.Insert(concurrencyTest));
+			Assert.IsNotNull(concurrencyTable.Insert(concurrencyTest));
 			Assert.IsTrue(transaction.Commit());
 		}
 
@@ -140,17 +140,17 @@ namespace UnitTests.DataEngine.Transactions
 			var integrationTest = new IntegrationTestEntity();
 			integrationTest.Name = TestContext.TestName;
 
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
 			var concurrencyTable = new ConcurrencyTestsTable();
 			var concurrencyTest = new ConcurrencyTesteEntity();
 			concurrencyTest.Name = TestContext.TestName;
 
-			Assert.IsTrue(concurrencyTable.Insert(concurrencyTest));
+			Assert.IsNotNull(concurrencyTable.Insert(concurrencyTest));
 			Assert.IsTrue(transaction.Rollback());
 
-			Assert.IsNull(integrationTestTable.GetByGuid(integrationTest.Guid));
-			Assert.IsNull(concurrencyTable.GetByGuid(concurrencyTest.Guid));
+			Assert.IsNull(integrationTestTable.GetById(integrationTest.Id));
+			Assert.IsNull(concurrencyTable.GetById(concurrencyTest.Id));
 		}
 
 		[TestMethod]
@@ -162,10 +162,10 @@ namespace UnitTests.DataEngine.Transactions
 			integrationTest.Name = this.TestContext.TestName;
 
 			var integrationTestTable = new IntegrationTestsTable();
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
 			QueryBuilder queryBuilder = new QueryBuilder()
-				.Where<IntegrationTestEntity>(integrationTest, integrationTest => integrationTest.Guid)
+				.Where<IntegrationTestEntity>(integrationTest, integrationTest => integrationTest.Id)
 				.Lock(LockTypes.Update);
 
 			var sameIntegrationTest = integrationTestTable.GetByCondition(queryBuilder).FirstOrDefault();

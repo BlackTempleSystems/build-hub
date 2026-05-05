@@ -1,4 +1,4 @@
-﻿namespace UnitTests.DataEngineTests.Entities
+namespace UnitTests.DataEngineTests.Entities
 {
     using BuildHub.Common.Logger;
     using BuildHub.DataEngine.Entities;
@@ -22,7 +22,7 @@
 		[TestMethod]
 		public void Assert_Get_Primary_Key_Mapping_Data_Returns_Correct_Data()
 		{
-			Assert.AreEqual("GUID", EntityDataMapper.GetPrimaryKeyMappingData<IntegrationTestEntity>().ColumnInfo.ColumnName);
+			Assert.AreEqual("ID", EntityDataMapper.GetPrimaryKeyMappingData<IntegrationTestEntity>().ColumnInfo.ColumnName);
 		}
 
 		[TestMethod]

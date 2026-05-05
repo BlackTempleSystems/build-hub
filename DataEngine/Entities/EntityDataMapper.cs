@@ -1,4 +1,4 @@
-﻿#region
+#region
 using BuildHub.Common.Utilities;
 using BuildHub.DataEngine.Exceptions.Entities;
 using Microsoft.Data.SqlClient;
@@ -21,6 +21,11 @@ namespace BuildHub.DataEngine.Entities
 	/// required.</remarks>
 	public sealed class EntityDataMapper
 	{
+		/// <summary>
+		/// Name of the guid column present in every IEntity.
+		/// </summary>
+		public static readonly string GuidColumnName = "GUID";
+
 		/// <summary>
 		/// Caches the mapping information between entity types
 		/// and their corresponding column metadata to improve lookup
@@ -59,7 +64,6 @@ namespace BuildHub.DataEngine.Entities
 			else
 			{
 				var entityColumnMappingList = new List<ColumnMappingData>();
-
 				var properties = Utilities.GetObjectProperties<TEntity>();
 				foreach (PropertyInfo property in properties)
 				{

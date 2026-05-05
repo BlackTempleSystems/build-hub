@@ -1,4 +1,4 @@
-﻿#region
+#region
 using BuildHub.Common.Logger;
 using BuildHub.Common.Utilities;
 using BuildHub.DataEngine.Exceptions.Queries;
@@ -238,7 +238,7 @@ namespace UnitTests.DataEngineTests.SQLQueries
 			var query = queryBuilder.GetQuery();
 			Assert.AreEqual($"UPDATE INTEGRATION_TESTS SET NAME = '{unitTest.Name}'" +
 				$", VERSION = 0, CREATED_AT = '{Utilities.FormatDateTime(unitTest.CreatedAt)}'," +
-				$" UPDATED_AT = '{Utilities.FormatDateTime(unitTest.UpdatedAt)}' WHERE GUID = '{unitTest.Guid}'", query);
+				$" UPDATED_AT = '{Utilities.FormatDateTime(unitTest.UpdatedAt)}' WHERE ID = 0", query);
 		}
 
 		[TestMethod]
@@ -253,7 +253,7 @@ namespace UnitTests.DataEngineTests.SQLQueries
 				.BuildDelete<IntegrationTestEntity>(unitTest);
 
 			var query = queryBuilder.GetQuery();
-			Assert.AreEqual($"DELETE FROM UNIT_TESTS WHERE GUID = '{unitTest.Guid}'", query);
+			Assert.AreEqual($"DELETE FROM UNIT_TESTS WHERE ID = 0", query);
 		}
 
 		[TestMethod]
@@ -481,12 +481,12 @@ namespace UnitTests.DataEngineTests.SQLQueries
             unitTest.Name = "DELETE TEST";
             unitTest.Guid = Guid.NewGuid();
 
-            var queryBuilder = new InternalQueryBuilder()
+			var queryBuilder = new InternalQueryBuilder()
                 .From("INTEGRATION_TESTS")
                 .BuildDelete<IntegrationTestEntity>(unitTest);
 
             string query = queryBuilder.GetQuery();
-            Assert.IsTrue(query.Contains($"WHERE GUID = '{unitTest.Guid}'"));
+            Assert.IsTrue(query.Contains($"WHERE ID = 0"));
             Assert.IsFalse(query.Contains("NAME"));
         }
 

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
@@ -23,10 +23,59 @@ export class RegisterPage {
   public userName: FormControl<string | null>;
   public password: FormControl<string | null>;
   public confirmPassword: FormControl<string | null>;
+export class RegisterPage extends BasePage {
 
-  public constructor(private toastService: ToastService) {
-    this.userName = new FormControl<string>('');
-    this.password = new FormControl<string>('');
-    this.confirmPassword = new FormControl<string>('');
+  private _authenticationService = inject(AuthenticationService);
+
+  public registerForm!: FormGroup;
+
+  public constructor() {
+    super();
+  }
+  override ngOnInit(): void {
+
+    this.registerForm = this._formBuilder.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      userName: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required]
+    },);
+  }
+
+  protected override validate(): boolean {
+    if (this.registerForm?.invalid) {
+      this.registerForm.markAllAsTouched();
+
+      return false;
+    }
+
+    return true;
+  }
+
+
+  onRegister(): void {
+    if (!this.validate())
+      return;
+
+    const registerUserRequest: RegisterUserRequest = {
+      firstName: this.registerForm.value.firstName!,
+      lastName: this.registerForm.value.lastName!,
+      userName: this.registerForm.value.userName!,
+      email: this.registerForm.value.email!,
+      password: this.registerForm.value.password!,
+      confirmedPassword: this.registerForm.value.confirmPassword!
+    };
+
+    this._authenticationService.register(registerUserRequest).subscribe({
+      next: (response) => {
+        this.redirectTo('/dashboard');
+      },
+      error: (error) => {
+      }
+    });
+
+    this.registerForm.reset();
   }
 }

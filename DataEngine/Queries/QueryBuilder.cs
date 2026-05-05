@@ -1,4 +1,4 @@
-﻿using BuildHub.DataEngine.Entities;
+using BuildHub.DataEngine.Entities;
 using BuildHub.DataEngine.Queries.Base;
 using System.Linq.Expressions;
 

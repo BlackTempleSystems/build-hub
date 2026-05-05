@@ -3,10 +3,19 @@
   <Sdk Name="Microsoft.Build.Sql" Version="2.1.0" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>23d356ac-d151-4793-8b21-c32406ac327a</ProjectGuid>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
   </PropertyGroup>
   <PropertyGroup>
     <Name>Users</Name>
     <DSP>Microsoft.Data.Tools.Schema.Sql.Sql170DatabaseSchemaProvider</DSP>
     <ModelCollation>1033, CI</ModelCollation>
   </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="dbo" />
+    <Folder Include="dbo\Tables" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\Users.sql" />
+    <Build Include="dbo\Tables\UserCredentials.sql" />
+  </ItemGroup>
 </Project>
