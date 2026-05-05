@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Tables.Base
+namespace BuildHub.DataEngine.Tables.Base
 {
 	#region Dependencies
 	using BuildHub.Common.Logger;
@@ -77,6 +77,9 @@
 			}
 			else
 			{
+				if (this._databaseConnection is not null)
+					return;
+
 				this._databaseConnection = DatabaseConnectionManager.GetInstance().GetDatabaseConnection(this._databaseSource);
 				this._isConnectionLocal = true;
 			}
@@ -168,14 +171,15 @@
 		}
 
 		/// <summary>
-		/// Retrieves an entity of type <typeparamref name="TEntity"/> from the database using its primary key GUID value.
+		/// Retrieves an entity of type TEntity by its primary key identifier.
 		/// </summary>
-		/// <remarks>This method performs a database query to locate an entity by its primary key GUID.  If the entity
-		/// does not exist or an error occurs, the method returns <see langword="null"/>.</remarks>
-		/// <param name="guid">The GUID value of the entity's primary key to search for.</param>
-		/// <returns>The entity of type <typeparamref name="TEntity"/> that matches the specified GUID;  or <see langword="null"/> if
-		/// no matching entity is found or if an error occurs during retrieval.</returns>
-		public virtual TEntity? GetByGuid(Guid guid)
+		/// <remarks>If no entity with the specified identifier exists, the method returns null. If a mapping
+		/// configuration is missing for the entity, a MissingColumnDescriptionException is thrown. The method may log errors
+		/// if retrieval fails due to exceptions.</remarks>
+		/// <param name="id">The value of the primary key used to locate the entity. Must correspond to a valid record in the underlying data
+		/// store.</param>
+		/// <returns>The entity of type TEntity if found; otherwise, null.</returns>
+		public virtual TEntity? GetById(int id)
 		{
 			try
 			{
@@ -184,10 +188,49 @@
 				var primaryKeyColumnInfo = EntityDataMapper.GetPrimaryKeyMappingData<TEntity>().ColumnInfo;
 				var queryBuilder = new InternalQueryBuilder()
 					.From(this.TableName)
-					.Where(primaryKeyColumnInfo.ColumnName, guid)
+					.Where(primaryKeyColumnInfo.ColumnName, id)
 					.BuildSelect();
 
 				using SqlCommand selectCommand = new SqlCommand(queryBuilder.GetQuery(), 
+					this._databaseConnection?.InternalConnection);
+				if (!this._isConnectionLocal)
+					selectCommand.Transaction = DatabaseContext.GetCurrentContext?.TransactionContext?.InternalTransaction;
+
+				using var sqlReader = selectCommand.ExecuteReader();
+
+				if (!sqlReader.Read())
+					return default(TEntity);
+
+				return EntityDataMapper.MapDataToEntity<TEntity>(sqlReader);
+			}
+			catch (MissingColumnDescriptionException missingColumnDescriptionException)
+			{
+				Logger.LogError(missingColumnDescriptionException, $"Failed to map entity because of missing column description.");
+				throw;
+			}
+			catch (Exception exception)
+			{
+				Logger.LogError(exception, $"Retrieving records for table {TableName} failed.");
+				return default(TEntity);
+			}
+			finally
+			{
+				this.ReleaseDatabaseConnection();
+			}
+		}
+
+		public virtual TEntity? GetByGuid(Guid guid)
+		{
+			try
+			{
+				this.AcquireDatabaseConnection();
+
+				var queryBuilder = new InternalQueryBuilder()
+					.From(this.TableName)
+					.Where(EntityDataMapper.GuidColumnName, guid)
+					.BuildSelect();
+
+				using SqlCommand selectCommand = new SqlCommand(queryBuilder.GetQuery(),
 					this._databaseConnection?.InternalConnection);
 				if (!this._isConnectionLocal)
 					selectCommand.Transaction = DatabaseContext.GetCurrentContext?.TransactionContext?.InternalTransaction;
@@ -336,7 +379,7 @@
 		/// not already assigned. If the entity implements <see cref="VersionedEntity"/>, its <c>CreatedAt</c> and
 		/// <c>UpdatedAt</c> properties will be set to the current date and time.</param>
 		/// <returns><see langword="true"/> if the entity was successfully inserted; otherwise, <see langword="false"/>.</returns>
-		public virtual bool Insert(TEntity entity)
+		public virtual TEntity? Insert(TEntity entity)
 		{
 			try
 			{
@@ -372,12 +415,13 @@
 					insertCommand.Transaction = DatabaseContext.GetCurrentContext?.TransactionContext?.InternalTransaction;
 
 				insertCommand.ExecuteNonQuery();
-				return true;
+
+				return GetByGuid(entity.Guid);
 			}
 			catch (Exception exception)
 			{
 				Logger.LogError(exception, $"Failed to insert a record for table: '{TableName}'.");
-				return false;
+				throw;
 			}
 			finally
 			{

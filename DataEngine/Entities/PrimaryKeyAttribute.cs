@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Entities
+namespace BuildHub.DataEngine.Entities
 {
 	/// <summary>
 	/// Specifies that the decorated property or field is part of the primary key for the containing entity.

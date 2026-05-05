@@ -1,3 +1,4 @@
+using BuildHub.Domain.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BuildHub.API.Controllers.Base
@@ -53,6 +54,31 @@ namespace BuildHub.API.Controllers.Base
 		/// <returns>A 404 Not Found result containing the specified response data.</returns>
 		protected IActionResult ApiNotFound<ResponseData>(ResponseData responseData) =>
 			NotFound(BuildResponse(false, responseData));
+
+		/// <summary>
+		/// Creates a 409 status code response.
+		/// </summary>
+		/// <typeparam name="ResponseData"></typeparam>
+		/// <param name="responseData"></param>
+		/// <returns></returns>
+		protected IActionResult ApiConflict<ResponseData>(ResponseData responseData) =>
+			Conflict(BuildResponse(false, responseData));
+
+		/// <summary>
+		/// Creates API responses base on the result pattern.
+		/// </summary>
+		/// <typeparam name="ResponseData"></typeparam>
+		/// <param name="responseData"></param>
+		/// <returns></returns>
+		protected IActionResult FromResult<T>(Result<T> result) 
+			=> result.Status switch
+		{
+			ResultStatus.Ok => ApiOk(result.Data),
+			ResultStatus.Unauthorized => ApiUnauthorized(result.ErrorMessage),
+			ResultStatus.NotFound => ApiNotFound(result.ErrorMessage),
+			ResultStatus.Conflict => ApiConflict(result.ErrorMessage),
+			_ => throw new Exception("Unhandled result status")
+		};
 
 		/// <summary>
 		/// Creates a new BaseServerResponse<T> instance containing the specified response data and success status.

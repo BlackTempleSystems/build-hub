@@ -1,4 +1,4 @@
-﻿using BuildHub.Common.Logger;
+using BuildHub.Common.Logger;
 using BuildHub.DataEngine.DatabaseConnection;
 using BuildHub.DataEngine.DatabaseConnectionManager;
 using BuildHub.DataEngine.Exceptions.Entities;
@@ -46,7 +46,7 @@ namespace UnitTests.DataEngineTests.Tables
 		public void Assert_Get_By_Guid_Returns_Null_If_Entity_Does_Not_Exist()
 		{
 			var integrationTestTable = new IntegrationTestsTable();
-			Assert.IsNull(integrationTestTable.GetByGuid(Guid.NewGuid()));
+			Assert.IsNull(integrationTestTable.GetById(0));
 		}
 
 		[TestMethod]
@@ -56,7 +56,7 @@ namespace UnitTests.DataEngineTests.Tables
 			integrationTest.Name = this.TestContext.TestName;
 
 			var integrationTestTable = new IntegrationTestsTable();
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
 			Assert.IsGreaterThan(0, integrationTestTable.GetByGuid(integrationTest.Guid).Id);
 		}
@@ -68,7 +68,7 @@ namespace UnitTests.DataEngineTests.Tables
             integrationTest.Name = this.TestContext.TestName;
 
             var integrationTestTable = new IntegrationTestsTable();
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
             var integrationTestTableWithUnmappedFields = new InegrationTestWithUnmappedFieldTable();
 			Assert.Throws<MissingColumnDescriptionException>(() => integrationTestTableWithUnmappedFields.GetAll());
@@ -81,7 +81,7 @@ namespace UnitTests.DataEngineTests.Tables
 			integrationTest.Name = this.TestContext.TestName;
 			var integrationTestTable = new IntegrationTestsTable();
 
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 			Assert.IsNotNull(integrationTestTable.GetByCondition(integrationTest, (integrationTest) => integrationTest.Id));
 		}
 
@@ -92,7 +92,7 @@ namespace UnitTests.DataEngineTests.Tables
 			integrationTest.Name = this.TestContext.TestName;
 			var integrationTestTable = new IntegrationTestsTable();
 
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
 			QueryBuilder queryBuilder = new QueryBuilder()
 				.Where(integrationTest, (integrationTest) => integrationTest.Guid);
@@ -107,9 +107,9 @@ namespace UnitTests.DataEngineTests.Tables
 			integrationTest.Name = this.TestContext.TestName;
 
 			var integrationTestTable = new IntegrationTestsTable();
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
-			var dbUnitTest = integrationTestTable.GetByGuid(integrationTest.Guid);
+			var dbUnitTest = integrationTestTable.GetById(integrationTest.Id);
 			Assert.AreEqual(integrationTest.Guid, dbUnitTest.Guid);
 		}
 
@@ -120,8 +120,8 @@ namespace UnitTests.DataEngineTests.Tables
 			integrationTest.Name = this.TestContext.TestName;
 
 			var integrationTestTable = new IntegrationTestsTable();
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
-			Assert.IsFalse(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 		}
 
 		[TestMethod]
@@ -131,7 +131,7 @@ namespace UnitTests.DataEngineTests.Tables
 			integrationTest.Name = this.TestContext.TestName;
 
 			var integrationTestTable = new IntegrationTestsTable();
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
 			integrationTest.Name = this.TestContext.TestName.ToLower();
 			Assert.IsTrue(integrationTestTable.Update(integrationTest));
@@ -144,7 +144,7 @@ namespace UnitTests.DataEngineTests.Tables
 			integrationTest.Name = this.TestContext.TestName;
 
 			var integrationTestTable = new IntegrationTestsTable();
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
 			integrationTest.Name = this.TestContext.TestName;
 			Assert.IsTrue(integrationTestTable.Delete(integrationTest));
@@ -157,7 +157,7 @@ namespace UnitTests.DataEngineTests.Tables
 			integrationTest.Name = this.TestContext.TestName;
 
 			var integrationTestTable = new IntegrationTestsTable();
-			Assert.IsTrue(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
 			integrationTest.Name = this.TestContext.TestName;
 			Assert.IsTrue(integrationTestTable.Delete(integrationTest));
@@ -187,9 +187,9 @@ namespace UnitTests.DataEngineTests.Tables
             integrationTest.Name = this.TestContext.TestName;
 
             var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsTrue(integrationTestsTable.Insert(integrationTest));
+            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
 
-            var dbEntity = integrationTestsTable.GetByGuid(integrationTest.Guid);
+            var dbEntity = integrationTestsTable.GetById(integrationTest.Id);
             Assert.AreEqual(this.TestContext.TestName, dbEntity.Name);
         }
 
@@ -200,7 +200,7 @@ namespace UnitTests.DataEngineTests.Tables
             integrationTest.Name = this.TestContext.TestName;
 
             var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsTrue(integrationTestsTable.Insert(integrationTest));
+            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
             Assert.IsGreaterThan(0, integrationTest.Id);
         }
 
@@ -214,8 +214,8 @@ namespace UnitTests.DataEngineTests.Tables
             integrationTest2.Name = this.TestContext.TestName + "_2";
 
             var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsTrue(integrationTestsTable.Insert(integrationTest1));
-            Assert.IsTrue(integrationTestsTable.Insert(integrationTest2));
+            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest1));
+            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest2));
 
             Assert.AreNotEqual(integrationTest1.Guid, integrationTest2.Guid);
         }
@@ -227,13 +227,13 @@ namespace UnitTests.DataEngineTests.Tables
             integrationTest.Name = this.TestContext.TestName;
 
             var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsTrue(integrationTestsTable.Insert(integrationTest));
+            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
 
             string updatedName = this.TestContext.TestName + "_updated";
             integrationTest.Name = updatedName;
             Assert.IsTrue(integrationTestsTable.Update(integrationTest));
 
-            var dbEntity = integrationTestsTable.GetByGuid(integrationTest.Guid);
+            var dbEntity = integrationTestsTable.GetById(integrationTest.Id);
             Assert.AreEqual(updatedName, dbEntity.Name);
         }
 
@@ -254,10 +254,10 @@ namespace UnitTests.DataEngineTests.Tables
             integrationTest.Name = this.TestContext.TestName;
 
             var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsTrue(integrationTestsTable.Insert(integrationTest));
+            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
             Assert.IsTrue(integrationTestsTable.Delete(integrationTest));
 
-            Assert.IsNull(integrationTestsTable.GetByGuid(integrationTest.Guid));
+            Assert.IsNull(integrationTestsTable.GetById(integrationTest.Id));
         }
 
         [TestMethod]
@@ -306,9 +306,9 @@ namespace UnitTests.DataEngineTests.Tables
             integrationTest.Name = this.TestContext.TestName;
 
             var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsTrue(integrationTestsTable.Insert(integrationTest));
+            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
 
-            var result = integrationTestsTable.GetByGuid(integrationTest.Guid);
+            var result = integrationTestsTable.GetById(integrationTest.Id);
             Assert.IsNotNull(result);
             Assert.AreEqual(integrationTest.Guid, result.Guid);
         }
@@ -322,13 +322,13 @@ namespace UnitTests.DataEngineTests.Tables
             for (int i = 0; i < 5; i++)
             {
                 var entity = new IntegrationTestEntity { Name = $"{this.TestContext.TestName}_{i}" };
-                Assert.IsTrue(integrationTestsTable.Insert(entity));
+                Assert.IsNotNull(integrationTestsTable.Insert(entity));
                 entities.Add(entity);
             }
 
             foreach (var entity in entities)
             {
-                var dbEntity = integrationTestsTable.GetByGuid(entity.Guid);
+                var dbEntity = integrationTestsTable.GetById(entity.Id);
                 Assert.IsNotNull(dbEntity);
                 Assert.AreEqual(entity.Guid, dbEntity.Guid);
             }
@@ -345,12 +345,12 @@ namespace UnitTests.DataEngineTests.Tables
                 using var scopedTransaction = new ScopedTransaction(DatabaseSource.IntegrationTests);
 
                 integrationTest = new IntegrationTestEntity { Name = this.TestContext.TestName };
-                Assert.IsTrue(integrationTestsTable.Insert(integrationTest));
+                Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
 
             }
             catch { }
 
-            Assert.IsNull(integrationTestsTable.GetByGuid(integrationTest.Guid));
+            Assert.IsNull(integrationTestsTable.GetById(integrationTest.Id));
         }
 
         [TestMethod]
@@ -361,11 +361,11 @@ namespace UnitTests.DataEngineTests.Tables
 
             using (var scopedTransaction = new ScopedTransaction(DatabaseSource.IntegrationTests))
             {
-                Assert.IsTrue(integrationTestsTable.Insert(integrationTest));
+                Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
                 scopedTransaction.Commit();
             }
 
-            Assert.IsNotNull(integrationTestsTable.GetByGuid(integrationTest.Guid));
+            Assert.IsNotNull(integrationTestsTable.GetById(integrationTest.Id));
         }
     }
 }

@@ -23,7 +23,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
         /// <summary>
         /// Interval in milliseconds on which a snapshot of the metrics is logged (5 minutes).
         /// </summary>
-        private const int _METRICS_SNAPSHOT_INTERVAL = 300000;
+        private const int _MetricsSnapshotInterval = 300000;
 
         /// <summary>
         /// Database configuration for a specific database source.
@@ -360,7 +360,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 
             InitializeConnections();
 
-            this._metricsLogTimer.Interval = _METRICS_SNAPSHOT_INTERVAL;
+            this._metricsLogTimer.Interval = _MetricsSnapshotInterval;
             this._metricsLogTimer.AutoReset = true;
             this._metricsLogTimer.Elapsed += this.OnMetricsSnapshot;
             this._metricsLogTimer.Enabled = true;

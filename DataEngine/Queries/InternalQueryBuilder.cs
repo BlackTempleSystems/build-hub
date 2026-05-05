@@ -6,8 +6,8 @@ namespace BuildHub.DataEngine.Queries
 	using BuildHub.DataEngine.Exceptions.Queries;
 	using BuildHub.DataEngine.Queries.Base;
 	using Entities;
-    using Microsoft.IdentityModel.Tokens;
-    using System.Data;
+	using Microsoft.IdentityModel.Tokens;
+	using System.Data;
 	using System.Text;
 	#endregion
 
@@ -91,7 +91,7 @@ namespace BuildHub.DataEngine.Queries
 		/// </summary>
 		private void ValidateQueryComponents()
 		{
-			if (_tableName.IsNullOrEmpty())
+			if (string.IsNullOrEmpty(_tableName))
 				throw new ArgumentException();
 		}
 
@@ -226,7 +226,7 @@ namespace BuildHub.DataEngine.Queries
 			{
 				ValidateQueryComponents();
 
-                this._query = string.Empty;
+				this._query = string.Empty;
 				int topStatementCount = this._queryBuilderState.TopStatementCount;
 
 				StringBuilder queryStringBuilder = new StringBuilder();
@@ -259,9 +259,9 @@ namespace BuildHub.DataEngine.Queries
 		{
 			if (!this._isQueryBuilt)
 			{
-                ValidateQueryComponents();
+				ValidateQueryComponents();
 
-                this._query = string.Empty;
+				this._query = string.Empty;
 
 				StringBuilder queryStringBuilder = new StringBuilder();
 				queryStringBuilder.Append($"INSERT INTO {this._tableName} ");
@@ -309,9 +309,9 @@ namespace BuildHub.DataEngine.Queries
 		{
 			if (!this._isQueryBuilt)
 			{
-                ValidateQueryComponents();
+				ValidateQueryComponents();
 
-                this._query = string.Empty;
+				this._query = string.Empty;
 
 				StringBuilder queryStringBuilder = new StringBuilder();
 				queryStringBuilder.Append($"UPDATE {this._tableName} ");
@@ -327,10 +327,16 @@ namespace BuildHub.DataEngine.Queries
 				{
 					if (EntityDataMapper.HasIdentityColumn(property))
 					{
+						if (!hasPrimaryKeyColumn && EntityDataMapper.HasPrimaryKeyColumn(property))
+						{
+							hasPrimaryKeyColumn = true;
+							primaryKeyValue = property.GetValue(entity);
+							continue;
+						}
 						continue;
 					}
 
-					if (EntityDataMapper.HasPrimaryKeyColumn(property))
+					if (!hasPrimaryKeyColumn && EntityDataMapper.HasPrimaryKeyColumn(property))
 					{
 						hasPrimaryKeyColumn = true;
 						primaryKeyValue = property.GetValue(entity);
@@ -372,9 +378,9 @@ namespace BuildHub.DataEngine.Queries
 		{
 			if (!this._isQueryBuilt)
 			{
-                ValidateQueryComponents();
+				ValidateQueryComponents();
 
-                this._query = string.Empty;
+				this._query = string.Empty;
 
 				StringBuilder queryStringBuilder = new StringBuilder();
 				queryStringBuilder.Append($"DELETE FROM {this._tableName}");

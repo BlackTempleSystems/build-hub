@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Entities
+namespace BuildHub.DataEngine.Entities
 {
 	/// <summary>
 	/// Represents an entity with read-only properties.
@@ -9,10 +9,10 @@
 	public class BaseEntity : IEntity
 	{
 		[Identity]
+		[PrimaryKey]
 		[ColumnInfo("ID")]
 		public int Id { get; protected set; }
-
-		[PrimaryKey]
+		
 		[ColumnInfo("GUID")]
 		public Guid Guid { get; set; }
 

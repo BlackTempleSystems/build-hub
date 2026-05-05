@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
@@ -29,16 +29,10 @@ import { LoginRequest } from '@app/core/services/authentication/models/login.req
 export class LoginPage extends BasePage {
 
   private _authenticationService = inject(AuthenticationService);
+  public loginForm!: FormGroup;
 
-  public loginForm: FormGroup;
-
-  public constructor(private fb: FormBuilder,) {
+  public constructor() {
     super();
-
-    this.loginForm = this.fb.group({
-      userName: ['', [Validators.required]],
-      userPassword: ['', [Validators.required]]
-    });
   }
 
   protected validate(): boolean {
@@ -53,25 +47,28 @@ export class LoginPage extends BasePage {
   }
 
   override ngOnInit(): void {
-
+    this.loginForm = this._formBuilder.group({
+      userName: ['', [Validators.required]],
+      password: ['', [Validators.required]]
+    });
   }
 
   public onLogin(): void {
     if (!this.validate())
       return;
 
-    let loginRequest = new LoginRequest();
-    loginRequest.userName = this.loginForm.get('userName')?.value;
-    loginRequest.userPassword = this.loginForm.get('userPassword')?.value;
+    // let loginRequest = new LoginRequest();
+    // loginRequest.userName = this.loginForm.get('userName')?.value;
+    // loginRequest.userPassword = this.loginForm.get('password')?.value;
 
-    this._authenticationService.login(this.loginForm.value).subscribe({
-      next: (response) => {
-        console.log(response);
-      },
-      error: (error) => {
-        console.log(error);
-      }
-    });
+    // this._authenticationService.login(this.loginForm.value).subscribe({
+    //   next: (response) => {
+    //     console.log(response);
+    //   },
+    //   error: (error) => {
+    //     console.log(error);
+    //   }
+    // });
 
     this.loginForm.reset();
   }

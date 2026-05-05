@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Entities
+namespace BuildHub.DataEngine.Entities
 {
 	/// <summary>
 	/// Represents an entity that maintains versioning and timestamp information for creation and updates.
@@ -24,6 +24,6 @@
 		/// <summary>
 		/// Increments the version counter.
 		/// </summary>
-		public void IncrementVersion() => this.Version++;
+		internal void IncrementVersion() => this.Version++;
 	}
 }
