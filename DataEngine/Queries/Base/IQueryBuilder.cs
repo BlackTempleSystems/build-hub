@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 namespace BuildHub.DataEngine.Queries.Base
 {
@@ -54,6 +54,18 @@ namespace BuildHub.DataEngine.Queries.Base
 		/// <param name="compareType">The type of comparison to apply between the property and its value. Defaults to <see cref="CompareTypes.Equal"/>.</param>
 		/// <returns>The current <c>TQueryBuilder</c> instance with the applied filter condition, enabling further query composition.</returns>
 		TQueryBuilder Where<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
+			where TEntity : IEntity;
+
+		/// <summary>
+		/// Adds an OR condition to the query using the specified entity property, comparison type, and value.
+		/// </summary>
+		/// <typeparam name="TEntity">The type of the entity to which the condition applies. Must implement <see cref="IEntity"/>.</typeparam>
+		/// <param name="entity">The entity instance containing the value to compare against the specified property.</param>
+		/// <param name="condition">An expression that specifies the property of <typeparamref name="TEntity"/> to use in the condition.</param>
+		/// <param name="compareType">The type of comparison to perform between the property and the entity value. Defaults to <see
+		/// cref="CompareTypes.Equal"/>.</param>
+		/// <returns>The current query builder instance with the OR condition applied.</returns>
+		TQueryBuilder Or<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
 			where TEntity : IEntity;
 
 		/// <summary>

@@ -6,9 +6,9 @@ namespace BuildHub.DataEngine.Queries
 	using BuildHub.DataEngine.Exceptions.Queries;
 	using BuildHub.DataEngine.Queries.Base;
 	using Entities;
-	using Microsoft.IdentityModel.Tokens;
 	using System.Data;
 	using System.Text;
+	using System.Linq.Expressions;
 	#endregion
 
 	/// <summary>
@@ -93,6 +93,11 @@ namespace BuildHub.DataEngine.Queries
 		{
 			if (string.IsNullOrEmpty(_tableName))
 				throw new ArgumentException();
+		}
+
+		private string ResolveWhereStatementOperator(WhereConditionTypes conditionTypes)
+		{
+			
 		}
 
 		/// <summary>
@@ -190,13 +195,32 @@ namespace BuildHub.DataEngine.Queries
 		/// <param name="compareType">The comparison operator to use for the condition, such as equal, greater than, or less than.</param>
 		/// <returns>The current <see cref="InternalQueryBuilder"/> instance with the added WHERE condition, allowing for method
 		/// chaining.</returns>
-		public InternalQueryBuilder Where<TEntity>(TEntity entity, System.Linq.Expressions.Expression<Func<TEntity, object>> condition, CompareTypes compareType)
+		public InternalQueryBuilder Where<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType)
 			where TEntity : IEntity
 		{
 			var columnInfo = EntityDataMapper.GetColumnInfo<TEntity>(condition);
 			var value = condition.Compile()(entity);
 
 			this._queryBuilderState.WhereStatements.Add(new WhereCondition(columnInfo.ColumnName, CompareTypes.Equal, value));
+			return this;
+		}
+
+		/// <summary>
+		/// Adds an OR condition to the query using the specified entity property, comparison type, and value.
+		/// </summary>
+		/// <typeparam name="TEntity">The type of the entity to which the condition applies. Must implement <see cref="IEntity"/>.</typeparam>
+		/// <param name="entity">The entity instance containing the value to compare against the specified property.</param>
+		/// <param name="condition">An expression that specifies the property of <typeparamref name="TEntity"/> to use in the condition.</param>
+		/// <param name="compareType">The type of comparison to perform between the property and the entity value. Defaults to <see
+		/// cref="CompareTypes.Equal"/>.</param>
+		/// <returns>The current query builder instance with the OR condition applied.</returns>
+		public InternalQueryBuilder Or<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
+			where TEntity : IEntity
+		{
+			var columnInfo = EntityDataMapper.GetColumnInfo<TEntity>(condition);
+			var value = condition.Compile()(entity);
+
+			this._queryBuilderState.WhereStatements.Add(new WhereCondition(columnInfo.ColumnName, compareType, value, WhereConditionTypes.WhereConditionTypeOr));
 			return this;
 		}
 

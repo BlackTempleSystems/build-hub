@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Queries
+namespace BuildHub.DataEngine.Queries
 {
 	/// <summary>
 	/// Represents the current state of a query being constructed, including filtering conditions, locking behavior, and

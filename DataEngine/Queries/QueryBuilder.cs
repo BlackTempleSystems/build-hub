@@ -90,6 +90,25 @@ namespace BuildHub.DataEngine.Queries
 		}
 
 		/// <summary>
+		/// Adds an OR condition to the query using the specified entity property, comparison type, and value.
+		/// </summary>
+		/// <typeparam name="TEntity">The type of the entity to which the condition applies. Must implement <see cref="IEntity"/>.</typeparam>
+		/// <param name="entity">The entity instance containing the value to compare against the specified property.</param>
+		/// <param name="condition">An expression that specifies the property of <typeparamref name="TEntity"/> to use in the condition.</param>
+		/// <param name="compareType">The type of comparison to perform between the property and the entity value. Defaults to <see
+		/// cref="CompareTypes.Equal"/>.</param>
+		/// <returns>The current query builder instance with the OR condition applied.</returns>
+		public QueryBuilder Or<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
+			where TEntity : IEntity
+		{
+			var columnInfo = EntityDataMapper.GetColumnInfo<TEntity>(condition);
+			var value = condition.Compile()(entity);
+
+			this.QueryBuilderState.WhereStatements.Add(new WhereCondition(columnInfo.ColumnName, compareType, value, WhereConditionTypes.WhereConditionTypeOr));
+			return this;
+		}
+
+		/// <summary>
 		/// Specifies the locking behavior for the query by setting the lock type.
 		/// </summary>
 		/// <param name="lockType">The type of lock to apply to the query. Determines how concurrent access to the queried data is managed.</param>
