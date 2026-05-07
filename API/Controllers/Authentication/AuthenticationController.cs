@@ -38,7 +38,7 @@ public class AuthenticationController : BaseApiController
 	[AllowAnonymous]
 	public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest, CancellationToken cancellationToken)
 	{
-		return ApiOk(new LoginResponse());
+		return FromResult(await _authenticationService.AuthenticateUser(loginRequest));
 	}
 
 	/// <summary>

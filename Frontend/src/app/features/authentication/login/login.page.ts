@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
@@ -46,7 +46,7 @@ export class LoginPage extends BasePage {
 
   override ngOnInit(): void {
     this.loginForm = this._formBuilder.group({
-      userName: ['', [Validators.required]],
+      email: ['', [Validators.required]],
       password: ['', [Validators.required]]
     });
   }
@@ -55,18 +55,19 @@ export class LoginPage extends BasePage {
     if (!this.validate())
       return;
 
-    // let loginRequest = new LoginRequest();
-    // loginRequest.userName = this.loginForm.get('userName')?.value;
-    // loginRequest.userPassword = this.loginForm.get('password')?.value;
+    const loginRequest: LoginRequest =
+    {
+      email: this.loginForm.get('email')?.value,
+      password: this.loginForm.get('password')?.value
+    };
 
-    // this._authenticationService.login(this.loginForm.value).subscribe({
-    //   next: (response) => {
-    //     console.log(response);
-    //   },
-    //   error: (error) => {
-    //     console.log(error);
-    //   }
-    // });
+    this._authenticationService.login(loginRequest).subscribe({
+      next: (response) => {
+        this.redirectTo('/dashboard');
+      },
+      error: (error) => {
+      }
+    });
 
     this.loginForm.reset();
   }

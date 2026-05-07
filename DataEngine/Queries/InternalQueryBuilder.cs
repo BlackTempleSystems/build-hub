@@ -9,6 +9,7 @@ namespace BuildHub.DataEngine.Queries
 	using System.Data;
 	using System.Text;
 	using System.Linq.Expressions;
+	using System.Security.Principal;
 	#endregion
 
 	/// <summary>
@@ -97,7 +98,15 @@ namespace BuildHub.DataEngine.Queries
 
 		private string ResolveWhereStatementOperator(WhereConditionTypes conditionTypes)
 		{
-			
+			switch (conditionTypes)
+			{
+				case WhereConditionTypes.WhereConditionTypeAnd:
+					return " AND ";
+				case WhereConditionTypes.WhereConditionTypeOr:
+					return " OR ";
+				default:
+					throw new ArgumentException();
+			}
 		}
 
 		/// <summary>
@@ -110,12 +119,12 @@ namespace BuildHub.DataEngine.Queries
 		{
 			if (this._queryBuilderState.WhereStatements.Count > 0)
 			{
-				var whereStatements = new List<string>();
 				queryStringBuilder.Append(" WHERE ");
-
-				foreach (var statement in this._queryBuilderState.WhereStatements)
+				for(int index = 0; index <  this._queryBuilderState.WhereStatements.Count; index++)
 				{
+					WhereCondition statement = this._queryBuilderState.WhereStatements[index];
 					string completedCondition = string.Empty;
+					string whereStatetmentOperator = ResolveWhereStatementOperator(statement.WhereConditionType);
 					string columnName = statement.InternalWhereCondition.Item1;
 					string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(statement.InternalWhereCondition.Item2);
 					object? value = statement?.InternalWhereCondition.Item3;
@@ -127,10 +136,11 @@ namespace BuildHub.DataEngine.Queries
 					}
 
 					completedCondition = $"{columnName} {compareOperator} {this.ProcessValue(value)}";
-					whereStatements.Add(completedCondition);
-				}
+					if (index > 0)
+						queryStringBuilder.Append(whereStatetmentOperator);
 
-				queryStringBuilder.AppendJoin(" AND ", whereStatements);
+					queryStringBuilder.Append(completedCondition);
+				}
 			}
 		}
 
@@ -205,6 +215,32 @@ namespace BuildHub.DataEngine.Queries
 			return this;
 		}
 
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="columnName"></param>
+		/// <param name="compareType"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public InternalQueryBuilder WhereOr(string columnName, CompareTypes compareType, object? value)
+		{
+			this._queryBuilderState.WhereStatements.Add(new WhereCondition(columnName.ToUpper(), compareType, value, WhereConditionTypes.WhereConditionTypeOr));
+			return this;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="columnName"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public InternalQueryBuilder WhereOr(string columnName, object? value)
+		{
+			this._queryBuilderState.WhereStatements.Add(new WhereCondition(columnName, CompareTypes.Equal, value, WhereConditionTypes.WhereConditionTypeOr));
+			return this;
+		}
+
 		/// <summary>
 		/// Adds an OR condition to the query using the specified entity property, comparison type, and value.
 		/// </summary>
@@ -214,7 +250,7 @@ namespace BuildHub.DataEngine.Queries
 		/// <param name="compareType">The type of comparison to perform between the property and the entity value. Defaults to <see
 		/// cref="CompareTypes.Equal"/>.</param>
 		/// <returns>The current query builder instance with the OR condition applied.</returns>
-		public InternalQueryBuilder Or<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
+		public InternalQueryBuilder WhereOr<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
 			where TEntity : IEntity
 		{
 			var columnInfo = EntityDataMapper.GetColumnInfo<TEntity>(condition);

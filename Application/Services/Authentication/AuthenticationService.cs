@@ -14,6 +14,7 @@ namespace BuildHub.Application.Services.Authentication
 	using BuildHub.Domain.UserCredentials.Entities;
 	using BuildHub.Domain.Users;
 	using BuildHub.Domain.Users.Entities;
+	using Microsoft.AspNetCore.Http;
 	using Models;
 
 	/// <summary>
@@ -48,9 +49,61 @@ namespace BuildHub.Application.Services.Authentication
 		/// </summary>
 		/// <param name="loginRequestData">The login request information containing user credentials to be authenticated. Cannot be null.</param>
 		/// <returns>A task that represents the asynchronous authentication operation.</returns>
-		public async Task<Result<LoginResponse>> AuthenticateUser(Models.LoginRequest loginRequestData)
+		public async Task<Result<LoginResponse>> AuthenticateUser(LoginRequest loginRequestData)
 		{
-			return Result<LoginResponse>.Success(null);
+			//var validationResult = _loginRequestValidator.Validate(loginRequestData);
+			//if (!validationResult.IsValid)
+			//	throw new ValidationException(validationResult.Errors);
+
+			UserEntity? user = new UserEntity();
+			user.Email = loginRequestData.Email;
+
+			var queryBuilder = new QueryBuilder();
+			queryBuilder.Where(user, user => user.Email!);
+
+			UsersTable usersTable = new UsersTable();
+			user = usersTable.GetByCondition(queryBuilder).FirstOrDefault();
+
+			if (user is null || user.Id <= 0)
+			{
+				Logger.LogError(ApplicationMessages.AccountWithEmailDoesntExists);
+
+				return Result<LoginResponse>.Failure(ApplicationMessages.AccountWithEmailDoesntExists,
+					ResultStatus.Unauthorized);
+			}
+
+			UserCredentialsEntity? userCredentials = new UserCredentialsEntity();
+			userCredentials.UserId = user.Id;
+
+			UserCredentialsTable userCredentialsTable = new UserCredentialsTable();
+
+			queryBuilder.Reset();
+			queryBuilder.Where(userCredentials, userCredentials => userCredentials.UserId);
+
+			userCredentials = userCredentialsTable.GetByCondition(queryBuilder).FirstOrDefault();
+			if(userCredentials is null || userCredentials.Id <= 0)
+			{
+				Logger.LogError(ApplicationMessages.InvalidEmailOrUsernameOrPassword);
+
+				return Result<LoginResponse>.Failure(ApplicationMessages.InvalidEmailOrUsernameOrPassword,
+					ResultStatus.Unauthorized);
+			}
+
+			if(!_cryptographicService.VerifyPassword(loginRequestData.Password, userCredentials.HashedPassword!))
+			{
+				Logger.LogError(ApplicationMessages.InvalidEmailOrUsernameOrPassword);
+
+				return Result<LoginResponse>.Failure(ApplicationMessages.InvalidEmailOrUsernameOrPassword,
+					ResultStatus.Unauthorized);
+			}
+
+			var jwtToken = this._jwtService.GenerateSecurityToken(user);
+
+			var loginResponse = new LoginResponse()
+			{
+			};
+
+			return Result<LoginResponse>.Success(loginResponse);
 		}
 
 		/// <summary>
@@ -71,7 +124,8 @@ namespace BuildHub.Application.Services.Authentication
 			newUser.UserName = registerUserRequest.UserName;
 
 			var queryBuilder = new QueryBuilder();
-			queryBuilder.Where(newUser, user => user.Email); // OR USERNAME
+			queryBuilder.Where(newUser, user => user.Email!)
+				.WhereOr(newUser, user => user.UserName!);
 
 			UsersTable usersTable = new UsersTable();
 			var existingUser = usersTable.GetByCondition(queryBuilder).FirstOrDefault();

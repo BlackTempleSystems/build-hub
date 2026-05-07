@@ -502,5 +502,49 @@ namespace UnitTests.DataEngineTests.SQLQueries
             string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(compareTypes);
             Assert.AreEqual($"SELECT * FROM {tableName} WITH(NOLOCK) WHERE {columnName} {compareOperator} '{value}'", queryBuilder.GetQuery());
         }
-    }
+
+		[TestMethod]
+		[DataRow("USERS", "NAME", CompareTypes.Equal, "O'Brien", "Leeroy")]
+		public void Build_Select_With_AND_And_Or_Clauses(string tableName, string columnName, CompareTypes compareTypes, string value, string anotherValue)
+		{
+			var queryBuilder = new InternalQueryBuilder()
+				.From(tableName)
+				.Where(columnName, compareTypes, value)
+				.WhereOr(columnName, compareTypes, anotherValue)
+				.BuildSelect();
+
+			string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(compareTypes);
+			var query = queryBuilder.GetQuery();
+			Assert.AreEqual($"SELECT * FROM {tableName} WITH(NOLOCK) WHERE {columnName} {compareOperator} '{value}' OR {columnName} {compareOperator} '{anotherValue}'", query);
+		}
+
+		[TestMethod]
+		[DataRow("USERS", "NAME", CompareTypes.Equal, "O'Brien")]
+		public void Build_Select_With_OR_Clauses_Only(string tableName, string columnName, CompareTypes compareTypes, string value) 
+		{ 
+			var queryBuilder = new InternalQueryBuilder()
+				.From(tableName)
+				.WhereOr(columnName, compareTypes, value)
+				.BuildSelect();
+
+			string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(compareTypes);
+			var query = queryBuilder.GetQuery();
+			Assert.AreEqual($"SELECT * FROM {tableName} WITH(NOLOCK) WHERE {columnName} {compareOperator} '{value}'", query);
+		}
+
+		[TestMethod]
+		[DataRow("USERS", "NAME", CompareTypes.Equal, "O'Brien", "Leeroy")]
+		public void Build_Select_With_2_Or_Clauses(string tableName, string columnName, CompareTypes compareTypes, string value, string anotherValue)
+		{
+			var queryBuilder = new InternalQueryBuilder()
+				.From(tableName)
+				.WhereOr(columnName, compareTypes, value)
+				.WhereOr(columnName, compareTypes, anotherValue)
+				.BuildSelect();
+
+			string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(compareTypes);
+			var query = queryBuilder.GetQuery();
+			Assert.AreEqual($"SELECT * FROM {tableName} WITH(NOLOCK) WHERE {columnName} {compareOperator} '{value}' OR {columnName} {compareOperator} '{anotherValue}'", query);
+		}
+	}
 }

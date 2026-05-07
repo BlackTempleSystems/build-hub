@@ -5,6 +5,8 @@ namespace BuildHub.Application.Services.Authentication.Models
 	/// </summary>
 	public sealed record class LoginResponse
 	{
+		public string AccessToken { get; set; } = string.Empty;
+
 		public LoginResponse()
 		{
 		}

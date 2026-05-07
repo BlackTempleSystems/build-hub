@@ -32,7 +32,6 @@ namespace BuildHub.DataEngine.Queries.Base
 		/// <param name="compareType"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		///
 		TQueryBuilder Where(string columnName, CompareTypes compareType, object? value);
 
 		/// <summary>
@@ -57,6 +56,24 @@ namespace BuildHub.DataEngine.Queries.Base
 			where TEntity : IEntity;
 
 		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="columnName"></param>
+		/// <param name="compareType"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		///
+		TQueryBuilder WhereOr(string columnName, CompareTypes compareType, object? value);
+
+		/// <summary>
+		/// Adds an or condition to the query that filters results based on the specified column and value.
+		/// </summary>
+		/// <param name="columnName">The name of the column to apply the condition to. Cannot be null or empty.</param>
+		/// <param name="value">The value to compare against the specified column. Typically used for equality checks.</param>
+		/// <returns>An instance of <see cref="IQueryBuilder"/> with the condition applied, allowing for further query customization.</returns>
+		TQueryBuilder WhereOr(string columnName, object? value);
+
+		/// <summary>
 		/// Adds an OR condition to the query using the specified entity property, comparison type, and value.
 		/// </summary>
 		/// <typeparam name="TEntity">The type of the entity to which the condition applies. Must implement <see cref="IEntity"/>.</typeparam>
@@ -65,7 +82,7 @@ namespace BuildHub.DataEngine.Queries.Base
 		/// <param name="compareType">The type of comparison to perform between the property and the entity value. Defaults to <see
 		/// cref="CompareTypes.Equal"/>.</param>
 		/// <returns>The current query builder instance with the OR condition applied.</returns>
-		TQueryBuilder Or<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
+		TQueryBuilder WhereOr<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
 			where TEntity : IEntity;
 
 		/// <summary>
