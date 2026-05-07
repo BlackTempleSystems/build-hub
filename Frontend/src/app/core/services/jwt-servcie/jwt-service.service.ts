@@ -6,7 +6,7 @@ import { Injectable } from "@angular/core";
 @Injectable({
     providedIn: 'root',
 })
-export class TokenStoreService {
+export class JwtService {
 
     constructor() {
     }

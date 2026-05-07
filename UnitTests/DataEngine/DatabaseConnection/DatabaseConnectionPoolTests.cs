@@ -216,7 +216,7 @@ namespace UnitTests.DataEngineTests.DatabaseConnection
 				{
                     var connection = pool.GetDatabaseConnection(databaseSource);
                 }
-				catch(ConnectionPoolExhaustedException ex)
+				catch(ConnectionPoolExhaustedException)
 				{
 					Assert.Throws<ConnectionPoolExhaustedException>(() => throw new ConnectionPoolExhaustedException(databaseSource));
 				}

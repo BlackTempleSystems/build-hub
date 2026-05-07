@@ -12,6 +12,6 @@ namespace BuildHub.Application.Services.Authentication.Jwt
 		/// </summary>
 		/// <param name="user">The user entity for which to generate the security token. Cannot be null.</param>
 		/// <returns>A string containing the generated security token for the specified user.</returns>
-		public string GenerateSecurityToken(UserEntity user);
+		public JwtModel GenerateSecurityToken(UserEntity user);
 	}
 }

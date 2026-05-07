@@ -14,7 +14,6 @@ namespace BuildHub.Application.Services.Authentication
 	using BuildHub.Domain.UserCredentials.Entities;
 	using BuildHub.Domain.Users;
 	using BuildHub.Domain.Users.Entities;
-	using Microsoft.AspNetCore.Http;
 	using Models;
 
 	/// <summary>
@@ -97,10 +96,13 @@ namespace BuildHub.Application.Services.Authentication
 					ResultStatus.Unauthorized);
 			}
 
-			var jwtToken = this._jwtService.GenerateSecurityToken(user);
+			var jwtModel = this._jwtService.GenerateSecurityToken(user);
 
 			var loginResponse = new LoginResponse()
 			{
+				UserName = user.UserName!,
+				Email = user.Email!,
+				Jwt = jwtModel
 			};
 
 			return Result<LoginResponse>.Success(loginResponse);
@@ -166,12 +168,12 @@ namespace BuildHub.Application.Services.Authentication
 				return Result<RegisterUserResponse>.Failure("Could not register user", ResultStatus.DatabaseFailure);
 			}
 
-			var jwtToken = this._jwtService.GenerateSecurityToken(newUser);
+			var jwtModel = this._jwtService.GenerateSecurityToken(newUser);
 
 			var registerUserResponse = new RegisterUserResponse();
 			registerUserResponse.UserName = newUser.UserName;
 			registerUserResponse.Email = newUser.Email;
-			registerUserResponse.AccessToken = jwtToken;
+			//registerUserResponse.AccessToken = jwtModel;
 
 			return Result<RegisterUserResponse>.Success(registerUserResponse);
 		}

@@ -136,6 +136,7 @@ namespace BuildHub.DataEngine.Queries
 					}
 
 					completedCondition = $"{columnName} {compareOperator} {this.ProcessValue(value)}";
+
 					if (index > 0)
 						queryStringBuilder.Append(whereStatetmentOperator);
 

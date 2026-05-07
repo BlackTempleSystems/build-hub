@@ -27,6 +27,7 @@ import { LoginRequest } from '@app/core/services/authentication/models/login.req
 export class LoginPage extends BasePage {
 
   private _authenticationService = inject(AuthenticationService);
+
   public loginForm!: FormGroup;
 
   public constructor() {

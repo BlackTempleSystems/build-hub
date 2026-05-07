@@ -60,7 +60,7 @@ public sealed class JwtService : IJwtService
 	/// <returns>A string containing the generated JWT. The token includes claims for the specified user and is signed using the
 	/// configured security key.</returns>
 	/// <exception cref="InvalidOperationException">Thrown if the JWT configuration is missing or invalid.</exception>
-	public string GenerateSecurityToken(UserEntity user)
+	public JwtModel GenerateSecurityToken(UserEntity user)
 	{
 		var jwtOptions = _configurationManager.GetConfigurationModel<JwtOptions>(JwtSectionKey);
 
@@ -71,10 +71,12 @@ public sealed class JwtService : IJwtService
 		var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
 		var currentDateTime = DateTime.UtcNow;
+		var expirationDate = DateTime.UtcNow.AddMinutes(jwtOptions.ExpirationInMinutes);
+
 		var tokenDescriptor = new SecurityTokenDescriptor
 		{
 			Subject = new ClaimsIdentity(GetClaims(user)),
-			Expires = DateTime.UtcNow.AddMinutes(jwtOptions.ExpirationInMinutes),
+			Expires = expirationDate,
 			SigningCredentials = signingCredentials,
 			Issuer = jwtOptions.Issuer,
 			Audience = jwtOptions.Audience,
@@ -85,6 +87,12 @@ public sealed class JwtService : IJwtService
 		var jwtTokenHandler = new Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler();
 		var securityToken = jwtTokenHandler.CreateToken(tokenDescriptor);
 
-		return securityToken;
+		var jwtModel = new JwtModel()
+		{
+			AccessToken = securityToken,
+			ExpirationDate = expirationDate
+		};
+
+		return jwtModel;
 	}
 }

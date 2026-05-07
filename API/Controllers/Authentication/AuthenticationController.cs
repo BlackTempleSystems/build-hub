@@ -38,7 +38,21 @@ public class AuthenticationController : BaseApiController
 	[AllowAnonymous]
 	public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest, CancellationToken cancellationToken)
 	{
-		return FromResult(await _authenticationService.AuthenticateUser(loginRequest));
+		var loginResponse = await _authenticationService.AuthenticateUser(loginRequest);
+		if(loginResponse.IsSuccess && loginResponse.Data is not null)
+		{
+			var jwt = loginResponse.Data?.Jwt;
+
+			Response.Cookies.Append("access_token", jwt?.AccessToken, new CookieOptions
+			{
+				HttpOnly = true,
+				Secure = true,
+				SameSite = SameSiteMode.Strict,
+				Expires = jwt?.ExpirationDate
+			});
+		}
+
+		return FromResult(loginResponse);
 	}
 
 	/// <summary>
