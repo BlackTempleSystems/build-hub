@@ -3,7 +3,7 @@ namespace BuildHub.Application.Messages
 	/// <summary>
 	/// 
 	/// </summary>
-	internal static class ApplicationMessages
+	public static class ApplicationMessages
 	{
 		/// <summary>
 		/// 
@@ -19,5 +19,10 @@ namespace BuildHub.Application.Messages
 		/// 
 		/// </summary>
 		public const string InvalidEmailOrUsernameOrPassword = "Invalid email/username or password";
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public const string BuildHubShuttingDown = "BuildHub server is shutting down gracefully. All services stopped.";
 	}
 }

@@ -13,6 +13,7 @@ namespace BuildHub.Application.Services.Authentication
 	using BuildHub.Domain.UserCredentials;
 	using BuildHub.Domain.UserCredentials.Entities;
 	using BuildHub.Domain.Users;
+	using Domain.Users.Models;
 	using BuildHub.Domain.Users.Entities;
 	using Models;
 
@@ -48,7 +49,7 @@ namespace BuildHub.Application.Services.Authentication
 		/// </summary>
 		/// <param name="loginRequestData">The login request information containing user credentials to be authenticated. Cannot be null.</param>
 		/// <returns>A task that represents the asynchronous authentication operation.</returns>
-		public async Task<Result<LoginResponse>> AuthenticateUser(LoginRequest loginRequestData)
+		public async Task<Result<LoginResponse>> LoginAsync(LoginRequest loginRequestData)
 		{
 			//var validationResult = _loginRequestValidator.Validate(loginRequestData);
 			//if (!validationResult.IsValid)
@@ -100,8 +101,12 @@ namespace BuildHub.Application.Services.Authentication
 
 			var loginResponse = new LoginResponse()
 			{
-				UserName = user.UserName!,
-				Email = user.Email!,
+				User = new UserModel()
+				{
+					UserGuid = user.Guid,
+					UserName =  user.UserName!,
+					Email = user.Email!
+				},
 				Jwt = jwtModel
 			};
 
@@ -113,7 +118,7 @@ namespace BuildHub.Application.Services.Authentication
 		/// </summary>
 		/// <param name="registerUserRequest">An object containing the information required to register the user. Cannot be null.</param>
 		/// <returns>A task that represents the asynchronous registration operation.</returns>
-		public async Task<Result<RegisterUserResponse>> RegisterUser(RegisterUserRequest registerUserRequest)
+		public async Task<Result<RegisterUserResponse>> RegisterAsync(RegisterUserRequest registerUserRequest)
 		{
 			var validationResult = _registerUserRequestValidator.Validate(registerUserRequest);
 			if (!validationResult.IsValid)
@@ -170,12 +175,42 @@ namespace BuildHub.Application.Services.Authentication
 
 			var jwtModel = this._jwtService.GenerateSecurityToken(newUser);
 
-			var registerUserResponse = new RegisterUserResponse();
-			registerUserResponse.UserName = newUser.UserName;
-			registerUserResponse.Email = newUser.Email;
-			//registerUserResponse.AccessToken = jwtModel;
+			var registerUserResponse = new RegisterUserResponse()
+			{
+				User = new UserModel()
+				{
+					UserGuid = newUser.Guid,
+					UserName = newUser.UserName!,
+					Email = newUser.Email!
+				},
+				Jwt = jwtModel
+			};
 
 			return Result<RegisterUserResponse>.Success(registerUserResponse);
+		}
+
+		/// <summary>
+		/// Retrieves the user from the database by guid.
+		/// </summary>
+		/// <param name="userGuid"></param>
+		/// <returns></returns>
+		public async Task<Result<UserModel>> GetUserByGuidAsync(Guid userGuid)
+		{
+			UsersTable usersTable = new UsersTable();
+			UserEntity? user = usersTable.GetByGuid(userGuid);
+
+			if(user is null)
+			{
+				Logger.LogError("User doesn't exist");
+				return Result<UserModel>.Failure("User doesn't exist", ResultStatus.DatabaseFailure);
+			}
+
+			var userModel = new UserModel();
+			userModel.UserGuid = userGuid;
+			userModel.UserName = user.UserName!;
+			userModel.Email = user.Email!;
+
+			return Result<UserModel>.Success(userModel);
 		}
 	}
 }

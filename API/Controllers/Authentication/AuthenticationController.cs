@@ -3,6 +3,7 @@ using BuildHub.Application.Services.Authentication;
 using BuildHub.Application.Services.Authentication.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BuildHub.API.Controllers.Authentication;
 
@@ -38,16 +39,16 @@ public class AuthenticationController : BaseApiController
 	[AllowAnonymous]
 	public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest, CancellationToken cancellationToken)
 	{
-		var loginResponse = await _authenticationService.AuthenticateUser(loginRequest);
-		if(loginResponse.IsSuccess && loginResponse.Data is not null)
+		var loginResponse = await _authenticationService.LoginAsync(loginRequest);
+		if (loginResponse.IsSuccess && loginResponse.Data is not null)
 		{
-			var jwt = loginResponse.Data?.Jwt;
+			var jwt = loginResponse.Data.Jwt;
 
-			Response.Cookies.Append("access_token", jwt?.AccessToken, new CookieOptions
+			Response.Cookies.Append("access_token", jwt.AccessToken, new CookieOptions
 			{
 				HttpOnly = true,
 				Secure = true,
-				SameSite = SameSiteMode.Strict,
+				SameSite = SameSiteMode.None,
 				Expires = jwt?.ExpirationDate
 			});
 		}
@@ -65,6 +66,29 @@ public class AuthenticationController : BaseApiController
 	[AllowAnonymous]
 	public async Task<IActionResult> Register([FromBody] RegisterUserRequest registerUserRequest, CancellationToken cancellationToken)
 	{
-		return FromResult(await _authenticationService.RegisterUser(registerUserRequest));
+		var registerResponse = await _authenticationService.RegisterAsync(registerUserRequest);
+		if(registerResponse.IsSuccess && registerResponse.Data is not null)
+		{
+			var jwt = registerResponse.Data.Jwt;
+
+			Response.Cookies.Append("access_token", jwt.AccessToken, new CookieOptions
+			{
+				HttpOnly = true,
+				Secure = true,
+				SameSite = SameSiteMode.None,
+				Expires = jwt?.ExpirationDate
+			});
+		}
+
+		return FromResult(registerResponse);
+	}
+
+	[Authorize]
+	[HttpGet("authenticateUser")]
+	public async Task<IActionResult> AuthenticateUser()
+	{
+		Guid userGuId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+		return FromResult(await _authenticationService.GetUserByGuidAsync(userGuId));
 	}
 }

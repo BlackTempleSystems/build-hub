@@ -1,3 +1,7 @@
+using BuildHub.Application.Services.Authentication.Jwt;
+using BuildHub.Domain.Users.Models;
+using System.Text.Json.Serialization;
+
 namespace BuildHub.Application.Services.Authentication.Models
 {
 	/// <summary>
@@ -5,12 +9,16 @@ namespace BuildHub.Application.Services.Authentication.Models
 	/// </summary>
 	public sealed class RegisterUserResponse
 	{
-		public string? UserName { get; set; }
-		public string? Email { get; set; }
-		public string? AccessToken { get; set; }
+		/// <summary>
+		/// 
+		/// </summary>
+		public UserModel? User { get; set; }
 
-		public RegisterUserResponse()
-		{
-		}
+		/// <summary>
+		/// 
+		/// </summary>
+
+		[JsonIgnore]
+		public JwtModel? Jwt { get; set; }
 	}
 }

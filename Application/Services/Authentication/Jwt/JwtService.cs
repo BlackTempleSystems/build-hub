@@ -45,6 +45,7 @@ public sealed class JwtService : IJwtService
 			[
 				new Claim(JwtRegisteredClaimNames.Sub, user.Guid.ToString()),
 				new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+				new Claim(JwtRegisteredClaimNames.Name, user.UserName!),
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 				//TODO Roles.
 			];

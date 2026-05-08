@@ -29,9 +29,8 @@ export abstract class BaseServerRequestService {
      * @param request request input model
      * @returns An observable with the response.
      */
-    protected sendServerRequest<Request, Response>(
+    protected sendServerPostRequest<Request, Response>(
         serviceRoute: string, request: Request): Observable<BaseServerResponse<Response>> {
-        this.sendServerRequest
         return this._httpClient
             .post<BaseServerResponse<Response>>(
                 this.constructFullRequestURL(serviceRoute),
@@ -40,14 +39,22 @@ export abstract class BaseServerRequestService {
             .pipe(catchError(this.handleError))
     }
 
+    protected sendServerGetRequest<Response>(
+        serviceRoute: string): Observable<BaseServerResponse<Response>> {
+        return this._httpClient
+            .get<BaseServerResponse<Response>>(
+                this.constructFullRequestURL(serviceRoute),
+            )
+            .pipe(catchError(this.handleError.bind(this)))
+    }
+
     /**
      * Handles errors related with http requests.
      * @param httpErrorResponse 
      * @returns 
      */
     protected handleError(httpErrorResponse: HttpErrorResponse) {
-
-        //TODO LOG error
+        this._toastService.showErrorToast('Something bad happened; please try again later.');
         return throwError(
             () => new Error('Something bad happened; please try again later.')
         );

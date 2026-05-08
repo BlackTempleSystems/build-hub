@@ -69,7 +69,11 @@ export class RegisterPage extends BasePage {
 
     this._authenticationService.register(registerUserRequest).subscribe({
       next: (response) => {
-        this.redirectTo('/dashboard');
+        if (response.response) {
+          this.registerForm.reset();
+          this._authenticationService.saveUser(response.response.user);
+          this.redirectTo('/dashboard');
+        }
       },
       error: (error) => {
       }

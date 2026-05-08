@@ -40,6 +40,7 @@ namespace BuildHub.Application.Services.Authentication.Extensions
 			services.AddSingleton<IJwtService, JwtService>();
 			services.AddSingleton<ICryptographicService, CryptographicService>();
 			services.AddScoped<IAuthenticationService, AuthenticationService>();
+			services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
 			ConfigurationManager configurationManager = ConfigurationManager.GetConfigurationManager();
 			var jwtOptions = configurationManager.GetConfigurationModel<JwtOptions>("Jwt");
@@ -66,6 +67,15 @@ namespace BuildHub.Application.Services.Authentication.Extensions
 
 					  ValidateLifetime = true,
 					  ClockSkew = TimeSpan.FromSeconds(30)
+				  };
+
+				  options.Events = new JwtBearerEvents
+				  {
+					  OnMessageReceived = context =>
+					  {
+						  context.Token = context.Request.Cookies["access_token"];
+						  return Task.CompletedTask;
+					  },
 				  };
 			  });
 

@@ -63,13 +63,16 @@ export class LoginPage extends BasePage {
     };
 
     this._authenticationService.login(loginRequest).subscribe({
-      next: (response) => {
-        this.redirectTo('/dashboard');
+      next: (loginResponse) => {
+        if (loginResponse.response) {
+          this.loginForm.reset();
+          this._authenticationService.saveUser(loginResponse.response.user);
+          this.redirectTo('/dashboard');
+        }
       },
       error: (error) => {
       }
     });
 
-    this.loginForm.reset();
   }
 }

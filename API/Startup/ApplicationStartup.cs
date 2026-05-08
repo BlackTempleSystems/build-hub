@@ -1,5 +1,4 @@
 #region
-using BuildHub.API.Messages;
 using BuildHub.Common.Logger;
 using Scalar.AspNetCore;
 using Serilog;
@@ -7,6 +6,7 @@ using System.Reflection;
 using BuildHub.Application.Services.Bootstrap;
 using BuildHub.Application.Services.Authentication.Extensions;
 using BuildHub.API.Middleware;
+using BuildHub.Application.Messages;
 #endregion
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +26,7 @@ builder.Services.AddCors(options =>
 		policy =>
 		{
 			policy.WithOrigins(frontendApplicationUrl)
+				  .AllowCredentials()
 				  .AllowAnyHeader()
 				  .AllowAnyMethod();
 		});

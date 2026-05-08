@@ -1,5 +1,6 @@
 namespace BuildHub.Application.Services.Authentication.Models
 {
+	using BuildHub.Domain.Users.Models;
 	using Jwt;
 	using System.Text.Json.Serialization;
 
@@ -9,15 +10,10 @@ namespace BuildHub.Application.Services.Authentication.Models
 	public sealed record class LoginResponse
 	{
 		/// <summary>
-		/// Gets or sets the user name associated with the account.
+		/// 
 		/// </summary>
-		public string UserName { get; set; } = string.Empty;
-
-		/// <summary>
-		/// Gets or sets the email address associated with the user.
-		/// </summary>
-		public string Email { get; set; } = string.Empty;
-
+		/// 
+		public UserModel? User { get; set; }
 		/// <summary>
 		/// Gets or sets the JSON Web Token (JWT) used for authenticating API requests.
 		/// </summary>

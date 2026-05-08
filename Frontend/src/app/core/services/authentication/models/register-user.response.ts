@@ -1,5 +1,5 @@
+import { UserModel } from "./user.model";
+
 export interface RegisterUserResponse {
-    userName: string;
-    email: string;
-    accessToken: string;
+    user: UserModel;
 }
