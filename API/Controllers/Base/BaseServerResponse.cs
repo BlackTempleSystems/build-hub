@@ -10,9 +10,20 @@ namespace BuildHub.API.Controllers.Base
 	/// <typeparam name="ResponseData">The type of the response payload returned by the server.</typeparam>
 	public sealed class BaseServerResponse<ResponseData>
 	{
+		/// <summary>
+		/// Gets or sets the date and time associated with this instance.
+		/// </summary>
 		public DateTime DateTimeStamp { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the operation completed successfully.
+		/// </summary>
 		public bool IsSuccessful { get; set; }
-		public ResponseData? Response { get; set; }
+
+		/// <summary>
+		/// Gets or sets the response data associated with the result.
+		/// </summary>
+		public ResponseData? ResultData { get; set; }
 
 		public BaseServerResponse()
 		{

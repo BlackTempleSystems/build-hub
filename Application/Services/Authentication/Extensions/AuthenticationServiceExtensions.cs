@@ -36,7 +36,8 @@ namespace BuildHub.Application.Services.Authentication.Extensions
 		public static IServiceCollection AddBuildHubAuthentication(this IServiceCollection services)
 		{
 			// Auth services
-			services.AddScoped<IValidator<RegisterUserRequest>, RegisterUserRequestValidator>();
+			services.AddScoped<IValidator<RegisterRequest>, RegisterRequestValidator>();
+			services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
 			services.AddSingleton<IJwtService, JwtService>();
 			services.AddSingleton<ICryptographicService, CryptographicService>();
 			services.AddScoped<IAuthenticationService, AuthenticationService>();

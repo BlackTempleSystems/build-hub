@@ -25,21 +25,30 @@ namespace BuildHub.Application.Services.Authentication
 		/// <summary>
 		/// Register user request validator.
 		/// </summary>
-		private readonly IValidator<RegisterUserRequest> _registerUserRequestValidator;
+		private readonly IValidator<RegisterRequest> _registerRequestValidator;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		private readonly IValidator<LoginRequest> _loginRequestValidator;
+
 		/// <summary>
 		/// Instance to the cryptographic service.
 		/// </summary>
 		private readonly ICryptographicService _cryptographicService;
+
 		/// <summary>
 		/// Instance to the jwt service.
 		/// </summary>
 		private readonly IJwtService _jwtService;
 
-		public AuthenticationService(IValidator<RegisterUserRequest> registerUserRequestValidator
+		public AuthenticationService(IValidator<RegisterRequest> registerUserRequestValidator
+			, IValidator<LoginRequest> loginRequestValidator
 			, ICryptographicService cryptographicService
 			, IJwtService jwtService)
 		{
-			this._registerUserRequestValidator = registerUserRequestValidator;
+			this._registerRequestValidator = registerUserRequestValidator;
+			this._loginRequestValidator = loginRequestValidator;
 			this._cryptographicService = cryptographicService;
 			this._jwtService = jwtService;
 		}
@@ -51,9 +60,9 @@ namespace BuildHub.Application.Services.Authentication
 		/// <returns>A task that represents the asynchronous authentication operation.</returns>
 		public async Task<Result<LoginResponse>> LoginAsync(LoginRequest loginRequestData)
 		{
-			//var validationResult = _loginRequestValidator.Validate(loginRequestData);
-			//if (!validationResult.IsValid)
-			//	throw new ValidationException(validationResult.Errors);
+			var validationResult = _loginRequestValidator.Validate(loginRequestData);
+			if (!validationResult.IsValid)
+				throw new ValidationException(validationResult.Errors);
 
 			UserEntity? user = new UserEntity();
 			user.Email = loginRequestData.Email;
@@ -118,9 +127,9 @@ namespace BuildHub.Application.Services.Authentication
 		/// </summary>
 		/// <param name="registerUserRequest">An object containing the information required to register the user. Cannot be null.</param>
 		/// <returns>A task that represents the asynchronous registration operation.</returns>
-		public async Task<Result<RegisterUserResponse>> RegisterAsync(RegisterUserRequest registerUserRequest)
+		public async Task<Result<RegisterUserResponse>> RegisterAsync(RegisterRequest registerUserRequest)
 		{
-			var validationResult = _registerUserRequestValidator.Validate(registerUserRequest);
+			var validationResult = _registerRequestValidator.Validate(registerUserRequest);
 			if (!validationResult.IsValid)
 				throw new ValidationException(validationResult.Errors);
 
@@ -149,7 +158,7 @@ namespace BuildHub.Application.Services.Authentication
 			newUser = usersTable.Insert(newUser);
 			if(newUser is null)
 			{
-				//TODO	ERROR.
+				Logger.LogError($"Failed to insert credentials for user ID '{newUser.Id}' during registration.");
 				return Result<RegisterUserResponse>.Failure("Could not register user", ResultStatus.DatabaseFailure);
 			}
 

@@ -4,8 +4,14 @@ namespace BuildHub.Common.Validators
 	/// Defines a contract for validating entities of a specified type.
 	/// </summary>
 	/// <typeparam name="T">The type to validate.</typeparam>
-	public interface IValidator<T>
+	public interface IValidator<TData>
 	{
-		ValidationResult Validate(T value);
+		/// <summary>
+		/// Validates the specified data and returns the result of the validation.
+		/// </summary>
+		/// <param name="data">The data to validate. Cannot be null unless the implementation allows null values.</param>
+		/// <returns>A ValidationResult that indicates whether the data is valid and contains any associated validation errors.</returns>
+		
+		ValidationResult Validate(TData data);
 	}
 }

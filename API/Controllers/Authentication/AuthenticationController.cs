@@ -64,7 +64,7 @@ public class AuthenticationController : BaseApiController
 	/// <returns>An IActionResult indicating the result of the registration operation.</returns>
 	[HttpPost("register")]
 	[AllowAnonymous]
-	public async Task<IActionResult> Register([FromBody] RegisterUserRequest registerUserRequest, CancellationToken cancellationToken)
+	public async Task<IActionResult> Register([FromBody] RegisterRequest registerUserRequest, CancellationToken cancellationToken)
 	{
 		var registerResponse = await _authenticationService.RegisterAsync(registerUserRequest);
 		if(registerResponse.IsSuccess && registerResponse.Data is not null)

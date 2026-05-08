@@ -21,7 +21,7 @@ namespace BuildHub.Application.Services.Authentication
 		/// </summary>
 		/// <param name="registerUserRequest">An object containing the information required to register the user. Cannot be null.</param>
 		/// <returns>A task that represents the asynchronous registration operation.</returns>
-		public Task<Result<RegisterUserResponse>> RegisterAsync(RegisterUserRequest registerUserRequest);
+		public Task<Result<RegisterUserResponse>> RegisterAsync(RegisterRequest registerUserRequest);
 
 		/// <summary>
 		/// Retrieves the user from the database by guid.

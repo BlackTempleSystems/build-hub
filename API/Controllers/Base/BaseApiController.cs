@@ -94,7 +94,7 @@ namespace BuildHub.API.Controllers.Base
 			BaseServerResponse<ResponseData> baseServerResponse = new();
 			baseServerResponse.DateTimeStamp = DateTime.UtcNow;
 			baseServerResponse.IsSuccessful = isSuccessful;
-			baseServerResponse.Response = responseData;
+			baseServerResponse.ResultData = responseData;
 
 			return baseServerResponse;
 		}

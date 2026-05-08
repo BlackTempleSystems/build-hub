@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
 	<RootNamespace>BuildHub.Infrastructure</RootNamespace>
 	<AssemblyName>BuildHub.Infrastructure</AssemblyName>
+	<BaseOutputPath>..\bin</BaseOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
