@@ -3,9 +3,7 @@ namespace BuildHub.Application.Services.Authentication
 	using BuildHub.Application.Messages;
 	using BuildHub.Application.Services.Authentication.Jwt;
 	using BuildHub.Application.Services.CryptographicService;
-	using BuildHub.Common.Exceptions.Validators;
 	using BuildHub.Common.Logger;
-	using BuildHub.Common.Validators;
 	using BuildHub.DataEngine.DatabaseConnection;
 	using BuildHub.DataEngine.Queries;
 	using BuildHub.DataEngine.Transactions;
@@ -16,22 +14,14 @@ namespace BuildHub.Application.Services.Authentication
 	using Domain.Users.Models;
 	using BuildHub.Domain.Users.Entities;
 	using Models;
+	using BuildHub.Application.Services.Authentication.Validators;
+	using FluentValidation;
 
 	/// <summary>
 	/// Provides authentication-related services for managing user sign-in, sign-out, and identity verification operations.
 	/// </summary>
 	public sealed class AuthenticationService : IAuthenticationService 
 	{
-		/// <summary>
-		/// Register user request validator.
-		/// </summary>
-		private readonly IValidator<RegisterRequest> _registerRequestValidator;
-
-		/// <summary>
-		/// 
-		/// </summary>
-		private readonly IValidator<LoginRequest> _loginRequestValidator;
-
 		/// <summary>
 		/// Instance to the cryptographic service.
 		/// </summary>
@@ -42,13 +32,9 @@ namespace BuildHub.Application.Services.Authentication
 		/// </summary>
 		private readonly IJwtService _jwtService;
 
-		public AuthenticationService(IValidator<RegisterRequest> registerUserRequestValidator
-			, IValidator<LoginRequest> loginRequestValidator
-			, ICryptographicService cryptographicService
+		public AuthenticationService(ICryptographicService cryptographicService
 			, IJwtService jwtService)
 		{
-			this._registerRequestValidator = registerUserRequestValidator;
-			this._loginRequestValidator = loginRequestValidator;
 			this._cryptographicService = cryptographicService;
 			this._jwtService = jwtService;
 		}
@@ -60,18 +46,14 @@ namespace BuildHub.Application.Services.Authentication
 		/// <returns>A task that represents the asynchronous authentication operation.</returns>
 		public async Task<Result<LoginResponse>> LoginAsync(LoginRequest loginRequestData)
 		{
-			var validationResult = _loginRequestValidator.Validate(loginRequestData);
-			if (!validationResult.IsValid)
-				throw new ValidationException(validationResult.Errors);
-
-			UserEntity? user = new UserEntity();
-			user.Email = loginRequestData.Email;
+			LoginRequestValidator loginRequestValidator = new LoginRequestValidator();
+			loginRequestValidator.ValidateAndThrow(loginRequestData);
 
 			var queryBuilder = new QueryBuilder();
-			queryBuilder.Where(user, user => user.Email!);
+			queryBuilder.Where<UserEntity>(user => user.Email, loginRequestData.Email);
 
 			UsersTable usersTable = new UsersTable();
-			user = usersTable.GetByCondition(queryBuilder).FirstOrDefault();
+			var user = usersTable.GetByCondition(queryBuilder).FirstOrDefault();
 
 			if (user is null || user.Id <= 0)
 			{
@@ -81,16 +63,13 @@ namespace BuildHub.Application.Services.Authentication
 					ResultStatus.Unauthorized);
 			}
 
-			UserCredentialsEntity? userCredentials = new UserCredentialsEntity();
-			userCredentials.UserId = user.Id;
+			queryBuilder.Reset();
+			queryBuilder.Where<UserCredentialsEntity>(userCredentials => userCredentials.UserId, user.Id);
 
 			UserCredentialsTable userCredentialsTable = new UserCredentialsTable();
+			var userCredentialsEntity = userCredentialsTable.GetByCondition(queryBuilder).FirstOrDefault();
 
-			queryBuilder.Reset();
-			queryBuilder.Where(userCredentials, userCredentials => userCredentials.UserId);
-
-			userCredentials = userCredentialsTable.GetByCondition(queryBuilder).FirstOrDefault();
-			if(userCredentials is null || userCredentials.Id <= 0)
+			if(userCredentialsEntity is null)
 			{
 				Logger.LogError(ApplicationMessages.InvalidEmailOrUsernameOrPassword);
 
@@ -98,7 +77,7 @@ namespace BuildHub.Application.Services.Authentication
 					ResultStatus.Unauthorized);
 			}
 
-			if(!_cryptographicService.VerifyPassword(loginRequestData.Password, userCredentials.HashedPassword!))
+			if(!_cryptographicService.VerifyPassword(loginRequestData.Password, userCredentialsEntity.HashedPassword!))
 			{
 				Logger.LogError(ApplicationMessages.InvalidEmailOrUsernameOrPassword);
 
@@ -125,72 +104,71 @@ namespace BuildHub.Application.Services.Authentication
 		/// <summary>
 		/// Registers a new user with the specified registration details.
 		/// </summary>
-		/// <param name="registerUserRequest">An object containing the information required to register the user. Cannot be null.</param>
+		/// <param name="registerRequest">An object containing the information required to register the user. Cannot be null.</param>
 		/// <returns>A task that represents the asynchronous registration operation.</returns>
-		public async Task<Result<RegisterUserResponse>> RegisterAsync(RegisterRequest registerUserRequest)
+		public async Task<Result<RegisterUserResponse>> RegisterAsync(RegisterRequest registerRequest)
 		{
-			var validationResult = _registerRequestValidator.Validate(registerUserRequest);
-			if (!validationResult.IsValid)
-				throw new ValidationException(validationResult.Errors);
-
-			UserEntity? newUser = new UserEntity();
-			newUser.FirstName = registerUserRequest.FirstName;
-			newUser.LastName = registerUserRequest.LastName;
-			newUser.Email = registerUserRequest.Email;
-			newUser.UserName = registerUserRequest.UserName;
+			RegisterRequestValidator registerRequestValidator = new RegisterRequestValidator();
+			registerRequestValidator.ValidateAndThrow(registerRequest);
 
 			var queryBuilder = new QueryBuilder();
-			queryBuilder.Where(newUser, user => user.Email!)
-				.WhereOr(newUser, user => user.UserName!);
+			queryBuilder.Where<UserEntity>(user => user.Email, registerRequest.Email);
+				//.WhereOr(newUser, user => user.UserName!);
 
 			UsersTable usersTable = new UsersTable();
-			var existingUser = usersTable.GetByCondition(queryBuilder).FirstOrDefault();
+			var existingUserEntity = usersTable.GetByCondition(queryBuilder).FirstOrDefault();
 
-			if (existingUser is not null && existingUser.Id > 0)
+			if (existingUserEntity is not null && existingUserEntity.Id > 0)
 			{
-				Logger.LogError(ApplicationMessages.RegistrationFailedUserAlreadyExists, registerUserRequest.Email);
+				Logger.LogError(ApplicationMessages.RegistrationFailedUserAlreadyExists, registerRequest.Email);
 
 				return Result<RegisterUserResponse>.Failure(ApplicationMessages.RegistrationFailedUserAlreadyExists, 
-					ResultStatus.Conflict, registerUserRequest.Email);
+					ResultStatus.Conflict, registerRequest.Email);
 			}
 
+			var newUserEntity = new UserEntity();
+			newUserEntity.UserName = registerRequest.UserName;
+			newUserEntity.Email = registerRequest.Email;
+			newUserEntity.FirstName = registerRequest.FirstName;
+			newUserEntity.LastName = registerRequest.LastName;
+
 			using ScopedTransaction scopedTransaction = new ScopedTransaction(DatabaseSource.Users);
-			newUser = usersTable.Insert(newUser);
-			if(newUser is null)
+			newUserEntity = usersTable.Insert(newUserEntity);
+			if(newUserEntity is null)
 			{
-				Logger.LogError($"Failed to insert credentials for user ID '{newUser.Id}' during registration.");
+				Logger.LogError($"Failed to insert user during registration.");
 				return Result<RegisterUserResponse>.Failure("Could not register user", ResultStatus.DatabaseFailure);
 			}
 
 			var salt = this._cryptographicService.GenerateSalt();
-			var hashedPassword = this._cryptographicService.HashPassword(registerUserRequest.Password, salt);
+			var hashedPassword = this._cryptographicService.HashPassword(registerRequest.Password, salt);
 
 			var userCredentials = new UserCredentialsEntity();
-			userCredentials.UserId = newUser!.Id;
+			userCredentials.UserId = newUserEntity.Id;
 			userCredentials.HashedPassword = hashedPassword;
 
 			UserCredentialsTable userCredentialsTable = new UserCredentialsTable();
 			if (userCredentialsTable.Insert(userCredentials) is null)
 			{
-				Logger.LogError($"Failed to insert credentials for user ID '{newUser.Id}' during registration.");
+				Logger.LogError($"Failed to insert credentials for user ID '{newUserEntity.Id}' during registration.");
 				return Result<RegisterUserResponse>.Failure("Could not register user", ResultStatus.DatabaseFailure);
 			}
 
 			if (!scopedTransaction.Commit())
 			{
-				Logger.LogError($"Transaction commit failed while registering user '{newUser.Email}'.");
+				Logger.LogError($"Transaction commit failed while registering user '{newUserEntity.Email}'.");
 				return Result<RegisterUserResponse>.Failure("Could not register user", ResultStatus.DatabaseFailure);
 			}
 
-			var jwtModel = this._jwtService.GenerateSecurityToken(newUser);
+			var jwtModel = this._jwtService.GenerateSecurityToken(newUserEntity);
 
 			var registerUserResponse = new RegisterUserResponse()
 			{
 				User = new UserModel()
 				{
-					UserGuid = newUser.Guid,
-					UserName = newUser.UserName!,
-					Email = newUser.Email!
+					UserGuid = newUserEntity.Guid,
+					UserName = newUserEntity.UserName!,
+					Email = newUserEntity.Email!
 				},
 				Jwt = jwtModel
 			};

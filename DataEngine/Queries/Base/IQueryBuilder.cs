@@ -52,7 +52,7 @@ namespace BuildHub.DataEngine.Queries.Base
 		/// <param name="condition">An expression that specifies the property of <typeparamref name="TEntity"/> to compare. Cannot be <c>null</c>.</param>
 		/// <param name="compareType">The type of comparison to apply between the property and its value. Defaults to <see cref="CompareTypes.Equal"/>.</param>
 		/// <returns>The current <c>TQueryBuilder</c> instance with the applied filter condition, enabling further query composition.</returns>
-		TQueryBuilder Where<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
+		TQueryBuilder Where<TEntity>(Expression<Func<TEntity, object>> condition, object? value, CompareTypes compareType = CompareTypes.Equal)
 			where TEntity : IEntity;
 
 		/// <summary>

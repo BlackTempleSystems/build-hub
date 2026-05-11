@@ -13,19 +13,19 @@ namespace BuildHub.Domain.Users.Entities
 	{
 		[MaxLength(128)]
 		[ColumnInfo("FIRST_NAME")]
-		public string? FirstName { get; set; }
+		public string FirstName { get; set; } = string.Empty;
 
 		[MaxLength(128)]
 		[ColumnInfo("LAST_NAME")]
-		public string? LastName { get; set; }
+		public string LastName { get; set; } = string.Empty;
 
 		[MaxLength(254)]
 		[ColumnInfo("EMAIL")]
-		public string? Email { get; set; }
+		public string Email { get; set; } = string.Empty;
 
 		[MaxLength(32)]
 		[ColumnInfo("USER_NAME")]
-		public string? UserName  { get; set; }
+		public string UserName { get; set; } = string.Empty;
 
 		[ColumnInfo("FAILED_LOGIN_ATTEMPTS")]
 		public int FailedLoginAttempts { get; set; }

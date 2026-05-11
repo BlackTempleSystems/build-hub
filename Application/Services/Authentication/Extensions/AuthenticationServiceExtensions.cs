@@ -1,10 +1,7 @@
 #region
 using BuildHub.Application.Services.Authentication.Jwt;
 using BuildHub.Application.Services.Authentication.Jwt.Configuration;
-using BuildHub.Application.Services.Authentication.Models;
-using BuildHub.Application.Services.Authentication.Validators;
 using BuildHub.Common.Configuration;
-using BuildHub.Common.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -36,8 +33,6 @@ namespace BuildHub.Application.Services.Authentication.Extensions
 		public static IServiceCollection AddBuildHubAuthentication(this IServiceCollection services)
 		{
 			// Auth services
-			services.AddScoped<IValidator<RegisterRequest>, RegisterRequestValidator>();
-			services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
 			services.AddSingleton<IJwtService, JwtService>();
 			services.AddSingleton<ICryptographicService, CryptographicService>();
 			services.AddScoped<IAuthenticationService, AuthenticationService>();

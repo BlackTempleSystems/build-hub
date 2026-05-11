@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.DatabaseConnection
+namespace BuildHub.DataEngine.DatabaseConnection
 {
     #region Dependencies
     using Transactions;
@@ -24,7 +24,7 @@
 		/// <summary>
 		/// Gets the current connection context for this asynchronous flow
 		/// </summary>
-		public static DatabaseContext GetCurrentContext => _currentThreadLocalDatabaseConnection.Value;
+		public static DatabaseContext GetCurrentContext => _currentThreadLocalDatabaseConnection.Value!;
 
 		/// <summary>
 		/// Determines whether a connection to the specified database source exists.

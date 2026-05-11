@@ -79,11 +79,10 @@ namespace BuildHub.DataEngine.Queries
 		/// <param name="compareType">The comparison operator to use for the condition, such as equal, greater than, or less than.</param>
 		/// <returns>The current <see cref="InternalQueryBuilder"/> instance with the added WHERE condition, allowing for method
 		/// chaining.</returns>
-		public QueryBuilder Where<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
+		public QueryBuilder Where<TEntity>(Expression<Func<TEntity, object>> condition, object? value, CompareTypes compareType = CompareTypes.Equal)
 			where TEntity : IEntity
 		{
 			var columnInfo = EntityDataMapper.GetColumnInfo<TEntity>(condition);
-			var value = condition.Compile()(entity);
 
 			this.QueryBuilderState.WhereStatements.Add(new WhereCondition(columnInfo.ColumnName, compareType, value));
 			return this;
