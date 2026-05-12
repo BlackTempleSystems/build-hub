@@ -76,7 +76,7 @@ services:
     profiles: ["frontend"]
     build:
       context: .
-      dockerfile: Frontend/Dockerfile
+      dockerfile: bHub/Dockerfile
     image: buildhub-frontend:local
     container_name: frontend
     ports:

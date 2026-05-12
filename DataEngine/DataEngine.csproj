@@ -9,6 +9,14 @@
 	<BaseOutputPath>..\bin\DataEngine</BaseOutputPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>9999</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningLevel>9999</WarningLevel>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Statistics\**" />
     <EmbeddedResource Remove="Statistics\**" />
