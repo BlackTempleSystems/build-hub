@@ -95,7 +95,7 @@ namespace UnitTests.DataEngineTests.Tables
 			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
 			QueryBuilder queryBuilder = new QueryBuilder()
-				.Where(integrationTest, (integrationTest) => integrationTest.Guid);
+				.Where<IntegrationTestEntity>(integrationTest => integrationTest.Guid, integrationTest.Guid);
 
 			Assert.IsNotNull(integrationTestTable.GetByCondition(queryBuilder));
 		}
@@ -294,7 +294,7 @@ namespace UnitTests.DataEngineTests.Tables
             var nonExistingEntity = new IntegrationTestEntity { Name = this.TestContext.TestName };
 
             QueryBuilder queryBuilder = new QueryBuilder()
-                .Where(nonExistingEntity, (e) => e.Guid);
+                .Where<IntegrationTestEntity>((e) => e.Guid, nonExistingEntity.Guid);
 
             Assert.IsEmpty(integrationTestsTable.GetByCondition(queryBuilder));
         }

@@ -1,4 +1,4 @@
-﻿namespace UnitTests.DataEngineTests.DatabaseConnection
+namespace UnitTests.DataEngineTests.DatabaseConnection
 {
     using BuildHub.Common.Logger;
     using BuildHub.DataEngine.DatabaseConnection;

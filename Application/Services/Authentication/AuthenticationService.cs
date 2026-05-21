@@ -161,6 +161,7 @@ namespace BuildHub.Application.Services.Authentication
 			}
 
 			var jwtModel = this._jwtService.GenerateSecurityToken(newUserEntity);
+			var refreshTokenModel = this._jwtService.GenerateRefreshToken();
 
 			var registerUserResponse = new RegisterUserResponse()
 			{
@@ -170,7 +171,8 @@ namespace BuildHub.Application.Services.Authentication
 					UserName = newUserEntity.UserName!,
 					Email = newUserEntity.Email!
 				},
-				Jwt = jwtModel
+				Jwt = jwtModel,
+				RefreshToken = refreshTokenModel
 			};
 
 			return Result<RegisterUserResponse>.Success(registerUserResponse);

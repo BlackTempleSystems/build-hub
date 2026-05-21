@@ -162,10 +162,10 @@ namespace UnitTests.DataEngine.Transactions
 			integrationTest.Name = this.TestContext.TestName;
 
 			var integrationTestTable = new IntegrationTestsTable();
-			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
+			Assert.IsNotNull(integrationTest = integrationTestTable.Insert(integrationTest));
 
 			QueryBuilder queryBuilder = new QueryBuilder()
-				.Where<IntegrationTestEntity>(integrationTest, integrationTest => integrationTest.Id)
+				.Where<IntegrationTestEntity>(integrationTest => integrationTest.Id, integrationTest.Id)
 				.Lock(LockTypes.Update);
 
 			var sameIntegrationTest = integrationTestTable.GetByCondition(queryBuilder).FirstOrDefault();

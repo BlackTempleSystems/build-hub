@@ -1,9 +1,11 @@
 using BuildHub.Application.Services.Authentication.Jwt.Configuration;
+using BuildHub.Application.Services.Authentication.Jwt.Models;
 using BuildHub.Common.Configuration;
 using BuildHub.Domain.Users.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace BuildHub.Application.Services.Authentication.Jwt;
@@ -19,7 +21,12 @@ public sealed class JwtService : IJwtService
 	/// <summary>
 	/// Key to access the jwt section.
 	/// </summary>
-	private const string JwtSectionKey = "Jwt";
+	private const string _JwtSectionKey = "Jwt";
+
+	/// <summary>
+	/// Refresh token byte size.
+	/// </summary>
+	private const int _RefershTokenBytesSize = 64;
 
 	/// <summary>
 	/// Configuration manager instance.
@@ -63,7 +70,7 @@ public sealed class JwtService : IJwtService
 	/// <exception cref="InvalidOperationException">Thrown if the JWT configuration is missing or invalid.</exception>
 	public JwtModel GenerateSecurityToken(UserEntity user)
 	{
-		var jwtOptions = _configurationManager.GetConfigurationModel<JwtOptions>(JwtSectionKey);
+		var jwtOptions = _configurationManager.GetConfigurationModel<JwtOptions>(_JwtSectionKey);
 
 		if (jwtOptions is null)
 			throw new InvalidOperationException();
@@ -95,5 +102,23 @@ public sealed class JwtService : IJwtService
 		};
 
 		return jwtModel;
+	}
+
+	public RefreshTokenModel GenerateRefreshToken()
+	{
+		Span<byte> randomBytes = stackalloc byte[_RefershTokenBytesSize];
+		using var randomNumebrGenerator= RandomNumberGenerator.Create();
+		randomNumebrGenerator.GetBytes(randomBytes);
+
+		var jwtOptions = _configurationManager.GetConfigurationModel<JwtOptions>(_JwtSectionKey);
+
+		if (jwtOptions is null)
+			throw new InvalidOperationException();
+
+		return new RefreshTokenModel
+		{
+			RefreshToken = Convert.ToBase64String(randomBytes),
+			ExpirationDate = DateTime.UtcNow.AddDays(jwtOptions.RefreshTokenDays)
+		};
 	}
 }

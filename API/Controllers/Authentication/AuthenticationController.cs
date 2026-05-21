@@ -70,6 +70,7 @@ public class AuthenticationController : BaseApiController
 		if(registerResponse.IsSuccess && registerResponse.Data is not null)
 		{
 			var jwt = registerResponse.Data.Jwt;
+			var refreshToken  = registerResponse.Data.RefreshToken;
 
 			Response.Cookies.Append("access_token", jwt.AccessToken, new CookieOptions
 			{
@@ -77,6 +78,14 @@ public class AuthenticationController : BaseApiController
 				Secure = true,
 				SameSite = SameSiteMode.None,
 				Expires = jwt?.ExpirationDate
+			});
+
+			Response.Cookies.Append("refresh_token", refreshToken.RefreshToken, new CookieOptions
+			{
+				HttpOnly = true,
+				Secure = true,
+				SameSite = SameSiteMode.None,
+				Expires = refreshToken?.ExpirationDate
 			});
 		}
 
