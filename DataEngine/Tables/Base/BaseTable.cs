@@ -40,7 +40,7 @@ namespace BuildHub.DataEngine.Tables.Base
 		/// </summary>
 		public string TableName { get; private set; }
 
-		protected BaseTable(DatabaseSource databaseSource = DatabaseSource.Core)
+		protected BaseTable(DatabaseSource databaseSource)
 		{
 			this._databaseSource = databaseSource;
 			this._isConnectionLocal = false;
@@ -323,19 +323,17 @@ namespace BuildHub.DataEngine.Tables.Base
 		/// results. The property referenced in this expression determines which column is compared in the query.</param>
 		/// <returns>An <see cref="IEnumerable{TEntity}"/> containing all entities from the data source that match the specified
 		/// condition. Returns an empty collection if no entities satisfy the condition.</returns>
-		public virtual IEnumerable<TEntity> GetByCondition(TEntity entity,
-			Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
+		public virtual IEnumerable<TEntity> GetByCondition(Expression<Func<TEntity, object>> condition, object? value, CompareTypes compareType = CompareTypes.Equal)
 		{
 			try
 			{
 				this.AcquireDatabaseConnection();
 
 				var columnInfo = EntityDataMapper.GetColumnInfo<TEntity>(condition);
-				var value = condition.Compile()(entity);
 
 				var internalQueryBuilder = new InternalQueryBuilder()
 					.From(this.TableName)
-					.Where(columnInfo.ColumnName, compareType, value)
+					.Where<TEntity>(condition, value, compareType)
 					.BuildSelect();
 
 				using SqlCommand selectCommand = new SqlCommand(internalQueryBuilder.GetQuery(), this._databaseConnection?.InternalConnection);

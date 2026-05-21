@@ -17,5 +17,6 @@
   <ItemGroup>
     <Build Include="dbo\Tables\Users.sql" />
     <Build Include="dbo\Tables\UserCredentials.sql" />
+    <Build Include="dbo\Tables\RefreshTokens.sql" />
   </ItemGroup>
 </Project>

@@ -1,1 +1,1 @@
-export * from './access-token-interceptor/access-token.interceptor';
+export * from './authentication-interceptor/authentication.interceptor';

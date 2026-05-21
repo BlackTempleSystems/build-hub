@@ -1,6 +1,6 @@
 using BuildHub.Application.Services.Authentication.Models;
+using BuildHub.Domain.Autehntication.Users.Models;
 using BuildHub.Domain.Results;
-using BuildHub.Domain.Users.Models;
 
 namespace BuildHub.Application.Services.Authentication
 {

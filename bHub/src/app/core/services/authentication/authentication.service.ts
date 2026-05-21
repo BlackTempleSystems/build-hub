@@ -74,7 +74,7 @@ export class AuthenticationService extends BaseServerRequestService {
    * @returns 
    */
   private authenticateUser(): Observable<BaseServerResponse<UserModel>> {
-    return this.sendGetRequest<UserModel>('authenticateUser');
+    return this.sendGetRequest<UserModel>('current-user');
   }
 
   /**

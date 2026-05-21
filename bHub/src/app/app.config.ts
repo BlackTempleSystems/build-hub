@@ -15,7 +15,7 @@ import { routes } from './app.routes';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { MessageService } from 'primeng/api';
-import { AccessTokenInterceptor, AuthenticationService } from './core';
+import { AuthenticationInterceptor, AuthenticationService } from './core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -39,7 +39,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptorsFromDi()),  // 👈 needed for class-based interceptors
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: AccessTokenInterceptor,
+      useClass: AuthenticationInterceptor,
       multi: true
     },
     provideAppInitializer(() => {

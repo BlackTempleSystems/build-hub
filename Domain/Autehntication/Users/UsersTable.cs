@@ -1,8 +1,8 @@
 using BuildHub.DataEngine.DatabaseConnection;
 using BuildHub.DataEngine.Tables.Base;
-using BuildHub.Domain.Users.Entities;
+using BuildHub.Domain.Autehntication.Users.Entities;
 
-namespace BuildHub.Domain.Users
+namespace BuildHub.Domain.Autehntication.Users
 {
 	/// <summary>
 	/// Represents a strongly-typed table for managing user entities in the data store.

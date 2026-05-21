@@ -25,6 +25,9 @@ namespace BuildHub.DataEngine.Queries
 	/// thread-safe. Each instance should be used by a single thread at a time. </para></remarks>
 	internal class InternalQueryBuilder : IInternalQueryBuilder<InternalQueryBuilder>
 	{
+		private const string _TrueBit = "1";
+		private const string _FalseBit = "0";
+
 		private string _query = string.Empty;
 		private string _tableName = string.Empty;
 		private bool _isQueryBuilt;
@@ -61,6 +64,16 @@ namespace BuildHub.DataEngine.Queries
 			if (value is Guid)
 				return StringUtilities.Stringify(value);
 
+			if(value is bool)
+			{
+				bool booleanValue = (bool)value;
+
+				if (booleanValue)
+					return _TrueBit;
+				else
+					return _FalseBit;
+			}
+
 			return value?.ToString() ?? string.Empty;
 		}
 
@@ -79,7 +92,8 @@ namespace BuildHub.DataEngine.Queries
 				type != typeof(Double) &&
 				type != typeof(String) &&
 				type != typeof(DateTime) &&
-				type != typeof(Guid))
+				type != typeof(Guid) &&
+				type != typeof(bool))
 			{
 				return false;
 			}

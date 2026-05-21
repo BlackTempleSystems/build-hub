@@ -1,7 +1,7 @@
 using BuildHub.DataEngine.Entities;
 using System.ComponentModel.DataAnnotations;
 
-namespace BuildHub.Domain.Users.Entities
+namespace BuildHub.Domain.Autehntication.Users.Entities
 {
 	/// <summary>
 	/// Represents a user entity within the system.

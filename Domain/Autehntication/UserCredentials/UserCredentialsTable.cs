@@ -1,7 +1,7 @@
 using BuildHub.DataEngine.Tables.Base;
-using BuildHub.Domain.UserCredentials.Entities;
+using BuildHub.Domain.Autehntication.UserCredentials.Entities;
 
-namespace BuildHub.Domain.UserCredentials
+namespace BuildHub.Domain.Autehntication.UserCredentials
 {
 	/// <summary>
 	/// Table class for user credentials.

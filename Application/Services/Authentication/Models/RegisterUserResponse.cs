@@ -1,6 +1,6 @@
 using BuildHub.Application.Services.Authentication.Jwt;
 using BuildHub.Application.Services.Authentication.Jwt.Models;
-using BuildHub.Domain.Users.Models;
+using BuildHub.Domain.Autehntication.Users.Models;
 using System.Text.Json.Serialization;
 
 namespace BuildHub.Application.Services.Authentication.Models

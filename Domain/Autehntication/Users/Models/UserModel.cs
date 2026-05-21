@@ -1,4 +1,4 @@
-namespace BuildHub.Domain.Users.Models
+namespace BuildHub.Domain.Autehntication.Users.Models
 {
 	/// <summary>
 	/// A User transport model

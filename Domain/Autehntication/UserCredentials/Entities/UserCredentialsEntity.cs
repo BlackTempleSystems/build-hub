@@ -1,6 +1,6 @@
 using BuildHub.DataEngine.Entities;
 
-namespace BuildHub.Domain.UserCredentials.Entities
+namespace BuildHub.Domain.Autehntication.UserCredentials.Entities
 {
 	/// <summary>
 	/// User credentials entity.

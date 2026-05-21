@@ -1,7 +1,7 @@
 using BuildHub.Application.Services.Authentication.Jwt.Configuration;
 using BuildHub.Application.Services.Authentication.Jwt.Models;
 using BuildHub.Common.Configuration;
-using BuildHub.Domain.Users.Entities;
+using BuildHub.Domain.Autehntication.Users.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

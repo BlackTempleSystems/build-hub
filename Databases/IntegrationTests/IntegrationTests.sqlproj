@@ -2,8 +2,10 @@
 <Project DefaultTargets="Build">
   <Sdk Name="Microsoft.Build.Sql" Version="2.1.0" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>9f7728b1-d7d1-4837-8765-39dccbed9c51</ProjectGuid>
+    <ProjectGuid>{9f7728b1-d7d1-4837-8765-39dccbed9c51}</ProjectGuid>
     <TargetDatabaseSet>True</TargetDatabaseSet>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <Name>IntegrationTests</Name>
