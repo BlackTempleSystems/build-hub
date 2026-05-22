@@ -23,10 +23,7 @@ public sealed class JwtService : IJwtService
 	/// </summary>
 	private const string _JwtSectionKey = "Jwt";
 
-	/// <summary>
-	/// Refresh token byte size.
-	/// </summary>
-	private const int _RefershTokenBytesSize = 64;
+	
 
 	/// <summary>
 	/// Configuration manager instance.
@@ -102,23 +99,5 @@ public sealed class JwtService : IJwtService
 		};
 
 		return jwtModel;
-	}
-
-	public RefreshTokenModel GenerateRefreshToken()
-	{
-		Span<byte> randomBytes = stackalloc byte[_RefershTokenBytesSize];
-		using var randomNumebrGenerator= RandomNumberGenerator.Create();
-		randomNumebrGenerator.GetBytes(randomBytes);
-
-		var jwtOptions = _configurationManager.GetConfigurationModel<JwtOptions>(_JwtSectionKey);
-
-		if (jwtOptions is null)
-			throw new InvalidOperationException();
-
-		return new RefreshTokenModel
-		{
-			RefreshToken = Convert.ToBase64String(randomBytes),
-			ExpirationDate = DateTime.UtcNow.AddDays(jwtOptions.RefreshTokenDays)
-		};
 	}
 }

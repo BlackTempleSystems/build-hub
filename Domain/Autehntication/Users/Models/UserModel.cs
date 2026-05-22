@@ -6,7 +6,7 @@ namespace BuildHub.Domain.Autehntication.Users.Models
 	public class UserModel
 	{
 		/// <summary>
-		/// 
+		/// Unique identifier of the user.
 		/// </summary>
 		public Guid UserGuid { get; set; }
 		/// <summary>

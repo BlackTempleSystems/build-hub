@@ -3,28 +3,30 @@ namespace BuildHub.Application.Services.Authentication
 	#region
 	using BuildHub.Application.Messages;
 	using BuildHub.Application.Services.Authentication.Jwt;
+	using BuildHub.Application.Services.Authentication.RefreshToken;
+	using BuildHub.Application.Services.Authentication.Validators;
 	using BuildHub.Application.Services.CryptographicService;
 	using BuildHub.Common.Logger;
 	using BuildHub.DataEngine.DatabaseConnection;
 	using BuildHub.DataEngine.Queries;
 	using BuildHub.DataEngine.Transactions;
-	using BuildHub.Domain.Results;
-	using Models;
-	using BuildHub.Application.Services.Authentication.Validators;
-	using FluentValidation;
-	using BuildHub.Domain.Autehntication.Users;
+	using BuildHub.Domain.Autehntication.RefreshTokens;
+	using BuildHub.Domain.Autehntication.RefreshTokens.Entities;
 	using BuildHub.Domain.Autehntication.UserCredentials;
+	using BuildHub.Domain.Autehntication.UserCredentials.Entities;
+	using BuildHub.Domain.Autehntication.Users;
 	using BuildHub.Domain.Autehntication.Users.Entities;
 	using BuildHub.Domain.Autehntication.Users.Models;
-	using BuildHub.Domain.Autehntication.UserCredentials.Entities;
-	using BuildHub.Domain.Autehntication.RefreshTokens.Entities;
-	using BuildHub.Domain.Autehntication.RefreshTokens;
-	#endregion
+	using BuildHub.Domain.Results;
+	using FluentValidation;
+	using Microsoft.Extensions.DependencyInjection;
+	using Models;
 
+	#endregion
 	/// <summary>
 	/// Provides authentication-related services for managing userEntity sign-in, sign-out, and identity verification operations.
 	/// </summary>
-	public sealed class AuthenticationService : IAuthenticationService 
+	public sealed class AuthenticationService : IAuthenticationService
 	{
 		/// <summary>
 		/// Instance to the cryptographic service.
@@ -36,11 +38,16 @@ namespace BuildHub.Application.Services.Authentication
 		/// </summary>
 		private readonly IJwtService _jwtService;
 
-		public AuthenticationService(ICryptographicService cryptographicService
-			, IJwtService jwtService)
+		/// <summary>
+		/// Provides access to the service responsible for managing refresh tokens.
+		/// </summary>
+		private readonly IRefreshTokenService _refreshTokenService;
+
+		public AuthenticationService(IServiceProvider serviceProvider)
 		{
-			this._cryptographicService = cryptographicService;
-			this._jwtService = jwtService;
+			this._cryptographicService = serviceProvider.GetService<ICryptographicService>()!;
+			this._jwtService = serviceProvider.GetService<IJwtService>()!;
+			this._refreshTokenService = serviceProvider.GetService<IRefreshTokenService>()!;
 		}
 
 		/// <summary>
@@ -67,7 +74,7 @@ namespace BuildHub.Application.Services.Authentication
 			UserCredentialsTable userCredentialsTable = new UserCredentialsTable();
 			var userCredentialsEntity = userCredentialsTable.GetByCondition(userCredentials => userCredentials.UserId, userEntity.Id).FirstOrDefault();
 
-			if(userCredentialsEntity is null)
+			if (userCredentialsEntity is null)
 			{
 				Logger.LogError(ApplicationMessages.InvalidEmailOrUsernameOrPassword);
 
@@ -75,7 +82,7 @@ namespace BuildHub.Application.Services.Authentication
 					ResultStatus.Unauthorized);
 			}
 
-			if(!_cryptographicService.VerifyPassword(loginRequestData.Password, userCredentialsEntity.HashedPassword!))
+			if (!_cryptographicService.VerifyPassword(loginRequestData.Password, userCredentialsEntity.HashedPassword!))
 			{
 				Logger.LogError(ApplicationMessages.InvalidEmailOrUsernameOrPassword);
 
@@ -83,11 +90,11 @@ namespace BuildHub.Application.Services.Authentication
 					ResultStatus.Unauthorized);
 			}
 
-			var refreshTokenModel = this._jwtService.GenerateRefreshToken();
+			var refreshTokenModel = this._refreshTokenService.GenerateAndSaveRefreshToken(userEntity);
 
 			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
 			var refreshTokenEntity = refreshTokensTable.GetByCondition(refreshToken => refreshToken.UserId, userEntity.Id).FirstOrDefault();
-			if(refreshTokenEntity is null)
+			if (refreshTokenEntity is null)
 			{
 				//TODO ERROR.
 				return Result<LoginResponse>.Failure(ApplicationMessages.InvalidEmailOrUsernameOrPassword,
@@ -97,7 +104,7 @@ namespace BuildHub.Application.Services.Authentication
 			refreshTokenEntity.IsRevoked = false;
 			refreshTokenEntity.ExpirationDate = refreshTokenModel.ExpirationDate;
 
-			if(!refreshTokensTable.Update(refreshTokenEntity))
+			if (!refreshTokensTable.Update(refreshTokenEntity))
 			{
 				//TODO ERROR.
 				return Result<LoginResponse>.Failure(ApplicationMessages.InvalidEmailOrUsernameOrPassword,
@@ -105,15 +112,21 @@ namespace BuildHub.Application.Services.Authentication
 			}
 
 			var jwtModel = this._jwtService.GenerateSecurityToken(userEntity);
+
+
 			var loginResponse = new LoginResponse()
 			{
 				User = new UserModel()
 				{
 					UserGuid = userEntity.Guid,
-					UserName =  userEntity.UserName!,
+					UserName = userEntity.UserName!,
 					Email = userEntity.Email!
 				},
-				Jwt = jwtModel
+				TokenPair = new TokenPairModel()
+				{
+					Jwt = jwtModel,
+					RefreshToken = refreshTokenModel
+				}
 			};
 
 			return Result<LoginResponse>.Success(loginResponse);
@@ -131,7 +144,7 @@ namespace BuildHub.Application.Services.Authentication
 
 			var queryBuilder = new QueryBuilder();
 			queryBuilder.Where<UserEntity>(user => user.Email, registerRequest.Email);
-				//.WhereOr(newUser, userEntity => userEntity.UserName!);
+			//.WhereOr(newUser, userEntity => userEntity.UserName!);
 
 			UsersTable usersTable = new UsersTable();
 			var existingUserEntity = usersTable.GetByCondition(queryBuilder).FirstOrDefault();
@@ -140,7 +153,7 @@ namespace BuildHub.Application.Services.Authentication
 			{
 				Logger.LogError(ApplicationMessages.RegistrationFailedUserAlreadyExists, registerRequest.Email);
 
-				return Result<RegisterUserResponse>.Failure(ApplicationMessages.RegistrationFailedUserAlreadyExists, 
+				return Result<RegisterUserResponse>.Failure(ApplicationMessages.RegistrationFailedUserAlreadyExists,
 					ResultStatus.Conflict, registerRequest.Email);
 			}
 
@@ -153,7 +166,7 @@ namespace BuildHub.Application.Services.Authentication
 			using ScopedTransaction scopedTransaction = new ScopedTransaction(DatabaseSource.Users);
 
 			newUserEntity = usersTable.Insert(newUserEntity);
-			if(newUserEntity is null)
+			if (newUserEntity is null)
 			{
 				Logger.LogError($"Failed to insert userEntity during registration.");
 				return Result<RegisterUserResponse>.Failure("Could not register userEntity", ResultStatus.DatabaseFailure);
@@ -173,22 +186,10 @@ namespace BuildHub.Application.Services.Authentication
 				return Result<RegisterUserResponse>.Failure("Could not register userEntity", ResultStatus.DatabaseFailure);
 			}
 
-			var refreshTokenModel = this._jwtService.GenerateRefreshToken();
-
-			var refreshTokenEntity = new RefreshTokenEntity();
-			refreshTokenEntity.RefreshToken = refreshTokenModel.RefreshToken;
-			refreshTokenEntity.ExpirationDate = refreshTokenModel.ExpirationDate;
-			refreshTokenEntity.UserId = newUserEntity.Id;
-
-			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
-			if(refreshTokensTable.Insert(refreshTokenEntity) is null)
-			{
-				Logger.LogError($"Failed to insert refresh token for userEntity userEntity ID '{newUserEntity.Id}' during registration.");
-				return Result<RegisterUserResponse>.Failure("Could not register userEntity", ResultStatus.DatabaseFailure);
-			}
+			var refreshTokenModel = this._refreshTokenService.GenerateAndSaveRefreshToken(newUserEntity);
 
 			var jwtModel = this._jwtService.GenerateSecurityToken(newUserEntity);
-			if(jwtModel is null)
+			if (jwtModel is null)
 			{
 				//TODO ERROR.
 				return Result<RegisterUserResponse>.Failure("Could not register userEntity", ResultStatus.Unauthorized);
@@ -208,8 +209,11 @@ namespace BuildHub.Application.Services.Authentication
 					UserName = newUserEntity.UserName!,
 					Email = newUserEntity.Email!
 				},
-				Jwt = jwtModel,
-				RefreshToken = refreshTokenModel
+				TokenPair = new TokenPairModel()
+				{
+					Jwt = jwtModel,
+					RefreshToken = refreshTokenModel
+				}
 			};
 
 			return Result<RegisterUserResponse>.Success(registerUserResponse);
@@ -225,7 +229,7 @@ namespace BuildHub.Application.Services.Authentication
 			UsersTable usersTable = new UsersTable();
 			UserEntity? user = usersTable.GetByGuid(userGuid);
 
-			if(user is null)
+			if (user is null)
 			{
 				Logger.LogError("User doesn't exist");
 				return Result<UserModel>.Failure("User doesn't exist", ResultStatus.DatabaseFailure);
@@ -235,6 +239,37 @@ namespace BuildHub.Application.Services.Authentication
 			userModel.UserGuid = userGuid;
 			userModel.UserName = user.UserName!;
 			userModel.Email = user.Email!;
+
+			return Result<UserModel>.Success(userModel);
+		}
+
+		/// <summary>
+		/// Gets a task that represents the asynchronous operation of refreshing the authentication token.
+		/// </summary>
+		/// <remarks>Await this task to ensure that the authentication token is refreshed before proceeding with
+		/// operations that require a valid token.</remarks>
+		public Task<Result<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest refreshTokenRequest)
+		{
+
+			UsersTable usersTable = new UsersTable();
+			UserEntity? user = usersTable.GetByGuid(refreshTokenRequest.UserGuid);
+
+			if (user is null)
+			{
+				//TODO ERROR
+
+				//Logger.LogError("User doesn't exist");
+				//return Result<UserModel>.Failure("User doesn't exist", ResultStatus.DatabaseFailure);
+			}
+
+			var refreshToken = _refreshTokenService.GetRefreshTokenForUser(user.Id);
+			if(refreshToken is  null)
+			{
+				//TODO ERROR
+
+			}
+
+			//TODO VALIDATE REVODED EXPIRATION DATE ETC HASH.
 
 			return Result<UserModel>.Success(userModel);
 		}
