@@ -29,5 +29,12 @@ namespace BuildHub.Application.Services.Authentication
 		/// <param name="userGuid"></param>
 		/// <returns></returns>
 		public Task<Result<UserModel>> GetUserByGuidAsync(Guid userGuid);
+
+		/// <summary>
+		/// Gets a task that represents the asynchronous operation of refreshing the authentication token.
+		/// </summary>
+		/// <remarks>Await this task to ensure that the authentication token is refreshed before proceeding with
+		/// operations that require a valid token.</remarks>
+		public Task<Result<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest refreshTokenRequest);
 	}
 }

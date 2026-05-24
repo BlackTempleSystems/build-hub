@@ -23,9 +23,9 @@ namespace BuildHub.Application.Services.Authentication.Models
 		public JwtModel? Jwt { get; set; }
 
 		/// <summary>
-		/// 
+		/// Gets or sets the pair of access and refresh tokens associated with the current user session.
 		/// </summary>
 		[JsonIgnore]
-		public RefreshTokenModel? RefreshToken { get; set; }
+		public TokenPairModel? TokenPair { get; set; }
 	}
 }

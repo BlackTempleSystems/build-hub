@@ -10,6 +10,7 @@ using System.Text;
 
 namespace BuildHub.Application.Services.Authentication.Extensions
 {
+	using BuildHub.Application.Services.Authentication.RefreshToken;
 	using CryptographicService;
 
 	/// <summary>
@@ -36,6 +37,7 @@ namespace BuildHub.Application.Services.Authentication.Extensions
 			services.AddSingleton<IJwtService, JwtService>();
 			services.AddSingleton<ICryptographicService, CryptographicService>();
 			services.AddScoped<IAuthenticationService, AuthenticationService>();
+			services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 			services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
 			ConfigurationManager configurationManager = ConfigurationManager.GetConfigurationManager();

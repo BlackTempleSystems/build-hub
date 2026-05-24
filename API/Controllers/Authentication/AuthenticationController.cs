@@ -18,6 +18,16 @@ namespace BuildHub.API.Controllers.Authentication;
 public class AuthenticationController : BaseApiController
 {
 	/// <summary>
+	/// Represents the key name used to store or retrieve the access tokens.
+	/// </summary>
+	private const string _AccessTokenKey = "access_token";
+
+	/// <summary>
+	/// Represents the key name used to store or retrieve the refresh tokens.
+	/// </summary>
+	private const string _RefreshTokenKey = "refresh_token";
+
+	/// <summary>
 	/// Authentication service.
 	/// </summary>
 	private readonly IAuthenticationService _authenticationService;
@@ -42,14 +52,23 @@ public class AuthenticationController : BaseApiController
 		var loginResponse = await _authenticationService.LoginAsync(loginRequest);
 		if (loginResponse.IsSuccess && loginResponse.Data is not null)
 		{
-			var jwt = loginResponse.Data.Jwt;
+			var jwt = loginResponse.Data.TokenPair?.Jwt;
+			var refreshToken = loginResponse.Data.TokenPair?.RefreshToken;
 
-			Response.Cookies.Append("access_token", jwt!.AccessToken, new CookieOptions
+			Response.Cookies.Append(_AccessTokenKey, jwt!.AccessToken, new CookieOptions
 			{
 				HttpOnly = true,
 				Secure = true,
 				SameSite = SameSiteMode.None,
 				Expires = jwt?.ExpirationDate
+			});
+
+			Response.Cookies.Append(_RefreshTokenKey, refreshToken!.RefreshToken!, new CookieOptions
+			{
+				HttpOnly = true,
+				Secure = true,
+				SameSite = SameSiteMode.None,
+				Expires = refreshToken?.ExpirationDate
 			});
 		}
 
@@ -69,10 +88,10 @@ public class AuthenticationController : BaseApiController
 		var registerResponse = await _authenticationService.RegisterAsync(registerUserRequest);
 		if(registerResponse.IsSuccess && registerResponse.Data is not null)
 		{
-			var jwt = registerResponse.Data.Jwt;
-			var refreshToken  = registerResponse.Data.RefreshToken;
+			var jwt = registerResponse.Data.TokenPair?.Jwt;
+			var refreshToken = registerResponse.Data.TokenPair?.RefreshToken;
 
-			Response.Cookies.Append("access_token", jwt!.AccessToken, new CookieOptions
+			Response.Cookies.Append(_AccessTokenKey, jwt!.AccessToken, new CookieOptions
 			{
 				HttpOnly = true,
 				Secure = true,
@@ -80,7 +99,7 @@ public class AuthenticationController : BaseApiController
 				Expires = jwt?.ExpirationDate
 			});
 
-			Response.Cookies.Append("refresh_token", refreshToken!.RefreshToken!, new CookieOptions
+			Response.Cookies.Append(_RefreshTokenKey, refreshToken!.RefreshToken!, new CookieOptions
 			{
 				HttpOnly = true,
 				Secure = true,
@@ -96,7 +115,7 @@ public class AuthenticationController : BaseApiController
 	[HttpGet("current-user")]
 	public async Task<IActionResult> GetCurrentUser()
 	{
-		Guid userGuid = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+		Guid userGuid = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
 		return FromResult(await _authenticationService.GetUserByGuidAsync(userGuid));
 	}
 
@@ -104,6 +123,9 @@ public class AuthenticationController : BaseApiController
 	[HttpGet("refresh")]
 	public async Task<IActionResult> RefreshToken()
 	{
-		//Request.Cookies["refresh_token"];
+		Guid userGuid = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+		string? refreshToken = Request.Cookies[_RefreshTokenKey];
+
+		return FromResult(await _authenticationService.RefreshToken());
 	}
 }
