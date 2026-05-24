@@ -82,7 +82,7 @@ namespace UnitTests.DataEngineTests.Tables
 			var integrationTestTable = new IntegrationTestsTable();
 
 			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
-			Assert.IsNotNull(integrationTestTable.GetByCondition(integrationTest, (integrationTest) => integrationTest.Id));
+			Assert.IsNotNull(integrationTestTable.GetByCondition(integrationTest => integrationTest.Id, integrationTest.Id));
 		}
 
 		[TestMethod]
