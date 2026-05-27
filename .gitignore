@@ -365,3 +365,4 @@ FodyWeavers.xsd
 .env
 .env.*
 !.env.example
+/API/Controllers/Authentication/AuthenticationController.cs

@@ -15,7 +15,9 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["BuildHub.sln", "./"]
 COPY ["API/API.csproj", "API/"]
+COPY ["Application/Application.csproj", "Application/"]
 COPY ["Common/Common.csproj", "Common/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
 COPY ["Infrastructure/Infrastructure.csproj", "Infrastructure/"]
 COPY ["DataEngine/DataEngine.csproj", "DataEngine/"]
 
