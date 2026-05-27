@@ -23,6 +23,7 @@ namespace BuildHub.Application.Services.Authentication
 	using Models;
 
 	#endregion
+
 	/// <summary>
 	/// Provides authentication-related services for managing userEntity sign-in, sign-out, and identity verification operations.
 	/// </summary>
@@ -248,13 +249,13 @@ namespace BuildHub.Application.Services.Authentication
 		/// </summary>
 		/// <remarks>Await this task to ensure that the authentication token is refreshed before proceeding with
 		/// operations that require a valid token.</remarks>
-		public Task<Result<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest refreshTokenRequest)
+		public async Task<Result<RefreshTokenResponse>> RefreshTokenAsync(RefreshTokenRequest refreshTokenRequest)
 		{
 
 			UsersTable usersTable = new UsersTable();
-			UserEntity? user = usersTable.GetByGuid(refreshTokenRequest.UserGuid);
+			UserEntity? userEntity = usersTable.GetByGuid(refreshTokenRequest.UserGuid);
 
-			if (user is null)
+			if (userEntity is null)
 			{
 				//TODO ERROR
 
@@ -262,16 +263,24 @@ namespace BuildHub.Application.Services.Authentication
 				//return Result<UserModel>.Failure("User doesn't exist", ResultStatus.DatabaseFailure);
 			}
 
-			var refreshToken = _refreshTokenService.GetRefreshTokenForUser(user.Id);
-			if(refreshToken is  null)
+			var refreshToken = _refreshTokenService.RotateRefreshToken(refreshTokenRequest.RefreshToken, userEntity);
+			if(refreshToken is null)
 			{
 				//TODO ERROR
-
+				return Result<RefreshTokenResponse>.Failure("", ResultStatus.Unauthorized);
 			}
 
-			//TODO VALIDATE REVODED EXPIRATION DATE ETC HASH.
+			var jwt = _jwtService.GenerateSecurityToken(userEntity);
+			var response = new RefreshTokenResponse()
+			{
+				TokenPair = new TokenPairModel()
+				{
+					Jwt = jwt,
+					RefreshToken = refreshToken
+				}
+			};
 
-			return Result<UserModel>.Success(userModel);
+			return  Result<RefreshTokenResponse>.Success(response);
 		}
 	}
 }

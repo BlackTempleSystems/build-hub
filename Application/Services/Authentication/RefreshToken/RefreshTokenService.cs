@@ -42,23 +42,11 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		/// metadata.</returns>
 		public RefreshTokenModel GenerateAndSaveRefreshToken(UserEntity userEntity)
 		{
-			Span<byte> randomBytes = stackalloc byte[_RefershTokenBytesSize];
-			using var randomNumebrGenerator = RandomNumberGenerator.Create();
-			randomNumebrGenerator.GetBytes(randomBytes);
-
-			var jwtOptions = _configurationManager.GetConfigurationModel<JwtOptions>(_JwtSectionKey);
-
-			if (jwtOptions is null)
-				throw new InvalidOperationException();
-
-			var refreshToken = Convert.ToBase64String(randomBytes);
-			var expirationDate = DateTime.UtcNow.AddDays(jwtOptions.RefreshTokenDays);
-
-			var hashedRefreshToken = HashfRefreshToken(refreshToken);
+			var refreshToken = GenerateNewRefreshToken();
 
 			var refreshTokenEntity = new RefreshTokenEntity();
-			refreshTokenEntity.RefreshToken = hashedRefreshToken;
-			refreshTokenEntity.ExpirationDate = expirationDate;
+			refreshTokenEntity.RefreshToken = refreshToken.Item1;
+			refreshTokenEntity.ExpirationDate = refreshToken.Item2;
 			refreshTokenEntity.UserId = userEntity.Id;
 
 			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
@@ -70,20 +58,9 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 
 			return new RefreshTokenModel
 			{
-				RefreshToken = refreshToken,
-				ExpirationDate = expirationDate
+				RefreshToken = refreshToken.Item1,
+				ExpirationDate = refreshToken.Item2
 			};
-		}
-
-		/// <summary>
-		/// Generates a hashed representation of the specified refresh token.
-		/// </summary>
-		/// <param name="rawToken">The raw refresh token to be hashed. Cannot be null or empty.</param>
-		/// <returns>A string containing the hashed value of the refresh token.</returns>
-		public string HashfRefreshToken(string rawRefreshToken)
-		{
-			var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawRefreshToken));
-			return Convert.ToBase64String(bytes);
 		}
 
 		/// <summary>
@@ -103,10 +80,93 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		/// <param name="userId">The unique identifier of the user whose refresh token is to be retrieved. Must be a positive integer.</param>
 		/// <returns>A <see cref="RefreshTokenModel"/> containing the refresh token information for the user, or <c>null</c> if no
 		/// refresh token exists for the specified user.</returns>
-		public RefreshTokenEntity? GetRefreshTokenForUser(int userId)
+		private RefreshTokenEntity? GetRefreshTokenForUser(int userId)
 		{
 			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
 			return  refreshTokensTable.GetByCondition(rToken => rToken.UserId, userId).FirstOrDefault();
+		}
+
+		/// <summary>
+		/// Replaces the specified refresh token with a new one, invalidating the original token.
+		/// </summary>
+		/// <param name="refreshTokenEntity">The refresh token entity to be rotated. Cannot be null.</param>
+		/// <returns>true if the refresh token was successfully rotated; otherwise, false.</returns>
+		public RefreshTokenModel? RotateRefreshToken(string rawRefreshToken, UserEntity userEntity)
+		{
+			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
+
+			var refreshTokenEntity = GetRefreshTokenForUser(userEntity.Id);
+			if (refreshTokenEntity is null)
+			{
+
+			}
+
+			if (refreshTokenEntity.IsRevoked)
+			{
+				//TODO ERROR
+			}
+
+			if (refreshTokenEntity.ExpirationDate < DateTime.UtcNow)
+			{
+				//TODO ERRORs
+			}
+
+			if (!VerifyfRefreshToken(rawRefreshToken, refreshTokenEntity.RefreshToken))
+			{
+				//TODO ERROR
+			}
+
+			var refreshToken = GenerateNewRefreshToken();
+			refreshTokenEntity.RefreshToken = refreshToken.Item1;
+			refreshTokenEntity.ExpirationDate = refreshToken.Item2;
+
+
+			if(!refreshTokensTable.Update(refreshTokenEntity))
+			{
+				//TODO LOG
+				return null;
+			}
+
+			return new RefreshTokenModel()
+			{
+				RefreshToken = refreshToken.Item1,
+				ExpirationDate = refreshToken.Item2
+			};
+		}
+
+		/// <summary>
+		/// Generates a hashed representation of the specified refresh token.
+		/// </summary>
+		/// <param name="rawToken">The raw refresh token to be hashed. Cannot be null or empty.</param>
+		/// <returns>A string containing the hashed value of the refresh token.</returns>
+		private string HashfRefreshToken(string rawRefreshToken)
+		{
+			var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawRefreshToken));
+			return Convert.ToBase64String(bytes);
+		}
+
+		/// <summary>
+		/// Generates a new refresh token and its expiration time.
+		/// </summary>
+		/// <returns>A tuple containing the newly generated refresh token as a string and its expiration date and time as a <see
+		/// cref="DateTime"/> value.</returns>
+		private Tuple<string, DateTime> GenerateNewRefreshToken()
+		{
+			Span<byte> randomBytes = stackalloc byte[_RefershTokenBytesSize];
+			using var randomNumebrGenerator = RandomNumberGenerator.Create();
+			randomNumebrGenerator.GetBytes(randomBytes);
+
+			var jwtOptions = _configurationManager.GetConfigurationModel<JwtOptions>(_JwtSectionKey);
+
+			if (jwtOptions is null)
+				throw new InvalidOperationException();
+
+			var refreshToken = Convert.ToBase64String(randomBytes);
+			var expirationDate = DateTime.UtcNow.AddDays(jwtOptions.RefreshTokenDays);
+
+			var hashedRefreshToken = HashfRefreshToken(refreshToken);
+
+			return new Tuple<string, DateTime>(hashedRefreshToken, expirationDate);
 		}
 	}
 }

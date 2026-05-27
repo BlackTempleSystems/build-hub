@@ -35,6 +35,6 @@ namespace BuildHub.Application.Services.Authentication
 		/// </summary>
 		/// <remarks>Await this task to ensure that the authentication token is refreshed before proceeding with
 		/// operations that require a valid token.</remarks>
-		public Task<Result<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest refreshTokenRequest);
+		public Task<Result<RefreshTokenResponse>> RefreshTokenAsync(RefreshTokenRequest refreshTokenRequest);
 	}
 }

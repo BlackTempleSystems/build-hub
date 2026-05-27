@@ -126,6 +126,10 @@ public class AuthenticationController : BaseApiController
 		Guid userGuid = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
 		string? refreshToken = Request.Cookies[_RefreshTokenKey];
 
-		return FromResult(await _authenticationService.RefreshToken());
+		var request = new RefreshTokenRequest();
+		request.RefreshToken = refreshToken;
+		request.UserGuid = userGuid;
+
+		return FromResult(await _authenticationService.RefreshTokenAsync(request));
 	}
 }

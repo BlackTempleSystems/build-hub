@@ -16,12 +16,6 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		/// metadata.</returns>
 		public RefreshTokenModel GenerateAndSaveRefreshToken(UserEntity usersEntity);
 
-		/// <summary>
-		/// Generates a hashed representation of the specified refresh token.
-		/// </summary>
-		/// <param name="rawToken">The raw refresh token to be hashed. Cannot be null or empty.</param>
-		/// <returns>A string containing the hashed value of the refresh token.</returns>
-		public string HashfRefreshToken(string rawRefreshToken);
 
 		/// <summary>
 		/// Verifies whether the specified raw refresh token matches the provided hashed token.
@@ -32,11 +26,10 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		public bool VerifyfRefreshToken(string rawRefreshToken, string hashedRefreshToken);
 
 		/// <summary>
-		/// Retrieves the refresh token associated with the specified user.
+		/// Replaces the specified refresh token with a new one, invalidating the original token.
 		/// </summary>
-		/// <param name="userId">The unique identifier of the user whose refresh token is to be retrieved. Must be a positive integer.</param>
-		/// <returns>A <see cref="RefreshTokenModel"/> containing the refresh token information for the user, or <c>null</c> if no
-		/// refresh token exists for the specified user.</returns>
-		public RefreshTokenEntity? GetRefreshTokenForUser(int userId);
+		/// <param name="refreshTokenEntity">The refresh token entity to be rotated. Cannot be null.</param>
+		/// <returns>true if the refresh token was successfully rotated; otherwise, false.</returns>
+		public RefreshTokenModel? RotateRefreshToken(string rawRefreshToken, UserEntity userEntity);
 	}
 }
