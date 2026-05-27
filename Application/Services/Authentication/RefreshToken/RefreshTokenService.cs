@@ -13,6 +13,13 @@ using System.Text;
 
 namespace BuildHub.Application.Services.Authentication.RefreshToken
 {
+	/// <summary>
+	/// Provides functionality for generating, validating, and rotating refresh tokens used in authentication workflows.
+	/// </summary>
+	/// <remarks>This service manages the lifecycle of refresh tokens, including secure generation, validation, and
+	/// rotation for user authentication scenarios. It is intended to be used as part of a token-based authentication
+	/// system to enable secure session renewal without requiring users to re-authenticate with their credentials. The
+	/// service is not thread-safe and should be used accordingly in multi-threaded environments.</remarks>
 	public sealed class RefreshTokenService : IRefreshTokenService
 	{
 		/// <summary>
@@ -44,16 +51,33 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		{
 			var refreshToken = GenerateNewRefreshToken();
 
-			var refreshTokenEntity = new RefreshTokenEntity();
-			refreshTokenEntity.RefreshToken = refreshToken.Item1;
-			refreshTokenEntity.ExpirationDate = refreshToken.Item2;
-			refreshTokenEntity.UserId = userEntity.Id;
-
 			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
-			if (refreshTokensTable.Insert(refreshTokenEntity) is null)
+			RefreshTokenEntity? refreshTokenEntity = refreshTokensTable.GetByCondition(token => token.UserId, userEntity.Id).FirstOrDefault();
+
+			if (refreshTokenEntity is null)
 			{
-				Logger.LogError($"Failed to insert refresh token for userEntity userEntity ID '{userEntity.Id}' during registration.");
-				throw new InvalidOperationException();
+				refreshTokenEntity = new RefreshTokenEntity();
+				refreshTokenEntity.RefreshToken = refreshToken.Item1;
+				refreshTokenEntity.ExpirationDate = refreshToken.Item2;
+				refreshTokenEntity.UserId = userEntity.Id;
+
+				if (refreshTokensTable.Insert(refreshTokenEntity) is null)
+				{
+					Logger.LogError($"Failed to insert refresh token for userEntity userEntity ID '{userEntity.Id}' during registration.");
+					throw new InvalidOperationException();
+				}
+			}
+			else
+			{
+				refreshTokenEntity.IsRevoked = false;
+				refreshTokenEntity.RefreshToken = refreshToken.Item1;
+				refreshTokenEntity.ExpirationDate = refreshToken.Item2;
+
+				if (!refreshTokensTable.Update(refreshTokenEntity))
+				{
+					//TODO ERROR
+					throw new InvalidOperationException();
+				}
 			}
 
 			return new RefreshTokenModel
@@ -83,7 +107,7 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		private RefreshTokenEntity? GetRefreshTokenForUser(int userId)
 		{
 			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
-			return  refreshTokensTable.GetByCondition(rToken => rToken.UserId, userId).FirstOrDefault();
+			return refreshTokensTable.GetByCondition(rToken => rToken.UserId, userId).FirstOrDefault();
 		}
 
 		/// <summary>
@@ -120,8 +144,7 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 			refreshTokenEntity.RefreshToken = refreshToken.Item1;
 			refreshTokenEntity.ExpirationDate = refreshToken.Item2;
 
-
-			if(!refreshTokensTable.Update(refreshTokenEntity))
+			if (!refreshTokensTable.Update(refreshTokenEntity))
 			{
 				//TODO LOG
 				return null;

@@ -1,5 +1,4 @@
 using BuildHub.Application.Services.Authentication.Jwt.Models;
-using BuildHub.Domain.Autehntication.RefreshTokens.Entities;
 using BuildHub.Domain.Autehntication.Users.Entities;
 
 namespace BuildHub.Application.Services.Authentication.RefreshToken
@@ -15,7 +14,6 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		/// <returns>A <see cref="RefreshTokenModel"/> instance containing the newly generated refresh token and its associated
 		/// metadata.</returns>
 		public RefreshTokenModel GenerateAndSaveRefreshToken(UserEntity usersEntity);
-
 
 		/// <summary>
 		/// Verifies whether the specified raw refresh token matches the provided hashed token.

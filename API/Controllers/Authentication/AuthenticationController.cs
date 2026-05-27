@@ -130,6 +130,26 @@ public class AuthenticationController : BaseApiController
 		request.RefreshToken = refreshToken;
 		request.UserGuid = userGuid;
 
-		return FromResult(await _authenticationService.RefreshTokenAsync(request));
+		var response = await _authenticationService.RefreshTokenAsync(request);
+		var jwt = response.Data.TokenPair?.Jwt;
+		var neRrefreshToken = response.Data.TokenPair?.RefreshToken;
+
+		Response.Cookies.Append(_AccessTokenKey, jwt!.AccessToken, new CookieOptions
+		{
+			HttpOnly = true,
+			Secure = true,
+			SameSite = SameSiteMode.None,
+			Expires = jwt?.ExpirationDate
+		});
+
+		Response.Cookies.Append(_RefreshTokenKey, neRrefreshToken!.RefreshToken!, new CookieOptions
+		{
+			HttpOnly = true,
+			Secure = true,
+			SameSite = SameSiteMode.None,
+			Expires = neRrefreshToken?.ExpirationDate
+		});
+
+		return FromResult(response);
 	}
 }

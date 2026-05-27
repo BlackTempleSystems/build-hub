@@ -92,28 +92,7 @@ namespace BuildHub.Application.Services.Authentication
 			}
 
 			var refreshTokenModel = this._refreshTokenService.GenerateAndSaveRefreshToken(userEntity);
-
-			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
-			var refreshTokenEntity = refreshTokensTable.GetByCondition(refreshToken => refreshToken.UserId, userEntity.Id).FirstOrDefault();
-			if (refreshTokenEntity is null)
-			{
-				//TODO ERROR.
-				return Result<LoginResponse>.Failure(ApplicationMessages.InvalidEmailOrUsernameOrPassword,
-					ResultStatus.Unauthorized);
-			}
-			refreshTokenEntity.RefreshToken = refreshTokenModel.RefreshToken;
-			refreshTokenEntity.IsRevoked = false;
-			refreshTokenEntity.ExpirationDate = refreshTokenModel.ExpirationDate;
-
-			if (!refreshTokensTable.Update(refreshTokenEntity))
-			{
-				//TODO ERROR.
-				return Result<LoginResponse>.Failure(ApplicationMessages.InvalidEmailOrUsernameOrPassword,
-					ResultStatus.Unauthorized);
-			}
-
 			var jwtModel = this._jwtService.GenerateSecurityToken(userEntity);
-
 
 			var loginResponse = new LoginResponse()
 			{

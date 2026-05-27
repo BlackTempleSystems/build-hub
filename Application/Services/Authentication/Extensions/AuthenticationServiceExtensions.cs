@@ -22,6 +22,16 @@ namespace BuildHub.Application.Services.Authentication.Extensions
 	public static class AuthenticationServiceExtensions
 	{
 		/// <summary>
+		/// Represents the key name used to store or retrieve the access tokens.
+		/// </summary>
+		private const string _AccessTokenKey = "access_token";
+
+		/// <summary>
+		/// Represents the key name used to store or retrieve the refresh tokens.
+		/// </summary>
+		private const string _RefreshTokenKey = "refresh_token";
+
+		/// <summary>
 		/// Adds JWT-based authentication and authorization services to the specified service collection using settings from
 		/// the provided configuration.
 		/// </summary>
