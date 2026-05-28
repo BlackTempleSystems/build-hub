@@ -475,6 +475,21 @@ namespace UnitTests.DataEngineTests.SQLQueries
         }
 
         [TestMethod]
+        public void Build_Update_Should_Not_Include_Guid_In_Set_Clause()
+        {
+            var unitTest = new IntegrationTestEntity();
+            unitTest.Name = "UPDATE TEST";
+            unitTest.Guid = Guid.NewGuid();
+
+            var queryBuilder = new InternalQueryBuilder()
+                .From("INTEGRATION_TESTS")
+                .BuildUpdate<IntegrationTestEntity>(unitTest);
+
+            string query = queryBuilder.GetQuery();
+            Assert.IsFalse(query.Contains("GUID ="));
+        }
+
+        [TestMethod]
         public void Build_Delete_Should_Only_Use_Guid_In_Where_Clause()
         {
             var unitTest = new IntegrationTestEntity();
@@ -510,7 +525,7 @@ namespace UnitTests.DataEngineTests.SQLQueries
 			var queryBuilder = new InternalQueryBuilder()
 				.From(tableName)
 				.Where(columnName, compareTypes, value)
-				.WhereOr(columnName, compareTypes, anotherValue)
+				.OrWhere(columnName, compareTypes, anotherValue)
 				.BuildSelect();
 
 			string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(compareTypes);
@@ -524,7 +539,7 @@ namespace UnitTests.DataEngineTests.SQLQueries
 		{ 
 			var queryBuilder = new InternalQueryBuilder()
 				.From(tableName)
-				.WhereOr(columnName, compareTypes, value)
+				.OrWhere(columnName, compareTypes, value)
 				.BuildSelect();
 
 			string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(compareTypes);
@@ -538,8 +553,8 @@ namespace UnitTests.DataEngineTests.SQLQueries
 		{
 			var queryBuilder = new InternalQueryBuilder()
 				.From(tableName)
-				.WhereOr(columnName, compareTypes, value)
-				.WhereOr(columnName, compareTypes, anotherValue)
+				.OrWhere(columnName, compareTypes, value)
+				.OrWhere(columnName, compareTypes, anotherValue)
 				.BuildSelect();
 
 			string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(compareTypes);

@@ -237,7 +237,7 @@ namespace BuildHub.DataEngine.Queries
 		/// <param name="compareType"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public InternalQueryBuilder WhereOr(string columnName, CompareTypes compareType, object? value)
+		public InternalQueryBuilder OrWhere(string columnName, CompareTypes compareType, object? value)
 		{
 			this._queryBuilderState.WhereStatements.Add(new WhereCondition(columnName.ToUpper(), compareType, value, WhereConditionTypes.WhereConditionTypeOr));
 			return this;
@@ -249,7 +249,7 @@ namespace BuildHub.DataEngine.Queries
 		/// <param name="columnName"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public InternalQueryBuilder WhereOr(string columnName, object? value)
+		public InternalQueryBuilder OrWhere(string columnName, object? value)
 		{
 			this._queryBuilderState.WhereStatements.Add(new WhereCondition(columnName, CompareTypes.Equal, value, WhereConditionTypes.WhereConditionTypeOr));
 			return this;
@@ -264,7 +264,16 @@ namespace BuildHub.DataEngine.Queries
 		/// <param name="compareType">The type of comparison to perform between the property and the entity value. Defaults to <see
 		/// cref="CompareTypes.Equal"/>.</param>
 		/// <returns>The current query builder instance with the OR condition applied.</returns>
-		public InternalQueryBuilder WhereOr<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
+		public InternalQueryBuilder OrWhere<TEntity>(Expression<Func<TEntity, object>> condition, object? value, CompareTypes compareType = CompareTypes.Equal)
+			where TEntity : IEntity
+		{
+			var columnInfo = EntityDataMapper.GetColumnInfo<TEntity>(condition);
+
+			this._queryBuilderState.WhereStatements.Add(new WhereCondition(columnInfo.ColumnName, compareType, value, WhereConditionTypes.WhereConditionTypeOr));
+			return this;
+		}
+
+		public InternalQueryBuilder OrWhere<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
 			where TEntity : IEntity
 		{
 			var columnInfo = EntityDataMapper.GetColumnInfo<TEntity>(condition);
@@ -418,6 +427,9 @@ namespace BuildHub.DataEngine.Queries
 					}
 
 					var columnName = EntityDataMapper.GetColumnInfo(property).ColumnName;
+					if (string.Equals(columnName, EntityDataMapper.GuidColumnName, StringComparison.OrdinalIgnoreCase))
+						continue;
+
 					var value = ProcessValue(property.GetValue(entity));
 					updateStatements.Add(columnName + " = " + value);
 				}

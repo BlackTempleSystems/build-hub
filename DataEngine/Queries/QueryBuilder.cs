@@ -95,7 +95,7 @@ namespace BuildHub.DataEngine.Queries
 		/// <param name="compareType">Compare type </param>
 		/// <param name="value"></param>
 		/// <returns>Returns a reference to the query builder</returns>
-		public QueryBuilder WhereOr(string columnName, CompareTypes compareType, object? value)
+		public QueryBuilder OrWhere(string columnName, CompareTypes compareType, object? value)
 		{
 			this.QueryBuilderState.WhereStatements.Add(new WhereCondition(columnName.ToUpper(), compareType, value, WhereConditionTypes.WhereConditionTypeOr));
 			return this;
@@ -107,7 +107,7 @@ namespace BuildHub.DataEngine.Queries
 		/// <param name="columnName">Name of the column</param>
 		/// <param name="value"></param>
 		/// <returns>Returns a reference to the query builder</returns>
-		public QueryBuilder WhereOr(string columnName, object? value)
+		public QueryBuilder OrWhere(string columnName, object? value)
 		{
 			this.QueryBuilderState.WhereStatements.Add(new WhereCondition(columnName, CompareTypes.Equal, value, WhereConditionTypes.WhereConditionTypeOr));
 			return this;
@@ -122,7 +122,16 @@ namespace BuildHub.DataEngine.Queries
 		/// <param name="compareType">The type of comparison to perform between the property and the entity value. Defaults to <see
 		/// cref="CompareTypes.Equal"/>.</param>
 		/// <returns>The current query builder instance with the OR condition applied.</returns>
-		public QueryBuilder WhereOr<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
+		public QueryBuilder OrWhere<TEntity>(Expression<Func<TEntity, object>> condition, object? value, CompareTypes compareType = CompareTypes.Equal)
+			where TEntity : IEntity
+		{
+			var columnInfo = EntityDataMapper.GetColumnInfo<TEntity>(condition);
+
+			this.QueryBuilderState.WhereStatements.Add(new WhereCondition(columnInfo.ColumnName, compareType, value, WhereConditionTypes.WhereConditionTypeOr));
+			return this;
+		}
+
+		public QueryBuilder OrWhere<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
 			where TEntity : IEntity
 		{
 			var columnInfo = EntityDataMapper.GetColumnInfo<TEntity>(condition);

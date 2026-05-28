@@ -79,7 +79,6 @@
         /// connection pool state. This method is thread-safe.</remarks>
         internal void OnRelease()
         {
-            Interlocked.Decrement(ref _totalConnectionsCount);
             Interlocked.Decrement(ref _activeConnectionsCount);
             Interlocked.Increment(ref _idleConnectionsCount);
         }
@@ -109,7 +108,11 @@
         /// <returns></returns>
         public double CalculateUtilizationPercentage()
         {
-            return (_activeConnectionsCount / _totalConnectionsCount) * 100;
+            int totalConnectionsCount = this.TotalConnectionsCount;
+            if (totalConnectionsCount <= 0)
+                return 0.0;
+
+            return ((double)this.ActiveConnectionsCount / totalConnectionsCount) * 100;
         }
     }
 }

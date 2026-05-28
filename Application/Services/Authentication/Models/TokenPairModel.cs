@@ -8,8 +8,14 @@ namespace BuildHub.Application.Services.Authentication.Models
 	/// </summary>
 	public sealed class TokenPairModel
 	{
+		/// <summary>
+		/// Gets or sets the JSON Web Token (JWT) associated with the current context.
+		/// </summary>
 		public JwtModel? Jwt { get; set; }
 
+		/// <summary>
+		/// Gets or sets the refresh token associated with the current authentication session.
+		/// </summary>
 		public RefreshTokenModel? RefreshToken { get; set; }
 	}
 }

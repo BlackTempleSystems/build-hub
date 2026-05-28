@@ -81,7 +81,7 @@ namespace BuildHub.Application.Services.Authentication.Extensions
 				  {
 					  OnMessageReceived = context =>
 					  {
-						  context.Token = context.Request.Cookies["access_token"];
+						  context.Token = context.Request.Cookies[_AccessTokenKey];
 						  return Task.CompletedTask;
 					  },
 				  };

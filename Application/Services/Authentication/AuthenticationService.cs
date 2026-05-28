@@ -66,9 +66,9 @@ namespace BuildHub.Application.Services.Authentication
 
 			if (userEntity is null || userEntity.Id <= 0)
 			{
-				Logger.LogError(ApplicationMessages.AccountWithEmailDoesntExists);
+				Logger.LogWarning(ApplicationMessages.AuthenticationAccountLookupFailed);
 
-				return Result<LoginResponse>.Failure(ApplicationMessages.InvalidEmailOrUsernameOrPassword,
+				return Result<LoginResponse>.Failure(ApplicationMessages.AuthenticationFailed,
 					ResultStatus.Unauthorized);
 			}
 
@@ -77,17 +77,17 @@ namespace BuildHub.Application.Services.Authentication
 
 			if (userCredentialsEntity is null)
 			{
-				Logger.LogError(ApplicationMessages.InvalidEmailOrUsernameOrPassword);
+				Logger.LogWarning(ApplicationMessages.AuthenticationCredentialLookupFailed);
 
-				return Result<LoginResponse>.Failure(ApplicationMessages.InvalidEmailOrUsernameOrPassword,
+				return Result<LoginResponse>.Failure(ApplicationMessages.AuthenticationFailed,
 					ResultStatus.Unauthorized);
 			}
 
 			if (!_cryptographicService.VerifyPassword(loginRequestData.Password, userCredentialsEntity.HashedPassword!))
 			{
-				Logger.LogError(ApplicationMessages.InvalidEmailOrUsernameOrPassword);
+				Logger.LogWarning(ApplicationMessages.AuthenticationCredentialVerificationFailed);
 
-				return Result<LoginResponse>.Failure(ApplicationMessages.InvalidEmailOrUsernameOrPassword,
+				return Result<LoginResponse>.Failure(ApplicationMessages.AuthenticationFailed,
 					ResultStatus.Unauthorized);
 			}
 
@@ -122,19 +122,19 @@ namespace BuildHub.Application.Services.Authentication
 			RegisterRequestValidator registerRequestValidator = new RegisterRequestValidator();
 			registerRequestValidator.ValidateAndThrow(registerRequest);
 
-			var queryBuilder = new QueryBuilder();
-			queryBuilder.Where<UserEntity>(user => user.Email, registerRequest.Email);
-			//.WhereOr(newUser, userEntity => userEntity.UserName!);
+			var queryBuilder = new QueryBuilder()
+				.Where<UserEntity>(user => user.Email, registerRequest.Email)
+				.OrWhere<UserEntity>(user => user.UserName, registerRequest.UserName);
 
 			UsersTable usersTable = new UsersTable();
 			var existingUserEntity = usersTable.GetByCondition(queryBuilder).FirstOrDefault();
 
 			if (existingUserEntity is not null && existingUserEntity.Id > 0)
 			{
-				Logger.LogError(ApplicationMessages.RegistrationFailedUserAlreadyExists, registerRequest.Email);
+				Logger.LogWarning(ApplicationMessages.RegistrationAccountConflict);
 
-				return Result<RegisterUserResponse>.Failure(ApplicationMessages.RegistrationFailedUserAlreadyExists,
-					ResultStatus.Conflict, registerRequest.Email);
+				return Result<RegisterUserResponse>.Failure(ApplicationMessages.RegistrationAccountConflict,
+					ResultStatus.Conflict);
 			}
 
 			var newUserEntity = new UserEntity();
@@ -148,8 +148,8 @@ namespace BuildHub.Application.Services.Authentication
 			newUserEntity = usersTable.Insert(newUserEntity);
 			if (newUserEntity is null)
 			{
-				Logger.LogError($"Failed to insert userEntity during registration.");
-				return Result<RegisterUserResponse>.Failure("Could not register userEntity", ResultStatus.DatabaseFailure);
+				Logger.LogError(ApplicationMessages.RegistrationUserPersistenceFailed);
+				return Result<RegisterUserResponse>.Failure(ApplicationMessages.RegistrationFailed, ResultStatus.DatabaseFailure);
 			}
 
 			var salt = this._cryptographicService.GenerateSalt();
@@ -162,8 +162,8 @@ namespace BuildHub.Application.Services.Authentication
 			UserCredentialsTable userCredentialsTable = new UserCredentialsTable();
 			if (userCredentialsTable.Insert(userCredentials) is null)
 			{
-				Logger.LogError($"Failed to insert credentials for userEntity ID '{newUserEntity.Id}' during registration.");
-				return Result<RegisterUserResponse>.Failure("Could not register userEntity", ResultStatus.DatabaseFailure);
+				Logger.LogError(ApplicationMessages.RegistrationCredentialPersistenceFailed);
+				return Result<RegisterUserResponse>.Failure(ApplicationMessages.RegistrationFailed, ResultStatus.DatabaseFailure);
 			}
 
 			var refreshTokenModel = this._refreshTokenService.GenerateAndSaveRefreshToken(newUserEntity);
@@ -171,14 +171,14 @@ namespace BuildHub.Application.Services.Authentication
 			var jwtModel = this._jwtService.GenerateSecurityToken(newUserEntity);
 			if (jwtModel is null)
 			{
-				//TODO ERROR.
-				return Result<RegisterUserResponse>.Failure("Could not register userEntity", ResultStatus.Unauthorized);
+				Logger.LogError(ApplicationMessages.RegistrationTokenGenerationFailed);
+				return Result<RegisterUserResponse>.Failure(ApplicationMessages.RegistrationFailed, ResultStatus.Unauthorized);
 			}
 
 			if (!scopedTransaction.Commit())
 			{
-				Logger.LogError($"Transaction commit failed while registering userEntity '{newUserEntity.Email}'.");
-				return Result<RegisterUserResponse>.Failure("Could not register userEntity", ResultStatus.DatabaseFailure);
+				Logger.LogError(ApplicationMessages.RegistrationTransactionCommitFailed);
+				return Result<RegisterUserResponse>.Failure(ApplicationMessages.RegistrationFailed, ResultStatus.DatabaseFailure);
 			}
 
 			var registerUserResponse = new RegisterUserResponse()
@@ -210,10 +210,7 @@ namespace BuildHub.Application.Services.Authentication
 			UserEntity? user = usersTable.GetByGuid(userGuid);
 
 			if (user is null)
-			{
-				Logger.LogError("User doesn't exist");
-				return Result<UserModel>.Failure("User doesn't exist", ResultStatus.DatabaseFailure);
-			}
+				return Result<UserModel>.Failure(ApplicationMessages.UserProfileNotFound, ResultStatus.NotFound);
 
 			var userModel = new UserModel();
 			userModel.UserGuid = userGuid;
@@ -230,23 +227,20 @@ namespace BuildHub.Application.Services.Authentication
 		/// operations that require a valid token.</remarks>
 		public async Task<Result<RefreshTokenResponse>> RefreshTokenAsync(RefreshTokenRequest refreshTokenRequest)
 		{
-
 			UsersTable usersTable = new UsersTable();
 			UserEntity? userEntity = usersTable.GetByGuid(refreshTokenRequest.UserGuid);
 
 			if (userEntity is null)
 			{
-				//TODO ERROR
-
-				//Logger.LogError("User doesn't exist");
-				//return Result<UserModel>.Failure("User doesn't exist", ResultStatus.DatabaseFailure);
+				Logger.LogWarning(ApplicationMessages.RefreshTokenAccountLookupFailed);
+				return Result<RefreshTokenResponse>.Failure(ApplicationMessages.RefreshTokenFailed, ResultStatus.Unauthorized);
 			}
 
 			var refreshToken = _refreshTokenService.RotateRefreshToken(refreshTokenRequest.RefreshToken, userEntity);
 			if(refreshToken is null)
 			{
-				//TODO ERROR
-				return Result<RefreshTokenResponse>.Failure("", ResultStatus.Unauthorized);
+				Logger.LogWarning(ApplicationMessages.RefreshTokenRotationFailed);
+				return Result<RefreshTokenResponse>.Failure(ApplicationMessages.RefreshTokenFailed, ResultStatus.Unauthorized);
 			}
 
 			var jwt = _jwtService.GenerateSecurityToken(userEntity);

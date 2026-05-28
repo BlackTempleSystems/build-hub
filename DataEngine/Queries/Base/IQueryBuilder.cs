@@ -63,7 +63,7 @@ namespace BuildHub.DataEngine.Queries.Base
 		/// <param name="value"></param>
 		/// <returns></returns>
 		///
-		TQueryBuilder WhereOr(string columnName, CompareTypes compareType, object? value);
+		TQueryBuilder OrWhere(string columnName, CompareTypes compareType, object? value);
 
 		/// <summary>
 		/// Adds an or condition to the query that filters results based on the specified column and value.
@@ -71,7 +71,7 @@ namespace BuildHub.DataEngine.Queries.Base
 		/// <param name="columnName">The name of the column to apply the condition to. Cannot be null or empty.</param>
 		/// <param name="value">The value to compare against the specified column. Typically used for equality checks.</param>
 		/// <returns>An instance of <see cref="IQueryBuilder"/> with the condition applied, allowing for further query customization.</returns>
-		TQueryBuilder WhereOr(string columnName, object? value);
+		TQueryBuilder OrWhere(string columnName, object? value);
 
 		/// <summary>
 		/// Adds an OR condition to the query using the specified entity property, comparison type, and value.
@@ -82,7 +82,7 @@ namespace BuildHub.DataEngine.Queries.Base
 		/// <param name="compareType">The type of comparison to perform between the property and the entity value. Defaults to <see
 		/// cref="CompareTypes.Equal"/>.</param>
 		/// <returns>The current query builder instance with the OR condition applied.</returns>
-		TQueryBuilder WhereOr<TEntity>(TEntity entity, Expression<Func<TEntity, object>> condition, CompareTypes compareType = CompareTypes.Equal)
+		TQueryBuilder OrWhere<TEntity>(Expression<Func<TEntity, object>> condition, object? value, CompareTypes compareType = CompareTypes.Equal)
 			where TEntity : IEntity;
 
 		/// <summary>

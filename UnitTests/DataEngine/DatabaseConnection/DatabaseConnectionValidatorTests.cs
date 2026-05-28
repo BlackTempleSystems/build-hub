@@ -6,6 +6,7 @@
 	using BuildHub.DataEngine.Transactions;
 
 	[TestClass]
+	[TestCategory("Integration")]
 	[DoNotParallelize]
 	public class DatabaseConnectionValidatorTests
 	{

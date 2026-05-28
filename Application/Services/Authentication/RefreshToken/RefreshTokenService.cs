@@ -99,18 +99,6 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		}
 
 		/// <summary>
-		/// Retrieves the refresh token associated with the specified user.
-		/// </summary>
-		/// <param name="userId">The unique identifier of the user whose refresh token is to be retrieved. Must be a positive integer.</param>
-		/// <returns>A <see cref="RefreshTokenModel"/> containing the refresh token information for the user, or <c>null</c> if no
-		/// refresh token exists for the specified user.</returns>
-		private RefreshTokenEntity? GetRefreshTokenForUser(int userId)
-		{
-			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
-			return refreshTokensTable.GetByCondition(rToken => rToken.UserId, userId).FirstOrDefault();
-		}
-
-		/// <summary>
 		/// Replaces the specified refresh token with a new one, invalidating the original token.
 		/// </summary>
 		/// <param name="refreshTokenEntity">The refresh token entity to be rotated. Cannot be null.</param>
@@ -155,6 +143,18 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 				RefreshToken = refreshToken.Item1,
 				ExpirationDate = refreshToken.Item2
 			};
+		}
+
+		/// <summary>
+		/// Retrieves the refresh token associated with the specified user.
+		/// </summary>
+		/// <param name="userId">The unique identifier of the user whose refresh token is to be retrieved. Must be a positive integer.</param>
+		/// <returns>A <see cref="RefreshTokenModel"/> containing the refresh token information for the user, or <c>null</c> if no
+		/// refresh token exists for the specified user.</returns>
+		private RefreshTokenEntity? GetRefreshTokenForUser(int userId)
+		{
+			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
+			return refreshTokensTable.GetByCondition(rToken => rToken.UserId, userId).FirstOrDefault();
 		}
 
 		/// <summary>

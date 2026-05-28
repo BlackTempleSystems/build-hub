@@ -45,14 +45,7 @@ public abstract class CommandBuilderBase<TBuilder, TContext> : ICommandBuilder
 
 	public BuildCommandResult GenerateCommand()
 	{
-		try
-		{
-            Validate();
-        }
-		catch(Exception exception)
-		{
-			Logger.LogWarning(exception, $"Validation for {Name} failed.");
-		}
+		Validate();
 
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 		IReadOnlyList<ExecutionStep> steps = new List<ExecutionStep>();
