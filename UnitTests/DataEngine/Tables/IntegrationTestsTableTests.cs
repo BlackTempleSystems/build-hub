@@ -14,14 +14,14 @@ namespace UnitTests.DataEngineTests.Tables
 	{
 		public TestContext TestContext { get; set; }
 
-        [ClassInitialize]
-        public static void ClassInit(TestContext context)
-        {
-            Logger.Initialize();
-            DatabaseConnectionManager.GetInstance().Initialize();
-        }
+		[ClassInitialize]
+		public static void ClassInit(TestContext context)
+		{
+			Logger.Initialize();
+			DatabaseConnectionManager.GetInstance().Initialize();
+		}
 
-        [ClassCleanup]
+		[ClassCleanup]
 		public static void Cleanup()
 		{
 		}
@@ -64,13 +64,13 @@ namespace UnitTests.DataEngineTests.Tables
 		[TestMethod]
 		public void Get_All_Unit_Test_With_Unmapped_Fields_Should_Throw_Exception()
 		{
-            var integrationTest = new IntegrationTestEntity();
-            integrationTest.Name = this.TestContext.TestName;
+			var integrationTest = new IntegrationTestEntity();
+			integrationTest.Name = this.TestContext.TestName;
 
-            var integrationTestTable = new IntegrationTestsTable();
+			var integrationTestTable = new IntegrationTestsTable();
 			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 
-            var integrationTestTableWithUnmappedFields = new InegrationTestWithUnmappedFieldTable();
+			var integrationTestTableWithUnmappedFields = new InegrationTestWithUnmappedFieldTable();
 			Assert.Throws<MissingColumnDescriptionException>(() => integrationTestTableWithUnmappedFields.GetAll());
 		}
 
@@ -171,201 +171,201 @@ namespace UnitTests.DataEngineTests.Tables
 			Assert.Throws<MissingTableNameException>(() => new IntegrationTestWithoutTableNameAttributeTable());
 		}
 
-        [TestMethod]
-        public void Get_All_Should_Return_Empty_List_When_No_Records_Exist()
-        {
-            var integrationTestsTable = new IntegrationTestsTable();
-            var allTests = integrationTestsTable.GetAll();
-            Assert.IsNotNull(allTests);
-            Assert.AreEqual(0, allTests.Count());
-        }
+		[TestMethod]
+		public void Get_All_Should_Return_Empty_List_When_No_Records_Exist()
+		{
+			var integrationTestsTable = new IntegrationTestsTable();
+			var allTests = integrationTestsTable.GetAll();
+			Assert.IsNotNull(allTests);
+			Assert.AreEqual(0, allTests.Count());
+		}
 
-        [TestMethod]
-        public void Insert_Should_Persist_Name_Correctly()
-        {
-            var integrationTest = new IntegrationTestEntity();
-            integrationTest.Name = this.TestContext.TestName;
+		[TestMethod]
+		public void Insert_Should_Persist_Name_Correctly()
+		{
+			var integrationTest = new IntegrationTestEntity();
+			integrationTest.Name = this.TestContext.TestName;
 
-            var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
+			var integrationTestsTable = new IntegrationTestsTable();
+			Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
 
-            var dbEntity = integrationTestsTable.GetById(integrationTest.Id);
-            Assert.AreEqual(this.TestContext.TestName, dbEntity.Name);
-        }
+			var dbEntity = integrationTestsTable.GetById(integrationTest.Id);
+			Assert.AreEqual(this.TestContext.TestName, dbEntity.Name);
+		}
 
-        [TestMethod]
-        public void Insert_Should_Assign_Valid_Id_After_Insert()
-        {
-            var integrationTest = new IntegrationTestEntity();
-            integrationTest.Name = this.TestContext.TestName;
+		[TestMethod]
+		public void Insert_Should_Assign_Valid_Id_After_Insert()
+		{
+			var integrationTest = new IntegrationTestEntity();
+			integrationTest.Name = this.TestContext.TestName;
 
-            var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
-            Assert.IsGreaterThan(0, integrationTest.Id);
-        }
+			var integrationTestsTable = new IntegrationTestsTable();
+			Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
+			Assert.IsGreaterThan(0, integrationTest.Id);
+		}
 
-        [TestMethod]
-        public void Insert_Should_Assign_Unique_Guids_For_Different_Entities()
-        {
-            var integrationTest1 = new IntegrationTestEntity();
-            integrationTest1.Name = this.TestContext.TestName + "_1";
+		[TestMethod]
+		public void Insert_Should_Assign_Unique_Guids_For_Different_Entities()
+		{
+			var integrationTest1 = new IntegrationTestEntity();
+			integrationTest1.Name = this.TestContext.TestName + "_1";
 
-            var integrationTest2 = new IntegrationTestEntity();
-            integrationTest2.Name = this.TestContext.TestName + "_2";
+			var integrationTest2 = new IntegrationTestEntity();
+			integrationTest2.Name = this.TestContext.TestName + "_2";
 
-            var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest1));
-            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest2));
+			var integrationTestsTable = new IntegrationTestsTable();
+			Assert.IsNotNull(integrationTestsTable.Insert(integrationTest1));
+			Assert.IsNotNull(integrationTestsTable.Insert(integrationTest2));
 
-            Assert.AreNotEqual(integrationTest1.Guid, integrationTest2.Guid);
-        }
+			Assert.AreNotEqual(integrationTest1.Guid, integrationTest2.Guid);
+		}
 
-        [TestMethod]
-        public void Update_Should_Persist_Changed_Name()
-        {
-            var integrationTest = new IntegrationTestEntity();
-            integrationTest.Name = this.TestContext.TestName;
+		[TestMethod]
+		public void Update_Should_Persist_Changed_Name()
+		{
+			var integrationTest = new IntegrationTestEntity();
+			integrationTest.Name = this.TestContext.TestName;
 
-            var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
+			var integrationTestsTable = new IntegrationTestsTable();
+			Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
 
-            string updatedName = this.TestContext.TestName + "_updated";
-            integrationTest.Name = updatedName;
-            Assert.IsTrue(integrationTestsTable.Update(integrationTest));
+			string updatedName = this.TestContext.TestName + "_updated";
+			integrationTest.Name = updatedName;
+			Assert.IsTrue(integrationTestsTable.Update(integrationTest));
 
-            var dbEntity = integrationTestsTable.GetById(integrationTest.Id);
-            Assert.AreEqual(updatedName, dbEntity.Name);
-        }
+			var dbEntity = integrationTestsTable.GetById(integrationTest.Id);
+			Assert.AreEqual(updatedName, dbEntity.Name);
+		}
 
-        [TestMethod]
-        public void Update_Should_Return_False_For_Non_Existing_Entity()
-        {
-            var integrationTest = new IntegrationTestEntity();
-            integrationTest.Name = this.TestContext.TestName;
+		[TestMethod]
+		public void Update_Should_Return_False_For_Non_Existing_Entity()
+		{
+			var integrationTest = new IntegrationTestEntity();
+			integrationTest.Name = this.TestContext.TestName;
 
-            var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsFalse(integrationTestsTable.Update(integrationTest));
-        }
+			var integrationTestsTable = new IntegrationTestsTable();
+			Assert.IsFalse(integrationTestsTable.Update(integrationTest));
+		}
 
-        [TestMethod]
-        public void Delete_Should_Remove_Entity_From_Database()
-        {
-            var integrationTest = new IntegrationTestEntity();
-            integrationTest.Name = this.TestContext.TestName;
+		[TestMethod]
+		public void Delete_Should_Remove_Entity_From_Database()
+		{
+			var integrationTest = new IntegrationTestEntity();
+			integrationTest.Name = this.TestContext.TestName;
 
-            var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
-            Assert.IsTrue(integrationTestsTable.Delete(integrationTest));
+			var integrationTestsTable = new IntegrationTestsTable();
+			Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
+			Assert.IsTrue(integrationTestsTable.Delete(integrationTest));
 
-            Assert.IsNull(integrationTestsTable.GetById(integrationTest.Id));
-        }
+			Assert.IsNull(integrationTestsTable.GetById(integrationTest.Id));
+		}
 
-        [TestMethod]
-        public void Delete_Non_Existing_Entity_Should_Return_False()
-        {
-            var integrationTest = new IntegrationTestEntity();
-            integrationTest.Name = this.TestContext.TestName;
+		[TestMethod]
+		public void Delete_Non_Existing_Entity_Should_Return_False()
+		{
+			var integrationTest = new IntegrationTestEntity();
+			integrationTest.Name = this.TestContext.TestName;
 
-            var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsFalse(integrationTestsTable.Delete(integrationTest));
-        }
+			var integrationTestsTable = new IntegrationTestsTable();
+			Assert.IsFalse(integrationTestsTable.Delete(integrationTest));
+		}
 
-        [TestMethod]
-        public void Get_All_Should_Return_All_Inserted_Entities()
-        {
-            var integrationTestsTable = new IntegrationTestsTable();
-            int initialCount = integrationTestsTable.GetAll().Count();
+		[TestMethod]
+		public void Get_All_Should_Return_All_Inserted_Entities()
+		{
+			var integrationTestsTable = new IntegrationTestsTable();
+			int initialCount = integrationTestsTable.GetAll().Count();
 
-            var test1 = new IntegrationTestEntity { Name = this.TestContext.TestName + "_1" };
-            var test2 = new IntegrationTestEntity { Name = this.TestContext.TestName + "_2" };
-            var test3 = new IntegrationTestEntity { Name = this.TestContext.TestName + "_3" };
+			var test1 = new IntegrationTestEntity { Name = this.TestContext.TestName + "_1" };
+			var test2 = new IntegrationTestEntity { Name = this.TestContext.TestName + "_2" };
+			var test3 = new IntegrationTestEntity { Name = this.TestContext.TestName + "_3" };
 
-            integrationTestsTable.Insert(test1);
-            integrationTestsTable.Insert(test2);
-            integrationTestsTable.Insert(test3);
+			integrationTestsTable.Insert(test1);
+			integrationTestsTable.Insert(test2);
+			integrationTestsTable.Insert(test3);
 
-            Assert.AreEqual(initialCount + 3, integrationTestsTable.GetAll().Count());
-        }
+			Assert.AreEqual(initialCount + 3, integrationTestsTable.GetAll().Count());
+		}
 
-        [TestMethod]
-        public void Get_By_Condition_With_Query_Builder_Should_Return_Empty_List_For_Non_Existing_Guid()
-        {
-            var integrationTestsTable = new IntegrationTestsTable();
-            var nonExistingEntity = new IntegrationTestEntity { Name = this.TestContext.TestName };
+		[TestMethod]
+		public void Get_By_Condition_With_Query_Builder_Should_Return_Empty_List_For_Non_Existing_Guid()
+		{
+			var integrationTestsTable = new IntegrationTestsTable();
+			var nonExistingEntity = new IntegrationTestEntity { Name = this.TestContext.TestName };
 
-            QueryBuilder queryBuilder = new QueryBuilder()
-                .Where<IntegrationTestEntity>((e) => e.Guid, nonExistingEntity.Guid);
+			QueryBuilder queryBuilder = new QueryBuilder()
+				.Where<IntegrationTestEntity>((e) => e.Guid, nonExistingEntity.Guid);
 
-            Assert.IsEmpty(integrationTestsTable.GetByCondition(queryBuilder));
-        }
+			Assert.IsEmpty(integrationTestsTable.GetByCondition(queryBuilder));
+		}
 
-        [TestMethod]
-        public void Get_By_Condition_Should_Return_Correct_Entity()
-        {
-            var integrationTest = new IntegrationTestEntity();
-            integrationTest.Name = this.TestContext.TestName;
+		[TestMethod]
+		public void Get_By_Condition_Should_Return_Correct_Entity()
+		{
+			var integrationTest = new IntegrationTestEntity();
+			integrationTest.Name = this.TestContext.TestName;
 
-            var integrationTestsTable = new IntegrationTestsTable();
-            Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
+			var integrationTestsTable = new IntegrationTestsTable();
+			Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
 
-            var result = integrationTestsTable.GetById(integrationTest.Id);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(integrationTest.Guid, result.Guid);
-        }
+			var result = integrationTestsTable.GetById(integrationTest.Id);
+			Assert.IsNotNull(result);
+			Assert.AreEqual(integrationTest.Guid, result.Guid);
+		}
 
-        [TestMethod]
-        public void Insert_Multiple_Entities_Should_All_Be_Retrievable()
-        {
-            var integrationTestsTable = new IntegrationTestsTable();
-            var entities = new List<IntegrationTestEntity>();
+		[TestMethod]
+		public void Insert_Multiple_Entities_Should_All_Be_Retrievable()
+		{
+			var integrationTestsTable = new IntegrationTestsTable();
+			var entities = new List<IntegrationTestEntity>();
 
-            for (int i = 0; i < 5; i++)
-            {
-                var entity = new IntegrationTestEntity { Name = $"{this.TestContext.TestName}_{i}" };
-                Assert.IsNotNull(integrationTestsTable.Insert(entity));
-                entities.Add(entity);
-            }
+			for (int i = 0; i < 5; i++)
+			{
+				var entity = new IntegrationTestEntity { Name = $"{this.TestContext.TestName}_{i}" };
+				Assert.IsNotNull(integrationTestsTable.Insert(entity));
+				entities.Add(entity);
+			}
 
-            foreach (var entity in entities)
-            {
-                var dbEntity = integrationTestsTable.GetById(entity.Id);
-                Assert.IsNotNull(dbEntity);
-                Assert.AreEqual(entity.Guid, dbEntity.Guid);
-            }
-        }
+			foreach (var entity in entities)
+			{
+				var dbEntity = integrationTestsTable.GetById(entity.Id);
+				Assert.IsNotNull(dbEntity);
+				Assert.AreEqual(entity.Guid, dbEntity.Guid);
+			}
+		}
 
-        [TestMethod]
-        public void Insert_Within_Transaction_Should_Rollback_On_Failure()
-        {
-            var integrationTestsTable = new IntegrationTestsTable();
-            IntegrationTestEntity integrationTest = null;
+		[TestMethod]
+		public void Insert_Within_Transaction_Should_Rollback_On_Failure()
+		{
+			var integrationTestsTable = new IntegrationTestsTable();
+			IntegrationTestEntity integrationTest = null;
 
-            try
-            {
-                using var scopedTransaction = new ScopedTransaction(DatabaseSource.IntegrationTests);
+			try
+			{
+				using var scopedTransaction = new ScopedTransaction(DatabaseSource.IntegrationTests);
 
-                integrationTest = new IntegrationTestEntity { Name = this.TestContext.TestName };
-                Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
+				integrationTest = new IntegrationTestEntity { Name = this.TestContext.TestName };
+				Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
 
-            }
-            catch { }
+			}
+			catch { }
 
-            Assert.IsNull(integrationTestsTable.GetById(integrationTest.Id));
-        }
+			Assert.IsNull(integrationTestsTable.GetById(integrationTest.Id));
+		}
 
-        [TestMethod]
-        public void Insert_Within_Committed_Transaction_Should_Persist()
-        {
-            var integrationTestsTable = new IntegrationTestsTable();
-            var integrationTest = new IntegrationTestEntity { Name = this.TestContext.TestName };
+		[TestMethod]
+		public void Insert_Within_Committed_Transaction_Should_Persist()
+		{
+			var integrationTestsTable = new IntegrationTestsTable();
+			var integrationTest = new IntegrationTestEntity { Name = this.TestContext.TestName };
 
-            using (var scopedTransaction = new ScopedTransaction(DatabaseSource.IntegrationTests))
-            {
-                Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
-                scopedTransaction.Commit();
-            }
+			using (var scopedTransaction = new ScopedTransaction(DatabaseSource.IntegrationTests))
+			{
+				Assert.IsNotNull(integrationTestsTable.Insert(integrationTest));
+				scopedTransaction.Commit();
+			}
 
-            Assert.IsNotNull(integrationTestsTable.GetById(integrationTest.Id));
-        }
-    }
+			Assert.IsNotNull(integrationTestsTable.GetById(integrationTest.Id));
+		}
+	}
 }

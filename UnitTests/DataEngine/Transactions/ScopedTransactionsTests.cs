@@ -14,14 +14,14 @@ namespace UnitTests.DataEngine.Transactions
 	{
 		public TestContext TestContext { get; set; }
 
-        [ClassInitialize]
-        public static void ClassInit(TestContext context)
-        {
-            Logger.Initialize();
-            DatabaseConnectionManager.GetInstance().Initialize();
-        }
+		[ClassInitialize]
+		public static void ClassInit(TestContext context)
+		{
+			Logger.Initialize();
+			DatabaseConnectionManager.GetInstance().Initialize();
+		}
 
-        [ClassCleanup]
+		[ClassCleanup]
 		public static void Cleanup()
 		{
 			using ScopedTransaction scopedTransaction = new ScopedTransaction(DatabaseSource.IntegrationTests);
@@ -55,7 +55,7 @@ namespace UnitTests.DataEngine.Transactions
 			var integrationTestTable = new IntegrationTestsTable();
 
 			var integrationTest = new IntegrationTestEntity();
-			integrationTest.Name = TestContext.TestName; 
+			integrationTest.Name = TestContext.TestName;
 
 			Assert.IsNotNull(integrationTestTable.Insert(integrationTest));
 			Assert.IsNotNull(integrationTestTable.GetById(integrationTest.Id));

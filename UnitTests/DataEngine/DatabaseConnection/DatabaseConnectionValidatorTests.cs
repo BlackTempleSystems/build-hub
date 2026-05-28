@@ -1,8 +1,8 @@
-﻿namespace UnitTests.DataEngineTests.DatabaseConnection
+namespace UnitTests.DataEngineTests.DatabaseConnection
 {
-    using BuildHub.Common.Logger;
+	using BuildHub.Common.Logger;
+	using BuildHub.DataEngine.DatabaseConnection;
 	using BuildHub.DataEngine.DatabaseConnectionManager;
-    using BuildHub.DataEngine.DatabaseConnection;
 	using BuildHub.DataEngine.Transactions;
 
 	[TestClass]
@@ -10,14 +10,14 @@
 	[DoNotParallelize]
 	public class DatabaseConnectionValidatorTests
 	{
-        [ClassInitialize]
-        public static void ClassInit(TestContext context)
-        {
-            Logger.Initialize();
-            DatabaseConnectionManager.GetInstance().Initialize();
-        }
+		[ClassInitialize]
+		public static void ClassInit(TestContext context)
+		{
+			Logger.Initialize();
+			DatabaseConnectionManager.GetInstance().Initialize();
+		}
 
-        [TestMethod]
+		[TestMethod]
 		[DataRow(DatabaseSource.IntegrationTests)]
 		public void Test_Connection_Should_Return_False_When_Connection_String_Is_Empty(DatabaseSource databaseSource)
 		{

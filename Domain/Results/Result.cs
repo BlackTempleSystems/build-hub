@@ -20,9 +20,9 @@ namespace BuildHub.Domain.Results
 		public string? ErrorMessage { get; init; }
 		public ResultStatus Status { get; init; }
 
-		private Result() 
+		private Result()
 		{
-			
+
 		}
 
 		/// <summary>
@@ -44,12 +44,12 @@ namespace BuildHub.Domain.Results
 		/// <param name="status"></param>
 		/// <param name=""></param>
 		/// <returns></returns>
-		public static Result<TData> Failure(string errorMessage, ResultStatus status, 
+		public static Result<TData> Failure(string errorMessage, ResultStatus status,
 			params object[] arguments) => new()
-		{
-			IsSuccess = false,
-			ErrorMessage = arguments.Length > 0 ? string.Format(errorMessage, arguments) : errorMessage,
-			Status = status
-		};
+			{
+				IsSuccess = false,
+				ErrorMessage = arguments.Length > 0 ? string.Format(errorMessage, arguments) : errorMessage,
+				Status = status
+			};
 	}
 }

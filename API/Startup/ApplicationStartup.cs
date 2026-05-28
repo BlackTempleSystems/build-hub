@@ -1,12 +1,12 @@
 #region
+using BuildHub.API.Middleware;
+using BuildHub.Application.Messages;
+using BuildHub.Application.Services.Authentication.Extensions;
+using BuildHub.Application.Services.Bootstrap;
 using BuildHub.Common.Logger;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Reflection;
-using BuildHub.Application.Services.Bootstrap;
-using BuildHub.Application.Services.Authentication.Extensions;
-using BuildHub.API.Middleware;
-using BuildHub.Application.Messages;
 #endregion
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +18,7 @@ builder.Services.AddBuildHubAuthentication();
 builder.Services.AddHostedService<DatabaseBootstrapService>();
 
 var applicationFrontEndOriginPolicy = "ApplicationFrontendOriginPolicy";
-var frontendApplicationUrl = builder.Configuration["FrontendApplicationSettings:BaseUrl"] 
+var frontendApplicationUrl = builder.Configuration["FrontendApplicationSettings:BaseUrl"]
 	?? throw new InvalidOperationException("FrontendApplicationSettings:BaseUrl is not configured.");
 builder.Services.AddCors(options =>
 {
@@ -36,12 +36,12 @@ var app = builder.Build();
 app.UseCors(applicationFrontEndOriginPolicy);
 
 Logger.Initialize();
-Logger.LogInformation("BuildHub API v{Version} starting... [{Environment}]", Assembly.GetExecutingAssembly().GetName().Version, 
+Logger.LogInformation("BuildHub API v{Version} starting... [{Environment}]", Assembly.GetExecutingAssembly().GetName().Version,
 	app.Environment.EnvironmentName);
 
 app.Lifetime.ApplicationStarted.Register(() =>
 {
-    Logger.LogInformation("Listening on {URLS}" , string.Join(", ", app.Urls));
+	Logger.LogInformation("Listening on {URLS}", string.Join(", ", app.Urls));
 });
 
 app.Lifetime.ApplicationStopping.Register(() =>

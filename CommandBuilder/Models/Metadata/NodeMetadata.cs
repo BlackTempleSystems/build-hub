@@ -1,4 +1,4 @@
-﻿namespace BuildHub.CommandBuilder.Models.Metadata;
+namespace BuildHub.CommandBuilder.Models.Metadata;
 
 /// <summary>
 /// Metadata for Node.js / NPM steps.

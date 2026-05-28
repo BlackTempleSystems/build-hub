@@ -76,6 +76,36 @@ namespace BuildHub.Application.Messages
 		public const string RefreshTokenRotationFailed = "Refresh token request failed during token rotation.";
 
 		/// <summary>
+		/// Operational log message used when a refresh token cannot be persisted.
+		/// </summary>
+		public const string RefreshTokenPersistenceFailed = "Refresh token operation failed while persisting token state.";
+
+		/// <summary>
+		/// Operational log message used when a refresh token cannot be found for rotation.
+		/// </summary>
+		public const string RefreshTokenLookupFailed = "Refresh token operation failed because no active token record was found.";
+
+		/// <summary>
+		/// Operational log message used when a revoked refresh token is submitted.
+		/// </summary>
+		public const string RefreshTokenRevoked = "Refresh token operation failed because the submitted token has been revoked.";
+
+		/// <summary>
+		/// Operational log message used when an expired refresh token is submitted.
+		/// </summary>
+		public const string RefreshTokenExpired = "Refresh token operation failed because the submitted token has expired.";
+
+		/// <summary>
+		/// Operational log message used when a submitted refresh token does not match the stored token hash.
+		/// </summary>
+		public const string RefreshTokenVerificationFailed = "Refresh token operation failed during token verification.";
+
+		/// <summary>
+		/// Operational log message used when refresh token configuration is missing.
+		/// </summary>
+		public const string RefreshTokenConfigurationMissing = "Refresh token operation failed because token configuration is missing.";
+
+		/// <summary>
 		/// Operational log message used when the application is stopping.
 		/// </summary>
 		public const string BuildHubShuttingDown = "BuildHub server is shutting down gracefully. All services stopped.";

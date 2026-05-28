@@ -86,7 +86,7 @@ public class AuthenticationController : BaseApiController
 	public async Task<IActionResult> Register([FromBody] RegisterRequest registerUserRequest, CancellationToken cancellationToken)
 	{
 		var registerResponse = await _authenticationService.RegisterAsync(registerUserRequest);
-		if(registerResponse.IsSuccess && registerResponse.Data is not null)
+		if (registerResponse.IsSuccess && registerResponse.Data is not null)
 		{
 			var jwt = registerResponse.Data.TokenPair?.Jwt;
 			var refreshToken = registerResponse.Data.TokenPair?.RefreshToken;

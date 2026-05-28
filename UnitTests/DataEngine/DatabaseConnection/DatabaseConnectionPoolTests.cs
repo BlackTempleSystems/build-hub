@@ -1,21 +1,21 @@
 namespace UnitTests.DataEngineTests.DatabaseConnection
 {
 	using BuildHub.DataEngine.DatabaseConnection;
-    using BuildHub.DataEngine.DatabaseConnectionManager;
-    using BuildHub.DataEngine.Exceptions.DatabaseConnection;
+	using BuildHub.DataEngine.DatabaseConnectionManager;
+	using BuildHub.DataEngine.Exceptions.DatabaseConnection;
 
 	[TestClass]
 	[TestCategory("Integration")]
 	[DoNotParallelize]
 	public sealed class DatabaseConnectionManagerTests
 	{
-        [ClassInitialize]
-        public static void ClassInit(TestContext context)
-        {
-            DatabaseConnectionManager.GetInstance().Initialize();
-        }
+		[ClassInitialize]
+		public static void ClassInit(TestContext context)
+		{
+			DatabaseConnectionManager.GetInstance().Initialize();
+		}
 
-        [TestMethod]
+		[TestMethod]
 		public void Get_Instance_Should_Return_Singleton_Instance()
 		{
 			DatabaseConnectionManager DatabaseConnectionManagerInstance = DatabaseConnectionManager.GetInstance();
@@ -214,14 +214,14 @@ namespace UnitTests.DataEngineTests.DatabaseConnection
 			{
 				try
 				{
-                    var connection = pool.GetDatabaseConnection(databaseSource);
-                }
-				catch(ConnectionPoolExhaustedException)
+					var connection = pool.GetDatabaseConnection(databaseSource);
+				}
+				catch (ConnectionPoolExhaustedException)
 				{
 					Assert.Throws<ConnectionPoolExhaustedException>(() => throw new ConnectionPoolExhaustedException(databaseSource));
 				}
 
-            });
+			});
 
 			Assert.Throws<ConnectionPoolExhaustedException>(() => pool.GetDatabaseConnection(databaseSource));
 		}
@@ -240,5 +240,5 @@ namespace UnitTests.DataEngineTests.DatabaseConnection
 
 			Assert.IsNotNull(pool.GetDatabaseConnection(databaseSource));
 		}
-    }
+	}
 }

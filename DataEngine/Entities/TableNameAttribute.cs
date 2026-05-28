@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Entities
+namespace BuildHub.DataEngine.Entities
 {
 	/// <summary>
 	/// Specifies the database table name associated with a class for mapping purposes.

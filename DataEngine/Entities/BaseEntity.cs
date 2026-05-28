@@ -12,7 +12,7 @@ namespace BuildHub.DataEngine.Entities
 		[PrimaryKey]
 		[ColumnInfo("ID")]
 		public int Id { get; protected set; }
-		
+
 		[ColumnInfo("GUID")]
 		public Guid Guid { get; set; }
 

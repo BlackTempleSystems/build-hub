@@ -7,9 +7,8 @@ namespace BuildHub.DataEngine.Queries
 	using BuildHub.DataEngine.Queries.Base;
 	using Entities;
 	using System.Data;
-	using System.Text;
 	using System.Linq.Expressions;
-	using System.Security.Principal;
+	using System.Text;
 	#endregion
 
 	/// <summary>
@@ -64,7 +63,7 @@ namespace BuildHub.DataEngine.Queries
 			if (value is Guid)
 				return StringUtilities.Stringify(value);
 
-			if(value is bool)
+			if (value is bool)
 			{
 				bool booleanValue = (bool)value;
 
@@ -134,7 +133,7 @@ namespace BuildHub.DataEngine.Queries
 			if (this._queryBuilderState.WhereStatements.Count > 0)
 			{
 				queryStringBuilder.Append(" WHERE ");
-				for(int index = 0; index <  this._queryBuilderState.WhereStatements.Count; index++)
+				for (int index = 0; index < this._queryBuilderState.WhereStatements.Count; index++)
 				{
 					WhereCondition statement = this._queryBuilderState.WhereStatements[index];
 					string completedCondition = string.Empty;

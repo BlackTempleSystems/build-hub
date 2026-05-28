@@ -1,4 +1,4 @@
-﻿using BuildHub.CommandBuilder.Models.Execution.Enums;
+using BuildHub.CommandBuilder.Models.Execution.Enums;
 
 namespace BuildHub.CommandBuilder.Models.Contexts;
 

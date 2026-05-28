@@ -36,6 +36,6 @@ namespace BuildHub.DataEngine.Queries
 			this.InternalWhereCondition = new Tuple<string, CompareTypes, object?>(columnName, compareType, value);
 			this.WhereConditionType = conditionTypes;
 		}
-	
+
 	}
 }

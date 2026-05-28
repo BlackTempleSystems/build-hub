@@ -1,8 +1,8 @@
 namespace BuildHub.DataEngine.DatabaseConnection
 {
-    #region Dependencies
-    using Transactions;
-    using DatabaseConnectionManager;
+	#region Dependencies
+	using DatabaseConnectionManager;
+	using Transactions;
 	#endregion
 
 	/// <summary>
@@ -10,7 +10,7 @@ namespace BuildHub.DataEngine.DatabaseConnection
 	/// </summary>
 	public sealed class DatabaseContext
 	{
-		private static readonly ThreadLocal<DatabaseContext> _currentThreadLocalDatabaseConnection = new (() => new DatabaseContext());
+		private static readonly ThreadLocal<DatabaseContext> _currentThreadLocalDatabaseConnection = new(() => new DatabaseContext());
 		private readonly Dictionary<DatabaseSource, DatabaseConnection> _contextDatabaseConnections;
 
 		public ITransactionContext? TransactionContext { get; set; }

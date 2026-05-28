@@ -1,4 +1,4 @@
-﻿using BuildHub.CommandBuilder.Models;
+using BuildHub.CommandBuilder.Models;
 using BuildHub.CommandBuilder.Models.Execution;
 
 namespace UnitTests.CommandBuilders.Models

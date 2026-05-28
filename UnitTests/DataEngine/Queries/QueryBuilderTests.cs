@@ -11,13 +11,13 @@ namespace UnitTests.DataEngineTests.SQLQueries
 	[TestClass]
 	public class QueryBuilderTests
 	{
-        [ClassInitialize]
-        public static void ClassInit(TestContext context)
-        {
-            Logger.Initialize();
-        }
+		[ClassInitialize]
+		public static void ClassInit(TestContext context)
+		{
+			Logger.Initialize();
+		}
 
-        [TestMethod]
+		[TestMethod]
 		[DataRow("USERS")]
 		[DataRow("BUILDS")]
 		[DataRow("UNIT_TESTS")]
@@ -270,253 +270,253 @@ namespace UnitTests.DataEngineTests.SQLQueries
 			Assert.AreEqual("SELECT * FROM BUILDS WITH(NOLOCK) WHERE BUILD_COUNT > 100 AND BUILD_NAME <> 'Test Build'", queryBuilder.GetQuery());
 		}
 
-        [TestMethod]
-        [DataRow("USERS")]
-        [DataRow("BUILDS")]
-        public void Build_Select_With_Multiple_Where_Clauses_Should_Generate_Correct_Query(string tableName)
-        {
-            var queryBuilder = new InternalQueryBuilder()
-                .From(tableName)
-                .Where("AGE", CompareTypes.GreaterThan, 18)
-                .Where("NAME", CompareTypes.Equal, "John")
-                .BuildSelect();
+		[TestMethod]
+		[DataRow("USERS")]
+		[DataRow("BUILDS")]
+		public void Build_Select_With_Multiple_Where_Clauses_Should_Generate_Correct_Query(string tableName)
+		{
+			var queryBuilder = new InternalQueryBuilder()
+				.From(tableName)
+				.Where("AGE", CompareTypes.GreaterThan, 18)
+				.Where("NAME", CompareTypes.Equal, "John")
+				.BuildSelect();
 
-            Assert.AreEqual($"SELECT * FROM {tableName} WITH(NOLOCK) WHERE AGE > 18 AND NAME = 'John'", queryBuilder.GetQuery());
-        }
+			Assert.AreEqual($"SELECT * FROM {tableName} WITH(NOLOCK) WHERE AGE > 18 AND NAME = 'John'", queryBuilder.GetQuery());
+		}
 
-        [TestMethod]
-        [DataRow("USERS")]
-        [DataRow("BUILDS")]
-        public void Build_Select_With_Top_And_Where_Should_Generate_Correct_Query(string tableName)
-        {
-            var queryBuilder = new InternalQueryBuilder()
-                .Top(10)
-                .From(tableName)
-                .Where("AGE", CompareTypes.GreaterThan, 18)
-                .BuildSelect();
+		[TestMethod]
+		[DataRow("USERS")]
+		[DataRow("BUILDS")]
+		public void Build_Select_With_Top_And_Where_Should_Generate_Correct_Query(string tableName)
+		{
+			var queryBuilder = new InternalQueryBuilder()
+				.Top(10)
+				.From(tableName)
+				.Where("AGE", CompareTypes.GreaterThan, 18)
+				.BuildSelect();
 
-            Assert.AreEqual($"SELECT TOP 10 * FROM {tableName} WITH(NOLOCK) WHERE AGE > 18", queryBuilder.GetQuery());
-        }
+			Assert.AreEqual($"SELECT TOP 10 * FROM {tableName} WITH(NOLOCK) WHERE AGE > 18", queryBuilder.GetQuery());
+		}
 
-        [TestMethod]
-        [DataRow("USERS")]
-        [DataRow("BUILDS")]
-        public void Build_Select_With_Top_And_Lock_Should_Generate_Correct_Query(string tableName)
-        {
-            var queryBuilder = new InternalQueryBuilder()
-                .Top(5)
-                .From(tableName)
-                .Lock(LockTypes.Update)
-                .BuildSelect();
+		[TestMethod]
+		[DataRow("USERS")]
+		[DataRow("BUILDS")]
+		public void Build_Select_With_Top_And_Lock_Should_Generate_Correct_Query(string tableName)
+		{
+			var queryBuilder = new InternalQueryBuilder()
+				.Top(5)
+				.From(tableName)
+				.Lock(LockTypes.Update)
+				.BuildSelect();
 
-            string lockDescription = EnumUtilities.GetEnumDescription<LockTypes>(LockTypes.Update);
-            Assert.AreEqual($"SELECT TOP 5 * FROM {tableName} WITH({lockDescription})", queryBuilder.GetQuery());
-        }
+			string lockDescription = EnumUtilities.GetEnumDescription<LockTypes>(LockTypes.Update);
+			Assert.AreEqual($"SELECT TOP 5 * FROM {tableName} WITH({lockDescription})", queryBuilder.GetQuery());
+		}
 
-        [TestMethod]
-        [DataRow("USERS")]
-        [DataRow("BUILDS")]
-        public void Build_Select_With_Top_Lock_And_Where_Should_Generate_Correct_Query(string tableName)
-        {
-            var queryBuilder = new InternalQueryBuilder()
-                .Top(5)
-                .From(tableName)
-                .Lock(LockTypes.Update)
-                .Where("AGE", CompareTypes.GreaterThan, 18)
-                .BuildSelect();
+		[TestMethod]
+		[DataRow("USERS")]
+		[DataRow("BUILDS")]
+		public void Build_Select_With_Top_Lock_And_Where_Should_Generate_Correct_Query(string tableName)
+		{
+			var queryBuilder = new InternalQueryBuilder()
+				.Top(5)
+				.From(tableName)
+				.Lock(LockTypes.Update)
+				.Where("AGE", CompareTypes.GreaterThan, 18)
+				.BuildSelect();
 
-            string lockDescription = EnumUtilities.GetEnumDescription<LockTypes>(LockTypes.Update);
-            Assert.AreEqual($"SELECT TOP 5 * FROM {tableName} WITH({lockDescription}) WHERE AGE > 18", queryBuilder.GetQuery());
-        }
+			string lockDescription = EnumUtilities.GetEnumDescription<LockTypes>(LockTypes.Update);
+			Assert.AreEqual($"SELECT TOP 5 * FROM {tableName} WITH({lockDescription}) WHERE AGE > 18", queryBuilder.GetQuery());
+		}
 
-        [TestMethod]
-        public void Build_Select_Without_From_Should_Throw()
-        {
-            Assert.Throws<ArgumentException>(() =>
-            {
-                new InternalQueryBuilder()
-                    .BuildSelect()
-                    .GetQuery();
-            });
-        }
+		[TestMethod]
+		public void Build_Select_Without_From_Should_Throw()
+		{
+			Assert.Throws<ArgumentException>(() =>
+			{
+				new InternalQueryBuilder()
+					.BuildSelect()
+					.GetQuery();
+			});
+		}
 
-        [TestMethod]
-        [DataRow("USERS", "NAME", CompareTypes.Equal, 1)]
-        [DataRow("BUILDS", "IS_ACTIVE", CompareTypes.Equal, 1)]
-        public void Build_Select_With_Bool_Where_Should_Generate_Correct_Query(string tableName, string columnName, CompareTypes compareTypes, int value)
-        {
-            var queryBuilder = new InternalQueryBuilder()
-                .From(tableName)
-                .Where(columnName, compareTypes, value)
-                .BuildSelect();
+		[TestMethod]
+		[DataRow("USERS", "NAME", CompareTypes.Equal, 1)]
+		[DataRow("BUILDS", "IS_ACTIVE", CompareTypes.Equal, 1)]
+		public void Build_Select_With_Bool_Where_Should_Generate_Correct_Query(string tableName, string columnName, CompareTypes compareTypes, int value)
+		{
+			var queryBuilder = new InternalQueryBuilder()
+				.From(tableName)
+				.Where(columnName, compareTypes, value)
+				.BuildSelect();
 
-            string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(compareTypes);
-            Assert.AreEqual($"SELECT * FROM {tableName} WITH(NOLOCK) WHERE {columnName} {compareOperator} {value}", queryBuilder.GetQuery());
-        }
+			string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(compareTypes);
+			Assert.AreEqual($"SELECT * FROM {tableName} WITH(NOLOCK) WHERE {columnName} {compareOperator} {value}", queryBuilder.GetQuery());
+		}
 
-        [TestMethod]
-        public void Build_Select_With_Guid_Where_Should_Generate_Correct_Query()
-        {
-            var guid = Guid.NewGuid();
-
-            var queryBuilder = new InternalQueryBuilder()
-                .From("USERS")
-                .Where("GUID", CompareTypes.Equal, guid)
-                .BuildSelect();
-
-            Assert.AreEqual($"SELECT * FROM USERS WITH(NOLOCK) WHERE GUID = '{guid}'", queryBuilder.GetQuery());
-        }
-
-        [TestMethod]
-        public void Reset_Should_Allow_Rebuilding_With_Different_Operation()
-        {
-            var queryBuilder = new InternalQueryBuilder()
-                .From("USERS")
-                .BuildSelect();
-
-            queryBuilder.Reset();
-
-            var unitTest = new IntegrationTestEntity();
-            unitTest.Name = "RESET TEST";
-
-            var rebuilt = queryBuilder
-                .From("INTEGRATION_TESTS")
-                .BuildInsert<IntegrationTestEntity>(unitTest);
-
-            Assert.IsTrue(rebuilt.GetQuery().StartsWith("INSERT INTO INTEGRATION_TESTS"));
-        }
-
-        [TestMethod]
-        public void Reset_Should_Clear_Where_Clauses()
-        {
-            var queryBuilder = new InternalQueryBuilder()
-                .From("USERS")
-                .Where("AGE", CompareTypes.GreaterThan, 18)
-                .Where("NAME", CompareTypes.Equal, "John");
-
-            queryBuilder.Reset();
-
-            var rebuilt = queryBuilder
-                .From("USERS")
-                .BuildSelect();
-
-            Assert.AreEqual("SELECT * FROM USERS WITH(NOLOCK)", rebuilt.GetQuery());
-        }
-
-        [TestMethod]
-        public void Reset_Should_Clear_Top_Clause()
-        {
-            var queryBuilder = new InternalQueryBuilder()
-                .Top(10)
-                .From("USERS")
-                .BuildSelect();
-
-            queryBuilder.Reset();
-
-            var rebuilt = queryBuilder
-                .From("USERS")
-                .BuildSelect();
-
-            Assert.AreEqual("SELECT * FROM USERS WITH(NOLOCK)", rebuilt.GetQuery());
-        }
-
-        [TestMethod]
-        public void Client_SQL_Builder_With_Mixed_Types_Should_Transfer_State_Correctly()
-        {
-            var sqlQueryBuilder = new QueryBuilder()
-                .Where("AGE", CompareTypes.GreaterThan, 18)
-                .Where("NAME", CompareTypes.Equal, "John");
-
-            var queryBuilder = new InternalQueryBuilder(sqlQueryBuilder)
-                .From("USERS")
-                .BuildSelect();
-
-            Assert.AreEqual("SELECT * FROM USERS WITH(NOLOCK) WHERE AGE > 18 AND NAME = 'John'", queryBuilder.GetQuery());
-        }
-
-        [TestMethod]
-        public void Client_SQL_Builder_With_No_Conditions_Should_Generate_Simple_Select()
-        {
-            var sqlQueryBuilder = new QueryBuilder();
-
-            var queryBuilder = new InternalQueryBuilder(sqlQueryBuilder)
-                .From("USERS")
-                .BuildSelect();
-
-            Assert.AreEqual("SELECT * FROM USERS WITH(NOLOCK)", queryBuilder.GetQuery());
-        }
-
-        [TestMethod]
-        public void Build_Insert_Should_Not_Include_Id_Column()
-        {
-            var unitTest = new IntegrationTestEntity();
-            unitTest.Name = "INSERT TEST";
-
-            var queryBuilder = new InternalQueryBuilder()
-                .From("INTEGRATION_TESTS")
-                .BuildInsert<IntegrationTestEntity>(unitTest);
-
-            Assert.IsFalse(queryBuilder.GetQuery().Contains("Id"));
-        }
-
-        [TestMethod]
-        public void Build_Update_Should_Not_Include_Id_In_Set_Clause()
-        {
-            var unitTest = new IntegrationTestEntity();
-            unitTest.Name = "UPDATE TEST";
-
-            var queryBuilder = new InternalQueryBuilder()
-                .From("INTEGRATION_TESTS")
-                .BuildUpdate<IntegrationTestEntity>(unitTest);
-
-            // ID should only appear in WHERE, not SET
-            string query = queryBuilder.GetQuery();
-            Assert.IsFalse(query.Contains("SET ID"));
-        }
-
-        [TestMethod]
-        public void Build_Update_Should_Not_Include_Guid_In_Set_Clause()
-        {
-            var unitTest = new IntegrationTestEntity();
-            unitTest.Name = "UPDATE TEST";
-            unitTest.Guid = Guid.NewGuid();
-
-            var queryBuilder = new InternalQueryBuilder()
-                .From("INTEGRATION_TESTS")
-                .BuildUpdate<IntegrationTestEntity>(unitTest);
-
-            string query = queryBuilder.GetQuery();
-            Assert.IsFalse(query.Contains("GUID ="));
-        }
-
-        [TestMethod]
-        public void Build_Delete_Should_Only_Use_Guid_In_Where_Clause()
-        {
-            var unitTest = new IntegrationTestEntity();
-            unitTest.Name = "DELETE TEST";
-            unitTest.Guid = Guid.NewGuid();
+		[TestMethod]
+		public void Build_Select_With_Guid_Where_Should_Generate_Correct_Query()
+		{
+			var guid = Guid.NewGuid();
 
 			var queryBuilder = new InternalQueryBuilder()
-                .From("INTEGRATION_TESTS")
-                .BuildDelete<IntegrationTestEntity>(unitTest);
+				.From("USERS")
+				.Where("GUID", CompareTypes.Equal, guid)
+				.BuildSelect();
 
-            string query = queryBuilder.GetQuery();
-            Assert.IsTrue(query.Contains($"WHERE ID = 0"));
-            Assert.IsFalse(query.Contains("NAME"));
-        }
+			Assert.AreEqual($"SELECT * FROM USERS WITH(NOLOCK) WHERE GUID = '{guid}'", queryBuilder.GetQuery());
+		}
 
-        [TestMethod]
-        [DataRow("USERS", "NAME", CompareTypes.Equal, "O'Brien")]
-        public void Build_Select_With_String_Containing_Special_Characters_Should_Handle_Correctly(string tableName, string columnName, CompareTypes compareTypes, string value)
-        {
-            var queryBuilder = new InternalQueryBuilder()
-                .From(tableName)
-                .Where(columnName, compareTypes, value)
-                .BuildSelect();
+		[TestMethod]
+		public void Reset_Should_Allow_Rebuilding_With_Different_Operation()
+		{
+			var queryBuilder = new InternalQueryBuilder()
+				.From("USERS")
+				.BuildSelect();
 
-            string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(compareTypes);
-            Assert.AreEqual($"SELECT * FROM {tableName} WITH(NOLOCK) WHERE {columnName} {compareOperator} '{value}'", queryBuilder.GetQuery());
-        }
+			queryBuilder.Reset();
+
+			var unitTest = new IntegrationTestEntity();
+			unitTest.Name = "RESET TEST";
+
+			var rebuilt = queryBuilder
+				.From("INTEGRATION_TESTS")
+				.BuildInsert<IntegrationTestEntity>(unitTest);
+
+			Assert.IsTrue(rebuilt.GetQuery().StartsWith("INSERT INTO INTEGRATION_TESTS"));
+		}
+
+		[TestMethod]
+		public void Reset_Should_Clear_Where_Clauses()
+		{
+			var queryBuilder = new InternalQueryBuilder()
+				.From("USERS")
+				.Where("AGE", CompareTypes.GreaterThan, 18)
+				.Where("NAME", CompareTypes.Equal, "John");
+
+			queryBuilder.Reset();
+
+			var rebuilt = queryBuilder
+				.From("USERS")
+				.BuildSelect();
+
+			Assert.AreEqual("SELECT * FROM USERS WITH(NOLOCK)", rebuilt.GetQuery());
+		}
+
+		[TestMethod]
+		public void Reset_Should_Clear_Top_Clause()
+		{
+			var queryBuilder = new InternalQueryBuilder()
+				.Top(10)
+				.From("USERS")
+				.BuildSelect();
+
+			queryBuilder.Reset();
+
+			var rebuilt = queryBuilder
+				.From("USERS")
+				.BuildSelect();
+
+			Assert.AreEqual("SELECT * FROM USERS WITH(NOLOCK)", rebuilt.GetQuery());
+		}
+
+		[TestMethod]
+		public void Client_SQL_Builder_With_Mixed_Types_Should_Transfer_State_Correctly()
+		{
+			var sqlQueryBuilder = new QueryBuilder()
+				.Where("AGE", CompareTypes.GreaterThan, 18)
+				.Where("NAME", CompareTypes.Equal, "John");
+
+			var queryBuilder = new InternalQueryBuilder(sqlQueryBuilder)
+				.From("USERS")
+				.BuildSelect();
+
+			Assert.AreEqual("SELECT * FROM USERS WITH(NOLOCK) WHERE AGE > 18 AND NAME = 'John'", queryBuilder.GetQuery());
+		}
+
+		[TestMethod]
+		public void Client_SQL_Builder_With_No_Conditions_Should_Generate_Simple_Select()
+		{
+			var sqlQueryBuilder = new QueryBuilder();
+
+			var queryBuilder = new InternalQueryBuilder(sqlQueryBuilder)
+				.From("USERS")
+				.BuildSelect();
+
+			Assert.AreEqual("SELECT * FROM USERS WITH(NOLOCK)", queryBuilder.GetQuery());
+		}
+
+		[TestMethod]
+		public void Build_Insert_Should_Not_Include_Id_Column()
+		{
+			var unitTest = new IntegrationTestEntity();
+			unitTest.Name = "INSERT TEST";
+
+			var queryBuilder = new InternalQueryBuilder()
+				.From("INTEGRATION_TESTS")
+				.BuildInsert<IntegrationTestEntity>(unitTest);
+
+			Assert.IsFalse(queryBuilder.GetQuery().Contains("Id"));
+		}
+
+		[TestMethod]
+		public void Build_Update_Should_Not_Include_Id_In_Set_Clause()
+		{
+			var unitTest = new IntegrationTestEntity();
+			unitTest.Name = "UPDATE TEST";
+
+			var queryBuilder = new InternalQueryBuilder()
+				.From("INTEGRATION_TESTS")
+				.BuildUpdate<IntegrationTestEntity>(unitTest);
+
+			// ID should only appear in WHERE, not SET
+			string query = queryBuilder.GetQuery();
+			Assert.IsFalse(query.Contains("SET ID"));
+		}
+
+		[TestMethod]
+		public void Build_Update_Should_Not_Include_Guid_In_Set_Clause()
+		{
+			var unitTest = new IntegrationTestEntity();
+			unitTest.Name = "UPDATE TEST";
+			unitTest.Guid = Guid.NewGuid();
+
+			var queryBuilder = new InternalQueryBuilder()
+				.From("INTEGRATION_TESTS")
+				.BuildUpdate<IntegrationTestEntity>(unitTest);
+
+			string query = queryBuilder.GetQuery();
+			Assert.IsFalse(query.Contains("GUID ="));
+		}
+
+		[TestMethod]
+		public void Build_Delete_Should_Only_Use_Guid_In_Where_Clause()
+		{
+			var unitTest = new IntegrationTestEntity();
+			unitTest.Name = "DELETE TEST";
+			unitTest.Guid = Guid.NewGuid();
+
+			var queryBuilder = new InternalQueryBuilder()
+				.From("INTEGRATION_TESTS")
+				.BuildDelete<IntegrationTestEntity>(unitTest);
+
+			string query = queryBuilder.GetQuery();
+			Assert.IsTrue(query.Contains($"WHERE ID = 0"));
+			Assert.IsFalse(query.Contains("NAME"));
+		}
+
+		[TestMethod]
+		[DataRow("USERS", "NAME", CompareTypes.Equal, "O'Brien")]
+		public void Build_Select_With_String_Containing_Special_Characters_Should_Handle_Correctly(string tableName, string columnName, CompareTypes compareTypes, string value)
+		{
+			var queryBuilder = new InternalQueryBuilder()
+				.From(tableName)
+				.Where(columnName, compareTypes, value)
+				.BuildSelect();
+
+			string compareOperator = EnumUtilities.GetEnumDescription<CompareTypes>(compareTypes);
+			Assert.AreEqual($"SELECT * FROM {tableName} WITH(NOLOCK) WHERE {columnName} {compareOperator} '{value}'", queryBuilder.GetQuery());
+		}
 
 		[TestMethod]
 		[DataRow("USERS", "NAME", CompareTypes.Equal, "O'Brien", "Leeroy")]
@@ -535,8 +535,8 @@ namespace UnitTests.DataEngineTests.SQLQueries
 
 		[TestMethod]
 		[DataRow("USERS", "NAME", CompareTypes.Equal, "O'Brien")]
-		public void Build_Select_With_OR_Clauses_Only(string tableName, string columnName, CompareTypes compareTypes, string value) 
-		{ 
+		public void Build_Select_With_OR_Clauses_Only(string tableName, string columnName, CompareTypes compareTypes, string value)
+		{
 			var queryBuilder = new InternalQueryBuilder()
 				.From(tableName)
 				.OrWhere(columnName, compareTypes, value)

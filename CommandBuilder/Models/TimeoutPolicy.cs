@@ -1,4 +1,4 @@
-﻿namespace BuildHub.CommandBuilder.Models;
+namespace BuildHub.CommandBuilder.Models;
 
 public sealed class TimeoutPolicy
 {

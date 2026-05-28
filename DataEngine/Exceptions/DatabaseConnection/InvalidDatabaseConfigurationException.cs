@@ -1,21 +1,21 @@
-﻿using BuildHub.DataEngine.DatabaseConnection;
+using BuildHub.DataEngine.DatabaseConnection;
 
 namespace BuildHub.DataEngine.Exceptions.DatabaseConnection
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class InvalidDatabaseConfigurationException : Exception
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public DatabaseSource DatabaseSource { get; private set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	public class InvalidDatabaseConfigurationException : Exception
+	{
+		/// <summary>
+		/// 
+		/// </summary>
+		public DatabaseSource DatabaseSource { get; private set; }
 
-        public InvalidDatabaseConfigurationException(string message, DatabaseSource databaseSource)
-            : base(message)
-        {
-            this.DatabaseSource = databaseSource;
-        }
-    }
+		public InvalidDatabaseConfigurationException(string message, DatabaseSource databaseSource)
+			: base(message)
+		{
+			this.DatabaseSource = databaseSource;
+		}
+	}
 }

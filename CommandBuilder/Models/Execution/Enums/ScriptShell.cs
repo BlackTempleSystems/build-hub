@@ -1,4 +1,4 @@
-﻿namespace BuildHub.CommandBuilder.Models.Execution.Enums;
+namespace BuildHub.CommandBuilder.Models.Execution.Enums;
 
 /// <summary>
 /// Supported script shells.

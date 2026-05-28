@@ -14,5 +14,5 @@ namespace BuildHub.Domain.Autehntication.UserCredentials.Entities
 		[ColumnInfo("HASHED_PASSWORD")]
 		public string? HashedPassword { get; set; }
 	}
-	
+
 }

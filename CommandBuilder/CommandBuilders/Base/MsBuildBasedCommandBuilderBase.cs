@@ -1,4 +1,4 @@
-﻿using BuildHub.CommandBuilder.Models.Contexts;
+using BuildHub.CommandBuilder.Models.Contexts;
 using BuildHub.CommandBuilder.Models.Enums;
 
 namespace BuildHub.CommandBuilder.CommandBuilders.Abstractions;

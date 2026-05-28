@@ -1,11 +1,9 @@
 using BuildHub.Application.Services.Authentication.Jwt.Configuration;
-using BuildHub.Application.Services.Authentication.Jwt.Models;
 using BuildHub.Common.Configuration;
 using BuildHub.Domain.Autehntication.Users.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace BuildHub.Application.Services.Authentication.Jwt;
@@ -23,7 +21,7 @@ public sealed class JwtService : IJwtService
 	/// </summary>
 	private const string _JwtSectionKey = "Jwt";
 
-	
+
 
 	/// <summary>
 	/// Configuration manager instance.

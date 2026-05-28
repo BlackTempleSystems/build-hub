@@ -1,4 +1,4 @@
-﻿namespace BuildHub.CommandBuilder.Models.Contexts;
+namespace BuildHub.CommandBuilder.Models.Contexts;
 
 /// <summary>
 /// Context for Visual Studio command builder.

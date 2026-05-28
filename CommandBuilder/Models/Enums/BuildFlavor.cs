@@ -1,4 +1,4 @@
-﻿namespace BuildHub.CommandBuilder.Models.Enums;
+namespace BuildHub.CommandBuilder.Models.Enums;
 
 /// <summary>
 /// Build flavor types.

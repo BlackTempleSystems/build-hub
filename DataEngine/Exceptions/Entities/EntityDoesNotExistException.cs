@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Exceptions.Entities
+namespace BuildHub.DataEngine.Exceptions.Entities
 {
 	/// <summary>
 	/// Represents an exception that is thrown when an operation attempts to access an entity that does not exist.

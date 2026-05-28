@@ -6,7 +6,7 @@ namespace BuildHub.DataEngine.Tables.Base
 	using BuildHub.DataEngine.Exceptions.Entities;
 	using DatabaseConnection;
 	using DatabaseConnectionManager;
-    using Entities;
+	using Entities;
 	using Microsoft.Data.SqlClient;
 	using Queries;
 	using System;
@@ -137,7 +137,7 @@ namespace BuildHub.DataEngine.Tables.Base
 					.From(this.TableName)
 					.BuildSelect();
 
-				using SqlCommand selectCommand = new SqlCommand(internalQueryBuilder.GetQuery(), 
+				using SqlCommand selectCommand = new SqlCommand(internalQueryBuilder.GetQuery(),
 					this._databaseConnection?.InternalConnection);
 
 				if (!this._isConnectionLocal)
@@ -191,7 +191,7 @@ namespace BuildHub.DataEngine.Tables.Base
 					.Where(primaryKeyColumnInfo.ColumnName, id)
 					.BuildSelect();
 
-				using SqlCommand selectCommand = new SqlCommand(queryBuilder.GetQuery(), 
+				using SqlCommand selectCommand = new SqlCommand(queryBuilder.GetQuery(),
 					this._databaseConnection?.InternalConnection);
 				if (!this._isConnectionLocal)
 					selectCommand.Transaction = DatabaseContext.GetCurrentContext?.TransactionContext?.InternalTransaction;
@@ -278,7 +278,7 @@ namespace BuildHub.DataEngine.Tables.Base
 					.From(this.TableName)
 					.BuildSelect();
 
-				using SqlCommand selectCommand = new SqlCommand(internalQueryBuilder.GetQuery(), 
+				using SqlCommand selectCommand = new SqlCommand(internalQueryBuilder.GetQuery(),
 					this._databaseConnection?.InternalConnection);
 				if (!this._isConnectionLocal)
 					selectCommand.Transaction = DatabaseContext.GetCurrentContext?.TransactionContext?.InternalTransaction;
@@ -406,7 +406,7 @@ namespace BuildHub.DataEngine.Tables.Base
 					.From(this.TableName)
 					.BuildInsert(entity);
 
-				using SqlCommand insertCommand = new SqlCommand(internalQueryBuilder.GetQuery(), 
+				using SqlCommand insertCommand = new SqlCommand(internalQueryBuilder.GetQuery(),
 					this._databaseConnection?.InternalConnection);
 
 				if (!this._isConnectionLocal)
@@ -442,7 +442,7 @@ namespace BuildHub.DataEngine.Tables.Base
 				this.AcquireDatabaseConnection();
 
 				var selectQuery = GenerateSelectQueryByPrimaryKey(entity, true);
-				using SqlCommand updateCommand = new SqlCommand(selectQuery, 
+				using SqlCommand updateCommand = new SqlCommand(selectQuery,
 					this._databaseConnection?.InternalConnection);
 
 				if (!this._isConnectionLocal)

@@ -1,4 +1,3 @@
-using BuildHub.Application.Services.Authentication.Jwt.Models;
 using BuildHub.Domain.Autehntication.Users.Entities;
 
 namespace BuildHub.Application.Services.Authentication.Jwt

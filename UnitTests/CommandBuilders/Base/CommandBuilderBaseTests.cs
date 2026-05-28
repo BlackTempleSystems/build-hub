@@ -1,4 +1,4 @@
-﻿using BuildHub.CommandBuilder.CommandBuilders.Abstractions;
+using BuildHub.CommandBuilder.CommandBuilders.Abstractions;
 using BuildHub.CommandBuilder.Models.Execution;
 
 namespace UnitTests.CommandBuilders.Abstractions
@@ -56,7 +56,7 @@ namespace UnitTests.CommandBuilders.Abstractions
 		private sealed class ThrowingBuilder : CommandBuilderBase<ThrowingBuilder, TestContext>
 		{
 			protected override string Name => "ThrowingBuilder";
-			
+
 			public bool DerivedValidated { get; private set; }
 
 			public ThrowingBuilder(TestContext ctx) : base(ctx)

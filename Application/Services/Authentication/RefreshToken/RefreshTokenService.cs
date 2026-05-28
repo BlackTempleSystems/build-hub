@@ -1,4 +1,5 @@
 #region
+using BuildHub.Application.Messages;
 using BuildHub.Application.Services.Authentication.Jwt.Configuration;
 using BuildHub.Application.Services.Authentication.Jwt.Models;
 using BuildHub.Common.Configuration;
@@ -8,7 +9,6 @@ using BuildHub.Domain.Autehntication.RefreshTokens.Entities;
 using BuildHub.Domain.Autehntication.Users.Entities;
 using System.Security.Cryptography;
 using System.Text;
-
 #endregion
 
 namespace BuildHub.Application.Services.Authentication.RefreshToken
@@ -22,10 +22,26 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 	/// service is not thread-safe and should be used accordingly in multi-threaded environments.</remarks>
 	public sealed class RefreshTokenService : IRefreshTokenService
 	{
+
+		private sealed class RefreshTokenGenerationResult
+		{
+			public string RawToken { get; private set; }
+			public string HashedToken { get; private set; }
+			public DateTime ExpirationDate { get; private set; }
+
+			public RefreshTokenGenerationResult(string rawToken, string hashedToken, DateTime expirationDate)
+			{
+				this.RawToken = rawToken;
+				this.HashedToken = hashedToken;
+				this.ExpirationDate = expirationDate;
+			}
+		}
+
+
 		/// <summary>
 		/// Refresh token byte size.
 		/// </summary>
-		private const int _RefershTokenBytesSize = 64;
+		private const int _RefreshTokenBytesSize = 64;
 
 		/// <summary>
 		/// Key to access the jwt section.
@@ -49,6 +65,8 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		/// metadata.</returns>
 		public RefreshTokenModel GenerateAndSaveRefreshToken(UserEntity userEntity)
 		{
+			ArgumentNullException.ThrowIfNull(userEntity);
+
 			var refreshToken = GenerateNewRefreshToken();
 
 			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
@@ -57,33 +75,33 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 			if (refreshTokenEntity is null)
 			{
 				refreshTokenEntity = new RefreshTokenEntity();
-				refreshTokenEntity.RefreshToken = refreshToken.Item1;
-				refreshTokenEntity.ExpirationDate = refreshToken.Item2;
+				refreshTokenEntity.RefreshToken = refreshToken.HashedToken;
+				refreshTokenEntity.ExpirationDate = refreshToken.ExpirationDate;
 				refreshTokenEntity.UserId = userEntity.Id;
 
 				if (refreshTokensTable.Insert(refreshTokenEntity) is null)
 				{
-					Logger.LogError($"Failed to insert refresh token for userEntity userEntity ID '{userEntity.Id}' during registration.");
-					throw new InvalidOperationException();
+					Logger.LogError(ApplicationMessages.RefreshTokenPersistenceFailed);
+					throw new InvalidOperationException(ApplicationMessages.RefreshTokenPersistenceFailed);
 				}
 			}
 			else
 			{
 				refreshTokenEntity.IsRevoked = false;
-				refreshTokenEntity.RefreshToken = refreshToken.Item1;
-				refreshTokenEntity.ExpirationDate = refreshToken.Item2;
+				refreshTokenEntity.RefreshToken = refreshToken.HashedToken;
+				refreshTokenEntity.ExpirationDate = refreshToken.ExpirationDate;
 
 				if (!refreshTokensTable.Update(refreshTokenEntity))
 				{
-					//TODO ERROR
-					throw new InvalidOperationException();
+					Logger.LogError(ApplicationMessages.RefreshTokenPersistenceFailed);
+					throw new InvalidOperationException(ApplicationMessages.RefreshTokenPersistenceFailed);
 				}
 			}
 
 			return new RefreshTokenModel
 			{
-				RefreshToken = refreshToken.Item1,
-				ExpirationDate = refreshToken.Item2
+				RefreshToken = refreshToken.RawToken,
+				ExpirationDate = refreshToken.ExpirationDate
 			};
 		}
 
@@ -93,9 +111,15 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		/// <param name="rawToken">The raw refresh token to validate. Cannot be null or empty.</param>
 		/// <param name="hashedToken">The hashed representation of the refresh token to compare against. Cannot be null or empty.</param>
 		/// <returns>true if the raw token matches the hashed token; otherwise, false.</returns>
-		public bool VerifyfRefreshToken(string rawRefreshToken, string hashedRefreshToken)
+		public bool VerifyRefreshToken(string rawRefreshToken, string hashedRefreshToken)
 		{
-			return HashfRefreshToken(rawRefreshToken).Equals(hashedRefreshToken);
+			if (string.IsNullOrWhiteSpace(rawRefreshToken) || string.IsNullOrWhiteSpace(hashedRefreshToken))
+				return false;
+
+			string submittedTokenHash = HashRefreshToken(rawRefreshToken);
+			return CryptographicOperations.FixedTimeEquals(
+				Encoding.UTF8.GetBytes(submittedTokenHash),
+				Encoding.UTF8.GetBytes(hashedRefreshToken));
 		}
 
 		/// <summary>
@@ -105,43 +129,50 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		/// <returns>true if the refresh token was successfully rotated; otherwise, false.</returns>
 		public RefreshTokenModel? RotateRefreshToken(string rawRefreshToken, UserEntity userEntity)
 		{
+			ArgumentNullException.ThrowIfNull(userEntity);
+
 			RefreshTokensTable refreshTokensTable = new RefreshTokensTable();
 
 			var refreshTokenEntity = GetRefreshTokenForUser(userEntity.Id);
 			if (refreshTokenEntity is null)
 			{
-
+				Logger.LogWarning(ApplicationMessages.RefreshTokenLookupFailed);
+				return null;
 			}
 
 			if (refreshTokenEntity.IsRevoked)
 			{
-				//TODO ERROR
+				Logger.LogWarning(ApplicationMessages.RefreshTokenRevoked);
+				return null;
 			}
 
 			if (refreshTokenEntity.ExpirationDate < DateTime.UtcNow)
 			{
-				//TODO ERRORs
+				Logger.LogWarning(ApplicationMessages.RefreshTokenExpired);
+				return null;
 			}
 
-			if (!VerifyfRefreshToken(rawRefreshToken, refreshTokenEntity.RefreshToken))
+			if (!VerifyRefreshToken(rawRefreshToken, refreshTokenEntity.RefreshToken))
 			{
-				//TODO ERROR
+				Logger.LogWarning(ApplicationMessages.RefreshTokenVerificationFailed);
+				return null;
 			}
 
 			var refreshToken = GenerateNewRefreshToken();
-			refreshTokenEntity.RefreshToken = refreshToken.Item1;
-			refreshTokenEntity.ExpirationDate = refreshToken.Item2;
+			refreshTokenEntity.RefreshToken = refreshToken.HashedToken;
+			refreshTokenEntity.ExpirationDate = refreshToken.ExpirationDate;
+			refreshTokenEntity.IsRevoked = false;
 
 			if (!refreshTokensTable.Update(refreshTokenEntity))
 			{
-				//TODO LOG
+				Logger.LogError(ApplicationMessages.RefreshTokenPersistenceFailed);
 				return null;
 			}
 
 			return new RefreshTokenModel()
 			{
-				RefreshToken = refreshToken.Item1,
-				ExpirationDate = refreshToken.Item2
+				RefreshToken = refreshToken.RawToken,
+				ExpirationDate = refreshToken.ExpirationDate
 			};
 		}
 
@@ -162,7 +193,7 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		/// </summary>
 		/// <param name="rawToken">The raw refresh token to be hashed. Cannot be null or empty.</param>
 		/// <returns>A string containing the hashed value of the refresh token.</returns>
-		private string HashfRefreshToken(string rawRefreshToken)
+		private string HashRefreshToken(string rawRefreshToken)
 		{
 			var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawRefreshToken));
 			return Convert.ToBase64String(bytes);
@@ -173,23 +204,26 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		/// </summary>
 		/// <returns>A tuple containing the newly generated refresh token as a string and its expiration date and time as a <see
 		/// cref="DateTime"/> value.</returns>
-		private Tuple<string, DateTime> GenerateNewRefreshToken()
+		private RefreshTokenGenerationResult GenerateNewRefreshToken()
 		{
-			Span<byte> randomBytes = stackalloc byte[_RefershTokenBytesSize];
-			using var randomNumebrGenerator = RandomNumberGenerator.Create();
-			randomNumebrGenerator.GetBytes(randomBytes);
+			Span<byte> randomBytes = stackalloc byte[_RefreshTokenBytesSize];
+			using var randomNumberGenerator = RandomNumberGenerator.Create();
+			randomNumberGenerator.GetBytes(randomBytes);
 
 			var jwtOptions = _configurationManager.GetConfigurationModel<JwtOptions>(_JwtSectionKey);
 
 			if (jwtOptions is null)
-				throw new InvalidOperationException();
+			{
+				Logger.LogError(ApplicationMessages.RefreshTokenConfigurationMissing);
+				throw new InvalidOperationException(ApplicationMessages.RefreshTokenConfigurationMissing);
+			}
 
 			var refreshToken = Convert.ToBase64String(randomBytes);
 			var expirationDate = DateTime.UtcNow.AddDays(jwtOptions.RefreshTokenDays);
 
-			var hashedRefreshToken = HashfRefreshToken(refreshToken);
+			var hashedRefreshToken = HashRefreshToken(refreshToken);
 
-			return new Tuple<string, DateTime>(hashedRefreshToken, expirationDate);
+			return new RefreshTokenGenerationResult(refreshToken, hashedRefreshToken, expirationDate);
 		}
 	}
 }

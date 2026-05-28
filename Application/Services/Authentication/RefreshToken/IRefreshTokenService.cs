@@ -21,7 +21,7 @@ namespace BuildHub.Application.Services.Authentication.RefreshToken
 		/// <param name="rawToken">The raw refresh token to validate. Cannot be null or empty.</param>
 		/// <param name="hashedToken">The hashed representation of the refresh token to compare against. Cannot be null or empty.</param>
 		/// <returns>true if the raw token matches the hashed token; otherwise, false.</returns>
-		public bool VerifyfRefreshToken(string rawRefreshToken, string hashedRefreshToken);
+		public bool VerifyRefreshToken(string rawRefreshToken, string hashedRefreshToken);
 
 		/// <summary>
 		/// Replaces the specified refresh token with a new one, invalidating the original token.

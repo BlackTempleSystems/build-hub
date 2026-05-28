@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BuildHub.API.Controllers.Base
 {
-    /// <summary>
-    /// Base api controller, every controller should derive form this.
-    /// The class provides basic api controller support and automatic url path computation
-    /// </summary>
-    [Route("api/[controller]")]
-    [ApiController]
-    public class BaseApiController :  ControllerBase
-    {
-        protected BaseApiController() 
-            : base() 
-        { 
-        }
+	/// <summary>
+	/// Base api controller, every controller should derive form this.
+	/// The class provides basic api controller support and automatic url path computation
+	/// </summary>
+	[Route("api/[controller]")]
+	[ApiController]
+	public class BaseApiController : ControllerBase
+	{
+		protected BaseApiController()
+			: base()
+		{
+		}
 
 		/// <summary>
 		/// Creates an HTTP 200 OK response containing a standardized success payload with the specified response data.
@@ -70,15 +70,15 @@ namespace BuildHub.API.Controllers.Base
 		/// <typeparam name="ResponseData"></typeparam>
 		/// <param name="responseData"></param>
 		/// <returns></returns>
-		protected IActionResult FromResult<T>(Result<T> result) 
+		protected IActionResult FromResult<T>(Result<T> result)
 			=> result.Status switch
-		{
-			ResultStatus.Ok => ApiOk(result.Data),
-			ResultStatus.Unauthorized => ApiUnauthorized(result.ErrorMessage),
-			ResultStatus.NotFound => ApiNotFound(result.ErrorMessage),
-			ResultStatus.Conflict => ApiConflict(result.ErrorMessage),
-			_ => throw new Exception("Unhandled result status")
-		};
+			{
+				ResultStatus.Ok => ApiOk(result.Data),
+				ResultStatus.Unauthorized => ApiUnauthorized(result.ErrorMessage),
+				ResultStatus.NotFound => ApiNotFound(result.ErrorMessage),
+				ResultStatus.Conflict => ApiConflict(result.ErrorMessage),
+				_ => throw new Exception("Unhandled result status")
+			};
 
 		/// <summary>
 		/// Creates a new BaseServerResponse<T> instance containing the specified response data and success status.

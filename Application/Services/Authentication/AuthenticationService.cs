@@ -10,8 +10,6 @@ namespace BuildHub.Application.Services.Authentication
 	using BuildHub.DataEngine.DatabaseConnection;
 	using BuildHub.DataEngine.Queries;
 	using BuildHub.DataEngine.Transactions;
-	using BuildHub.Domain.Autehntication.RefreshTokens;
-	using BuildHub.Domain.Autehntication.RefreshTokens.Entities;
 	using BuildHub.Domain.Autehntication.UserCredentials;
 	using BuildHub.Domain.Autehntication.UserCredentials.Entities;
 	using BuildHub.Domain.Autehntication.Users;
@@ -237,7 +235,7 @@ namespace BuildHub.Application.Services.Authentication
 			}
 
 			var refreshToken = _refreshTokenService.RotateRefreshToken(refreshTokenRequest.RefreshToken, userEntity);
-			if(refreshToken is null)
+			if (refreshToken is null)
 			{
 				Logger.LogWarning(ApplicationMessages.RefreshTokenRotationFailed);
 				return Result<RefreshTokenResponse>.Failure(ApplicationMessages.RefreshTokenFailed, ResultStatus.Unauthorized);
@@ -253,7 +251,7 @@ namespace BuildHub.Application.Services.Authentication
 				}
 			};
 
-			return  Result<RefreshTokenResponse>.Success(response);
+			return Result<RefreshTokenResponse>.Success(response);
 		}
 	}
 }

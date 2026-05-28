@@ -1,4 +1,4 @@
-﻿namespace BuildHub.DataEngine.Transactions
+namespace BuildHub.DataEngine.Transactions
 {
 	using BuildHub.Common.Logger;
 	using BuildHub.Common.Utilities;

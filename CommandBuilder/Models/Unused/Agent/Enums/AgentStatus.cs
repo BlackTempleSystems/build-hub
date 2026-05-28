@@ -1,4 +1,4 @@
-﻿namespace BuildHub.CommandBuilder.Models.Unused.Agent.Enums;
+namespace BuildHub.CommandBuilder.Models.Unused.Agent.Enums;
 
 /// <summary>
 /// Operational status of an agent.
