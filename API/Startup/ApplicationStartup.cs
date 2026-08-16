@@ -1,6 +1,7 @@
 #region
 using BuildHub.API.Auth;
 using BuildHub.API.Messages;
+using BuildHub.API.Observability;
 using BuildHub.Common.Logger;
 using BuildHub.Infrastructure.Databases;
 using Scalar.AspNetCore;
@@ -16,6 +17,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddBuildHubAuth(builder.Configuration);
 builder.Services.AddBuildHubDatabases(builder.Configuration);
 builder.Services.AddHealthChecks().AddResourceUtilizationHealthCheck();
+
+builder.Services.AddBuildHubObservability(
+	builder.Configuration,
+	builder.Environment);
 
 var app = builder.Build();
 
