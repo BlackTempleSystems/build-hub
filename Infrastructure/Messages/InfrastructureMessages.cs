@@ -1,9 +1,9 @@
-﻿namespace Infrastructure.Messages
+namespace Infrastructure.Messages
 {
-    /// <summary>
-    /// Messages used in the infrastructure project.
-    /// </summary>
-    internal static class InfrastructureMessages
-    {
-    }
+	/// <summary>
+	/// Messages used in the infrastructure project.
+	/// </summary>
+	internal static class InfrastructureMessages
+	{
+	}
 }

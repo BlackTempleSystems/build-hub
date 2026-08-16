@@ -1,4 +1,3 @@
-using BuildHub.API.Auth;
 using BuildHub.API.Auth.Models;
 using BuildHub.API.Controllers.Base;
 using BuildHub.Domain.Store;

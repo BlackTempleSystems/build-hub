@@ -3,7 +3,6 @@ using BuildHub.Infrastructure.Auth.Services;
 using BuildHub.Infrastructure.Auth.Store;
 using BuildHub.Infrastructure.Auth.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;

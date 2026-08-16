@@ -1,4 +1,4 @@
-﻿using Serilog;
+using Serilog;
 using Serilog.Events;
 
 namespace BuildHub.Common.Logger
@@ -18,7 +18,7 @@ namespace BuildHub.Common.Logger
 		public string? LogFileDirectory { get; set; }
 		public RollingInterval RollingInterval { get; set; }
 		public string? SeqServerUrl { get; set; }
-		public string? SerilogAPIKey { get; set;}
-        public bool LogToConsoleEnabled { get; set; }
+		public string? SerilogAPIKey { get; set; }
+		public bool LogToConsoleEnabled { get; set; }
 	}
 }

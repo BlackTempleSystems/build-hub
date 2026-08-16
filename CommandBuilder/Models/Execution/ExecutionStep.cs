@@ -1,4 +1,4 @@
-﻿namespace BuildHub.CommandBuilder.Models.Execution;
+namespace BuildHub.CommandBuilder.Models.Execution;
 
 /// <summary>
 /// Represents a single step in a execution plan.

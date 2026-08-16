@@ -1,4 +1,4 @@
-﻿using BuildHub.CommandBuilder.Models.Enums;
+using BuildHub.CommandBuilder.Models.Enums;
 
 namespace BuildHub.CommandBuilder.Models.Unused.Agent;
 

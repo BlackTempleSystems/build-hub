@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\DataEngine\DataEngine.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿namespace BuildHub.CommandBuilder.Models.Unused.Agent.Enums;
+namespace BuildHub.CommandBuilder.Models.Unused.Agent.Enums;
 
 /// <summary>
 /// Capabilities supported by an agent.

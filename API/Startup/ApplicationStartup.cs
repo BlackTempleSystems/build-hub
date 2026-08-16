@@ -1,11 +1,8 @@
 #region
-using BuildHub.API.Messages;
 using BuildHub.API.Auth;
-using BuildHub.API.Services.HealthCheck;
-using BuildHub.API.Startup;
+using BuildHub.API.Messages;
 using BuildHub.Common.Logger;
-using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using BuildHub.Infrastructure.Databases;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Reflection;
@@ -17,20 +14,18 @@ builder.Host.UseSerilog();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddBuildHubAuth(builder.Configuration);
-builder.Services.AddHostedService<DatabaseBootstrapService>();
-builder.Services.AddHealthChecks()
-	.AddCheck<DatabaseHealthCheck>("DatabaseHealthCheck")
-	.AddResourceUtilizationHealthCheck();
+builder.Services.AddBuildHubDatabases(builder.Configuration);
+builder.Services.AddHealthChecks().AddResourceUtilizationHealthCheck();
 
 var app = builder.Build();
 
 Logger.Initialize();
-Logger.LogInformation("BuildHub API v{Version} starting... [{Environment}]", Assembly.GetExecutingAssembly().GetName().Version, 
+Logger.LogInformation("BuildHub API v{Version} starting... [{Environment}]", Assembly.GetExecutingAssembly().GetName().Version,
 	app.Environment.EnvironmentName);
 
 app.Lifetime.ApplicationStarted.Register(() =>
 {
-    Logger.LogInformation("Listening on {URLS}" , string.Join(", ", app.Urls));
+	Logger.LogInformation("Listening on {URLS}", string.Join(", ", app.Urls));
 });
 
 app.Lifetime.ApplicationStopping.Register(() =>
@@ -50,10 +45,7 @@ if (app.Environment.IsDevelopment())
 	});
 }
 
-app.MapHealthChecks("/health", new HealthCheckOptions
-{
-	ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
+app.MapHealthChecks("/health");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

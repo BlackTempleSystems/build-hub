@@ -1,4 +1,4 @@
-﻿using BuildHub.CommandBuilder.Models;
+using BuildHub.CommandBuilder.Models;
 
 namespace BuildHub.CommandBuilder.CommandBuilders.Abstractions;
 

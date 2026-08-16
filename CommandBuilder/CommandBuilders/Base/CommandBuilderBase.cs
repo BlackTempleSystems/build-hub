@@ -1,4 +1,4 @@
-﻿using BuildHub.CommandBuilder.Models;
+using BuildHub.CommandBuilder.Models;
 using BuildHub.CommandBuilder.Models.Execution;
 using BuildHub.Common.Logger;
 
@@ -47,21 +47,21 @@ public abstract class CommandBuilderBase<TBuilder, TContext> : ICommandBuilder
 	{
 		try
 		{
-            Validate();
-        }
-		catch(Exception exception)
+			Validate();
+		}
+		catch (Exception exception)
 		{
 			Logger.LogWarning(exception, $"Validation for {Name} failed.");
 		}
 
-        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+		var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 		IReadOnlyList<ExecutionStep> steps = new List<ExecutionStep>();
 
 		try
 		{
 
-            steps = GenerateCommandInternal();
-			
+			steps = GenerateCommandInternal();
+
 			return BuildCommandResult.CreateSuccess(Name, stopwatch.Elapsed, steps);
 		}
 		catch (Exception ex)

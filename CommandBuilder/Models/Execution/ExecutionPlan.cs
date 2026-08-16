@@ -1,4 +1,4 @@
-﻿namespace BuildHub.CommandBuilder.Models.Execution;
+namespace BuildHub.CommandBuilder.Models.Execution;
 
 /// <summary>
 /// Represents a reusable execution plan definition containing ordered steps.

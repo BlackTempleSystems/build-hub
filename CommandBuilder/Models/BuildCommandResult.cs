@@ -1,4 +1,4 @@
-﻿using BuildHub.CommandBuilder.Models.Execution;
+using BuildHub.CommandBuilder.Models.Execution;
 
 namespace BuildHub.CommandBuilder.Models;
 

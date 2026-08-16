@@ -1,4 +1,4 @@
-﻿namespace BuildHub.CommandBuilder.Models.Execution;
+namespace BuildHub.CommandBuilder.Models.Execution;
 
 public sealed record class ExecutionCommand
 {

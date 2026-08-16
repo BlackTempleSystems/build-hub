@@ -1,4 +1,4 @@
-﻿using BuildHub.CommandBuilder.Models;
+using BuildHub.CommandBuilder.Models;
 
 namespace TestProject.CommandBuilders.General
 {
